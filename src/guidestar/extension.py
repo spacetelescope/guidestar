@@ -24,7 +24,7 @@ def setup(app):
     app.add_css_file('guidestar-controls.css')
 
     return {
-        'version': '0.1.0',
+        'version': __import__('guidestar').__version__,
         'parallel_read_safe': True,
         'parallel_write_safe': True,
     }
