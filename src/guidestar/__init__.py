@@ -4,7 +4,7 @@ guidestar: Reusable wireframe demo infrastructure for Sphinx and standalone HTML
 
 try:
     from importlib.metadata import version
-    __version__ = version("guidestar")
+    __version__ = version("sphinx-guidestar")
 except Exception:
     __version__ = "unknown"
 

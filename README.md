@@ -11,7 +11,7 @@ demos step through a configurable sequence of actions, including optional transc
 ## Installation
 
 ```bash
-pip install guidestar
+pip install sphinx-guidestar
 ```
 
 Or for development:

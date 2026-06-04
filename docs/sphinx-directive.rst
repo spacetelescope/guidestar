@@ -74,7 +74,7 @@ to embed demos in its Sphinx documentation.
 
       # pyproject.toml
       [project.optional-dependencies]
-      docs = ["guidestar"]
+      docs = ["sphinx-guidestar"]
 
 2. Enable the extension in ``conf.py``:
 
