@@ -8,13 +8,13 @@ Install from source (or from PyPI once published):
 
 .. code-block:: bash
 
-   pip install docs-wireframe-demo
+   pip install guidestar
 
 For building documentation locally you will also need the theme:
 
 .. code-block:: bash
 
-   pip install docs-wireframe-demo[docs]
+   pip install guidestar[docs]
 
 
 Minimal Sphinx example
@@ -25,7 +25,7 @@ Minimal Sphinx example
    .. code-block:: python
 
       extensions = [
-          'docs_wireframe_demo',
+          'guidestar',
       ]
 
 2. Place your wireframe HTML in ``docs/_static/my-app.html``.
@@ -34,7 +34,7 @@ Minimal Sphinx example
 
    .. code-block:: rst
 
-      .. wireframe-demo:: _static/my-app.html
+      .. guidestar-demo:: _static/my-app.html
          :steps: #start-btn@1500:click, #panel@1000:toggle-class=open, #save-btn@2000:click
          :height: 400px
 
@@ -49,7 +49,7 @@ Minimal Sphinx example
 Live example
 ------------
 
-.. wireframe-demo:: _static/example-wireframe.html
+.. guidestar-demo:: _static/example-wireframe.html
    :steps: #demo-btn-1@1500:click|Click the first button, #demo-panel@1000:toggle-class=open|^Toggle the panel open, #demo-btn-2@1500:add-class=active|Activate the second button, #demo-input@1500:type-text=Hello World|Type into the input, #demo-btn-2@1500:remove-class=active, #demo-panel@1000:toggle-class=open|vClose the panel
    :height: 300px
    :repeat: true
@@ -65,11 +65,11 @@ No Sphinx needed — just include the JS and CSS files directly:
    <!DOCTYPE html>
    <html>
    <head>
-       <link rel="stylesheet" href="wireframe-demo-controls.css">
+       <link rel="stylesheet" href="guidestar-controls.css">
    </head>
    <body>
-       <div data-wireframe-demo
-            data-wireframe-config='{
+       <div data-guidestar
+            data-guidestar-config='{
               "htmlSrc": "my-app.html",
               "steps": [
                 {"target": "#btn", "action": "click", "delay": 1500, "caption": "Click the button"},
@@ -77,6 +77,6 @@ No Sphinx needed — just include the JS and CSS files directly:
               ]
             }'>
        </div>
-       <script src="wireframe-demo-controller.js"></script>
+       <script src="guidestar-controller.js"></script>
    </body>
    </html>

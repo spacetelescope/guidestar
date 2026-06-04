@@ -1,17 +1,17 @@
 /*
- * wireframe-demo-controls.css
+ * guidestar-controls.css
  *
  * Styles that must live in the main document (outside Shadow DOM)
  * because they target elements inside the consumer's HTML.
  *
  * The play/pause/restart button styles are inside the Shadow DOM
- * (see wireframe-demo-controller.js) and are themeable via CSS
+ * (see guidestar-controller.js) and are themeable via CSS
  * custom properties — see README for the full list.
  */
 
 /* ── Container base ──────────────────────────────────────────────── */
 
-[data-wireframe-demo] {
+[data-guidestar] {
     position: relative;
     overflow: hidden;
     isolation: isolate;
@@ -19,14 +19,14 @@
 
 /* ── Highlight animation applied to targeted elements ────────────── */
 
-@keyframes wfd-highlight-pulse {
+@keyframes gs-highlight-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.6); }
     70%  { box-shadow: 0 0 0 8px rgba(255, 152, 0, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
 }
 
-.wfd-highlight {
-    animation: wfd-highlight-pulse 0.8s ease-out;
+.gs-highlight {
+    animation: gs-highlight-pulse 0.8s ease-out;
     outline: 2px solid rgba(255, 152, 0, 0.7);
     outline-offset: 2px;
     border-radius: 2px;
@@ -36,28 +36,28 @@
 
 /*
  * Themeable via CSS custom properties:
- *   --wfd-caption-bg           Background (default: rgba(0,0,0,0.72))
- *   --wfd-caption-color        Text color (default: #fff)
- *   --wfd-caption-font-size    Font size (default: 14px)
- *   --wfd-caption-padding      Padding (default: 10px 16px)
- *   --wfd-caption-inset        Left & right inset — keeps the caption
+ *   --gs-caption-bg           Background (default: rgba(0,0,0,0.72))
+ *   --gs-caption-color        Text color (default: #fff)
+ *   --gs-caption-font-size    Font size (default: 14px)
+ *   --gs-caption-padding      Padding (default: 10px 16px)
+ *   --gs-caption-inset        Left & right inset — keeps the caption
  *                              clear of the control button (default: 68px)
  */
 
-.wfd-caption {
+.gs-caption {
     position: absolute;
-    left: var(--wfd-caption-inset, 68px);
-    right: var(--wfd-caption-inset, 68px);
+    left: var(--gs-caption-inset, 68px);
+    right: var(--gs-caption-inset, 68px);
     z-index: 9998;
-    min-height: var(--wfd-control-size, 44px);
+    min-height: var(--gs-control-size, 44px);
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 16px;
-    background: var(--wfd-caption-bg, rgba(0, 0, 0, 0.72));
-    color: var(--wfd-caption-color, #fff);
-    font-size: var(--wfd-caption-font-size, 14px);
+    background: var(--gs-caption-bg, rgba(0, 0, 0, 0.72));
+    color: var(--gs-caption-color, #fff);
+    font-size: var(--gs-caption-font-size, 14px);
     line-height: 1.4;
     text-align: center;
     pointer-events: none;
@@ -66,28 +66,28 @@
     transition: opacity 0.3s ease;
 }
 
-.wfd-caption--top {
+.gs-caption--top {
     top: 12px;
     bottom: auto;
 }
 
-.wfd-caption--bottom {
+.gs-caption--bottom {
     bottom: 34px;
     top: auto;
     transition: bottom 0.3s ease, opacity 0.3s ease;
 }
 
-.wfd-caption--bottom.wfd-caption--timeline-visible {
+.gs-caption--bottom.gs-caption--timeline-visible {
     bottom: 84px;
 }
 
-.wfd-caption--visible {
+.gs-caption--visible {
     opacity: 1;
 }
 
 /* ── Controls host positioning ───────────────────────────────────── */
 
-.wfd-controls-host {
+.gs-controls-host {
     position: absolute;
     bottom: 12px;
     right: 12px;
@@ -98,49 +98,49 @@
 
 /*
  * Themeable via CSS custom properties:
- *   --wfd-timeline-bg           Track background (default: rgba(0,0,0,0.5))
- *   --wfd-timeline-dot-color    Dot border & fill color (default: #fff)
- *   --wfd-timeline-dot-size     Dot diameter (default: 10px)
- *   --wfd-timeline-line-color   Connecting line color (default: rgba(255,255,255,0.3))
+ *   --gs-timeline-bg           Track background (default: rgba(0,0,0,0.5))
+ *   --gs-timeline-dot-color    Dot border & fill color (default: #fff)
+ *   --gs-timeline-dot-size     Dot diameter (default: 10px)
+ *   --gs-timeline-line-color   Connecting line color (default: rgba(255,255,255,0.3))
  */
 
-.wfd-timeline {
+.gs-timeline {
     position: absolute;
     bottom: 12px;
-    left: var(--wfd-caption-inset, 68px);
-    right: var(--wfd-caption-inset, 68px);
+    left: var(--gs-caption-inset, 68px);
+    right: var(--gs-caption-inset, 68px);
     z-index: 9999;
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 6px;
-    background: var(--wfd-timeline-bg, rgba(0, 0, 0, 0.5));
+    background: var(--gs-timeline-bg, rgba(0, 0, 0, 0.5));
     border-radius: 6px 6px 0 0;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
 }
 
-.wfd-timeline--visible {
+.gs-timeline--visible {
     opacity: 1;
     pointer-events: auto;
 }
 
 /* Connecting line behind dots */
-.wfd-timeline::before {
+.gs-timeline::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 12px;
     right: 12px;
     height: 2px;
-    background: var(--wfd-timeline-line-color, rgba(255, 255, 255, 0.3));
+    background: var(--gs-timeline-line-color, rgba(255, 255, 255, 0.3));
     transform: translateY(-50%);
     pointer-events: none;
 }
 
-.wfd-timeline__dot {
+.gs-timeline__dot {
     position: relative;
     width: 28px;
     height: 28px;
@@ -155,56 +155,56 @@
 }
 
 /* Visual dot circle rendered as pseudo-element */
-.wfd-timeline__dot::after {
+.gs-timeline__dot::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--wfd-timeline-dot-size, 10px);
-    height: var(--wfd-timeline-dot-size, 10px);
+    width: var(--gs-timeline-dot-size, 10px);
+    height: var(--gs-timeline-dot-size, 10px);
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 2px solid var(--wfd-timeline-dot-color, var(--wfd-control-color, #fff));
+    border: 2px solid var(--gs-timeline-dot-color, var(--gs-control-color, #fff));
     background: transparent;
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     pointer-events: none;
 }
 
-.wfd-timeline__dot:hover::after {
+.gs-timeline__dot:hover::after {
     transform: translate(-50%, -50%) scale(1.3);
 }
 
-.wfd-timeline__dot--filled::after {
-    background: var(--wfd-timeline-dot-color, var(--wfd-control-color, #fff));
+.gs-timeline__dot--filled::after {
+    background: var(--gs-timeline-dot-color, var(--gs-control-color, #fff));
 }
 
-.wfd-timeline__dot--current::after {
+.gs-timeline__dot--current::after {
     transform: translate(-50%, -50%) scale(1.3);
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
 }
 
-.wfd-timeline__dot--current:hover::after {
+.gs-timeline__dot--current:hover::after {
     transform: translate(-50%, -50%) scale(1.4);
 }
 
 /* ── Timeline dot hover tooltip ──────────────────────────────────── */
 
-.wfd-timeline-tooltip {
+.gs-timeline-tooltip {
     position: absolute;
     z-index: 10001;
     display: flex;
     align-items: center;
     gap: 2px;
     padding: 4px;
-    background: var(--wfd-control-bg, rgba(0, 0, 0, 0.55));
-    border-radius: var(--wfd-control-radius, 8px);
+    background: var(--gs-control-bg, rgba(0, 0, 0, 0.55));
+    border-radius: var(--gs-control-radius, 8px);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
 }
 
 /* Invisible bridge extending below the tooltip to cover the gap to the dot */
-.wfd-timeline-tooltip::after {
+.gs-timeline-tooltip::after {
     content: '';
     position: absolute;
     bottom: -10px;
@@ -213,18 +213,18 @@
     height: 10px;
 }
 
-.wfd-timeline-tooltip--visible {
+.gs-timeline-tooltip--visible {
     opacity: 1;
     pointer-events: auto;
 }
 
-.wfd-timeline-tooltip__btn {
+.gs-timeline-tooltip__btn {
     width: 28px;
     height: 28px;
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: var(--wfd-control-color, #fff);
+    color: var(--gs-control-color, #fff);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -233,39 +233,39 @@
     transition: background 0.15s ease;
 }
 
-.wfd-timeline-tooltip__btn[hidden] {
+.gs-timeline-tooltip__btn[hidden] {
     display: none;
 }
 
-.wfd-timeline-tooltip__btn:hover {
+.gs-timeline-tooltip__btn:hover {
     background: rgba(255, 255, 255, 0.15);
 }
 
-.wfd-timeline-tooltip__btn svg {
+.gs-timeline-tooltip__btn svg {
     width: 18px;
     height: 18px;
     fill: currentColor;
 }
 
-.wfd-timeline-tooltip__btn--play {
+.gs-timeline-tooltip__btn--play {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
 }
 
-.wfd-timeline-tooltip__btn--play:hover {
+.gs-timeline-tooltip__btn--play:hover {
     background: rgba(255, 255, 255, 0.25);
 }
 
 /* ── Restart overlay ─────────────────────────────────────────────────────── */
 
-@keyframes wfd-restart-expand {
+@keyframes gs-restart-expand {
     0%   { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(2.5); }
 }
 
-.wfd-restart-overlay {
+.gs-restart-overlay {
     position: absolute;
     inset: 0;
     z-index: 9990;
@@ -276,93 +276,93 @@
     opacity: 0;
 }
 
-.wfd-restart-overlay--active {
-    animation: wfd-restart-expand 0.7s ease-out forwards;
+.gs-restart-overlay--active {
+    animation: gs-restart-expand 0.7s ease-out forwards;
 }
 
-.wfd-restart-overlay__icon {
+.gs-restart-overlay__icon {
     width: 72px;
     height: 72px;
-    border-radius: var(--wfd-control-radius, 8px);
-    background: var(--wfd-control-bg, rgba(0, 0, 0, 0.3));
+    border-radius: var(--gs-control-radius, 8px);
+    background: var(--gs-control-bg, rgba(0, 0, 0, 0.3));
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.wfd-restart-overlay__icon svg {
+.gs-restart-overlay__icon svg {
     width: 40px;
     height: 40px;
-    fill: var(--wfd-control-color, #fff);
+    fill: var(--gs-control-color, #fff);
 }
 
 /* ── Focus indicators ────────────────────────────────────────────── */
 
-.wfd-timeline__dot:focus-visible {
-    outline: 2px solid var(--wfd-timeline-dot-color, var(--wfd-control-color, #fff));
+.gs-timeline__dot:focus-visible {
+    outline: 2px solid var(--gs-timeline-dot-color, var(--gs-control-color, #fff));
     outline-offset: 2px;
 }
 
-.wfd-timeline-tooltip__btn:focus-visible {
-    outline: 2px solid var(--wfd-control-color, #fff);
+.gs-timeline-tooltip__btn:focus-visible {
+    outline: 2px solid var(--gs-control-color, #fff);
     outline-offset: 1px;
 }
 
 /* ── Reduced motion ──────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-    .wfd-highlight {
+    .gs-highlight {
         animation: none;
     }
-    .wfd-caption {
+    .gs-caption {
         transition: none;
     }
-    .wfd-caption--bottom {
+    .gs-caption--bottom {
         transition: none;
     }
-    .wfd-timeline {
+    .gs-timeline {
         transition: none;
     }
-    .wfd-timeline__dot::after {
+    .gs-timeline__dot::after {
         transition: none;
     }
-    .wfd-timeline__dot:hover::after {
+    .gs-timeline__dot:hover::after {
         transform: translate(-50%, -50%);
     }
-    .wfd-timeline__dot--current::after {
+    .gs-timeline__dot--current::after {
         transform: translate(-50%, -50%);
     }
-    .wfd-timeline-tooltip {
+    .gs-timeline-tooltip {
         transition: none;
     }
-    .wfd-timeline-tooltip__btn {
+    .gs-timeline-tooltip__btn {
         transition: none;
     }
-    .wfd-restart-overlay--active {
+    .gs-restart-overlay--active {
         animation: none;
         opacity: 0;
     }
 }
 
 /* Config-driven reduced motion (reduceMotion: true) */
-.wfd-reduce-motion .wfd-highlight {
+.gs-reduce-motion .gs-highlight {
     animation: none;
 }
-.wfd-reduce-motion .wfd-caption,
-.wfd-reduce-motion .wfd-caption--bottom {
+.gs-reduce-motion .gs-caption,
+.gs-reduce-motion .gs-caption--bottom {
     transition: none;
 }
-.wfd-reduce-motion .wfd-timeline,
-.wfd-reduce-motion .wfd-timeline__dot::after,
-.wfd-reduce-motion .wfd-timeline-tooltip,
-.wfd-reduce-motion .wfd-timeline-tooltip__btn {
+.gs-reduce-motion .gs-timeline,
+.gs-reduce-motion .gs-timeline__dot::after,
+.gs-reduce-motion .gs-timeline-tooltip,
+.gs-reduce-motion .gs-timeline-tooltip__btn {
     transition: none;
 }
-.wfd-reduce-motion .wfd-timeline__dot:hover::after,
-.wfd-reduce-motion .wfd-timeline__dot--current::after {
+.gs-reduce-motion .gs-timeline__dot:hover::after,
+.gs-reduce-motion .gs-timeline__dot--current::after {
     transform: translate(-50%, -50%);
 }
-.wfd-reduce-motion .wfd-restart-overlay--active {
+.gs-reduce-motion .gs-restart-overlay--active {
     animation: none;
     opacity: 0;
 }

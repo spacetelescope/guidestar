@@ -4,8 +4,8 @@ Configuration Reference
 Config object
 -------------
 
-When creating a ``WireframeDemo`` programmatically or via the
-``data-wireframe-config`` attribute, the following properties are supported:
+When creating a ``Guidestar`` programmatically or via the
+``data-guidestar-config`` attribute, the following properties are supported:
 
 .. list-table::
    :header-rows: 1
@@ -291,8 +291,8 @@ Packages can register their own domain-specific actions:
 
 .. code-block:: javascript
 
-   WireframeDemo.registerAction('select-tab', function(step, el, contentRoot) {
-       // "this" is the WireframeDemo instance
+   Guidestar.registerAction('select-tab', function(step, el, contentRoot) {
+       // "this" is the Guidestar instance
        var tabs = contentRoot.querySelectorAll('.tab');
        tabs.forEach(function(tab) {
            tab.classList.remove('active');
@@ -307,7 +307,7 @@ The handler receives:
 - ``step`` — the full step object
 - ``el`` — the resolved target element (may be ``null``)
 - ``contentRoot`` — the container element holding the injected HTML
-- ``this`` — the ``WireframeDemo`` instance (access ``this.pause()``, ``this.play()``, etc.)
+- ``this`` — the ``Guidestar`` instance (access ``this.pause()``, ``this.play()``, etc.)
 
 
 Captions (transcript overlay)
@@ -379,7 +379,7 @@ Styling captions
 ^^^^^^^^^^^^^^^^
 
 Caption appearance is controlled via CSS custom properties set on the
-``[data-wireframe-demo]`` container:
+``[data-guidestar]`` container:
 
 .. list-table::
    :header-rows: 1
@@ -388,19 +388,19 @@ Caption appearance is controlled via CSS custom properties set on the
    * - Property
      - What it controls
      - Default
-   * - ``--wfd-caption-bg``
+   * - ``--gs-caption-bg``
      - Background color
      - ``rgba(0,0,0,0.72)``
-   * - ``--wfd-caption-color``
+   * - ``--gs-caption-color``
      - Text color
      - ``#fff``
-   * - ``--wfd-caption-font-size``
+   * - ``--gs-caption-font-size``
      - Font size
      - ``14px``
-   * - ``--wfd-caption-padding``
+   * - ``--gs-caption-padding``
      - Padding
      - ``10px 16px``
-   * - ``--wfd-caption-inset``
+   * - ``--gs-caption-inset``
      - Left & right inset — centres the caption and keeps it clear of the
        control button
      - ``68px``
@@ -409,8 +409,8 @@ Example:
 
 .. code-block:: css
 
-   [data-wireframe-demo] {
-       --wfd-caption-bg: rgba(0, 0, 80, 0.85);
-       --wfd-caption-font-size: 16px;
-       --wfd-caption-padding: 12px 20px;
+   [data-guidestar] {
+       --gs-caption-bg: rgba(0, 0, 80, 0.85);
+       --gs-caption-font-size: 16px;
+       --gs-caption-padding: 12px 20px;
    }

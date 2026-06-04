@@ -100,7 +100,7 @@ The GIF loops automatically and shows the full demo sequence.
 
 For example, the "kitchen-sink-short" demo GIF hosted on GitHub Pages:
 
-.. image:: https://spacetelescope.github.io/docs-wireframe-demo/kitchen-sink-short.gif
+.. image:: https://spacetelescope.github.io/guidestar/kitchen-sink-short.gif
    :alt: Kitchen Sink Short — animated GIF demo
    :width: 100%
 

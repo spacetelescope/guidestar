@@ -28,7 +28,7 @@ Add a single workflow file to your repository:
          models: read
        steps:
          - uses: actions/checkout@v4
-         - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+         - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
            env:
              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            with:
@@ -38,7 +38,7 @@ Add a single workflow file to your repository:
 That's it. The action will:
 
 1. **Auto-discover** all wireframe demos in your ``docs/`` directory by scanning for
-   ``.. wireframe-demo::`` directives in RST files and ``data-wireframe-demo``
+   ``.. guidestar-demo::`` directives in RST files and ``data-guidestar``
    attributes in HTML/Jinja templates.
 
 2. **Resolve** the wireframe HTML, CSS, and custom actions JS files by following
@@ -64,15 +64,15 @@ Auto-Discovery
 
 The action scans your ``docs-root`` directory recursively for wireframe demos:
 
-**RST files** — Finds ``.. wireframe-demo::`` directives and extracts:
+**RST files** — Finds ``.. guidestar-demo::`` directives and extracts:
 
 - The wireframe HTML path (the directive argument)
 - Step definitions from ``:steps:`` or ``:steps-json:`` options
 - Custom CSS/JS from ``:css:`` and ``:js:`` options
 
-**HTML/Jinja files** — Finds ``data-wireframe-demo`` attributes and extracts:
+**HTML/Jinja files** — Finds ``data-guidestar`` attributes and extracts:
 
-- The ``htmlSrc`` from the ``data-wireframe-config`` JSON
+- The ``htmlSrc`` from the ``data-guidestar-config`` JSON
 - Step definitions from the ``steps`` array in the config
 - Handles Jinja ``{{ pathto(...) }}`` expressions
 
@@ -109,7 +109,7 @@ require an LLM to detect:
 
 - **Action checks**: Every action name used in steps is verified against the
   list of built-in actions and any custom actions registered in the custom
-  actions JS file (detected via ``WireframeDemo.registerAction(...)`` calls).
+  actions JS file (detected via ``Guidestar.registerAction(...)`` calls).
 
 Validation issues are:
 
@@ -183,7 +183,7 @@ works out of the box for public repositories.
 
 .. code-block:: yaml
 
-   - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+   - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
      env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -195,7 +195,7 @@ OpenAI
 
 .. code-block:: yaml
 
-   - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+   - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
      env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      with:
@@ -209,7 +209,7 @@ Anthropic
 
 .. code-block:: yaml
 
-   - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+   - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
      env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      with:
@@ -258,7 +258,7 @@ Then reference it in your workflow:
 
 .. code-block:: yaml
 
-   - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+   - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
      env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      with:
@@ -272,7 +272,7 @@ Example: jdaviz
 ----------------
 
 For `jdaviz <https://github.com/spacetelescope/jdaviz>`_, which uses
-``data-wireframe-demo`` in a Jinja template with custom actions:
+``data-guidestar`` in a Jinja template with custom actions:
 
 .. code-block:: yaml
    :caption: ``.github/workflows/wireframe-review.yml``
@@ -290,7 +290,7 @@ For `jdaviz <https://github.com/spacetelescope/jdaviz>`_, which uses
          models: read
        steps:
          - uses: actions/checkout@v4
-         - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+         - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
            env:
              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            with:
@@ -379,7 +379,7 @@ targeting the PR branch whenever the LLM identifies needed wireframe changes:
 
 .. code-block:: yaml
 
-   - uses: spacetelescope/docs-wireframe-demo/.github/actions/wireframe-review@main
+   - uses: spacetelescope/guidestar/.github/actions/wireframe-review@main
      env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      with:

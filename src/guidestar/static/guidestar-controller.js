@@ -1,5 +1,5 @@
 /**
- * WireframeDemo — Generic interactive demo engine.
+ * Guidestar — Generic interactive demo engine.
  *
  * Fetches arbitrary HTML, injects it into a container, overlays play/pause/restart
  * controls (inside a Shadow DOM for style isolation), and steps through a
@@ -8,24 +8,24 @@
  * Supports multiple independent instances on the same page.
  *
  * Usage (declarative):
- *   <div data-wireframe-demo
- *        data-wireframe-config='{"htmlSrc":"app.html","steps":[...]}'>
+ *   <div data-guidestar
+ *        data-guidestar-config='{"htmlSrc":"app.html","steps":[...]}'>
  *   </div>
  *
  * Usage (programmatic):
- *   const demo = new WireframeDemo(element, { htmlSrc: 'app.html', steps: [...] });
+ *   const demo = new Guidestar(element, { htmlSrc: 'app.html', steps: [...] });
  */
 (function (root) {
     'use strict';
 
     // Guard: if already loaded, do not re-initialise.
-    if (root.WireframeDemo) { return; }
+    if (root.Guidestar) { return; }
 
     // ── Custom action registry (shared across all instances) ────────────
     // Stored on window so scripts that load before this one (or a second
     // load of this file) share the same registry.
-    var _customActions = root.__wireframeDemoActions || {};
-    root.__wireframeDemoActions = _customActions;
+    var _customActions = root.__guidestarActions || {};
+    root.__guidestarActions = _customActions;
 
     // ── Step parser ─────────────────────────────────────────────────────
 
@@ -176,135 +176,135 @@
     // ── Controls template (injected into Shadow DOM) ────────────────────
 
     // CSS custom properties (pierce Shadow DOM) for downstream theming:
-    //   --wfd-control-size          Button width & height (default: 44px)
-    //   --wfd-control-radius        Border-radius (default: 8px)
-    //   --wfd-control-bg            Background color (default: rgba(0,0,0,0.55))
-    //   --wfd-control-bg-hover      Background on hover (default: rgba(0,0,0,0.75))
-    //   --wfd-control-border        Border shorthand (default: none)
-    //   --wfd-control-color         Icon fill color (default: #fff)
-    //   --wfd-control-icon-size     SVG icon size (default: 22px)
-    //   --wfd-control-bottom        Bottom offset (default: 12px)
-    //   --wfd-control-right         Right offset (default: 12px)
-    //   --wfd-control-tooltip-bg    Tooltip background (default: rgba(0,0,0,0.8))
-    //   --wfd-control-tooltip-color Tooltip text color (default: #fff)
+    //   --gs-control-size          Button width & height (default: 44px)
+    //   --gs-control-radius        Border-radius (default: 8px)
+    //   --gs-control-bg            Background color (default: rgba(0,0,0,0.55))
+    //   --gs-control-bg-hover      Background on hover (default: rgba(0,0,0,0.75))
+    //   --gs-control-border        Border shorthand (default: none)
+    //   --gs-control-color         Icon fill color (default: #fff)
+    //   --gs-control-icon-size     SVG icon size (default: 22px)
+    //   --gs-control-bottom        Bottom offset (default: 12px)
+    //   --gs-control-right         Right offset (default: 12px)
+    //   --gs-control-tooltip-bg    Tooltip background (default: rgba(0,0,0,0.8))
+    //   --gs-control-tooltip-color Tooltip text color (default: #fff)
 
     var CONTROLS_CSS = [
         ':host {',
         '  display: flex; flex-direction: column; gap: 6px;',
         '  position: absolute;',
-        '  bottom: var(--wfd-control-bottom, 12px);',
-        '  right: var(--wfd-control-right, 12px);',
+        '  bottom: var(--gs-control-bottom, 12px);',
+        '  right: var(--gs-control-right, 12px);',
         '  z-index: 10000;',
         '  align-items: flex-end;',
         '}',
-        '@keyframes wfd-btn-pulse {',
+        '@keyframes gs-btn-pulse {',
         '  0%   { transform: scale(1); opacity: 0.5; }',
         '  100% { transform: scale(2); opacity: 0; }',
         '}',
-        '.wfd-control-btn {',
-        '  width: var(--wfd-control-size, 44px);',
-        '  height: var(--wfd-control-size, 44px);',
-        '  border-radius: var(--wfd-control-radius, 8px);',
-        '  border: var(--wfd-control-border, none);',
+        '.gs-control-btn {',
+        '  width: var(--gs-control-size, 44px);',
+        '  height: var(--gs-control-size, 44px);',
+        '  border-radius: var(--gs-control-radius, 8px);',
+        '  border: var(--gs-control-border, none);',
         '  padding: 0;',
-        '  background: var(--wfd-control-bg, rgba(0,0,0,0.55));',
-        '  color: var(--wfd-control-color, #fff);',
+        '  background: var(--gs-control-bg, rgba(0,0,0,0.55));',
+        '  color: var(--gs-control-color, #fff);',
         '  cursor: pointer;',
         '  display: flex; align-items: center; justify-content: center;',
         '  transition: background 0.2s, transform 0.2s;',
         '  position: relative;',
         '}',
-        '.wfd-control-btn::before {',
+        '.gs-control-btn::before {',
         '  content: ""; position: absolute; inset: 0;',
         '  border-radius: inherit;',
-        '  background: var(--wfd-control-color, #fff);',
+        '  background: var(--gs-control-color, #fff);',
         '  opacity: 0; pointer-events: none;',
         '}',
-        '.wfd-control-btn--pulse::before {',
-        '  animation: wfd-btn-pulse 0.5s ease-out;',
+        '.gs-control-btn--pulse::before {',
+        '  animation: gs-btn-pulse 0.5s ease-out;',
         '}',
-        '.wfd-control-btn:hover {',
-        '  background: var(--wfd-control-bg-hover, rgba(0,0,0,0.75));',
+        '.gs-control-btn:hover {',
+        '  background: var(--gs-control-bg-hover, rgba(0,0,0,0.75));',
         '  transform: scale(1.05);',
         '}',
-        '.wfd-control-btn svg {',
-        '  width: var(--wfd-control-icon-size, 22px);',
-        '  height: var(--wfd-control-icon-size, 22px);',
+        '.gs-control-btn svg {',
+        '  width: var(--gs-control-icon-size, 22px);',
+        '  height: var(--gs-control-icon-size, 22px);',
         '  fill: currentColor;',
         '}',
-        '.wfd-control-btn[hidden] { display: none; }',
-        '.wfd-control-btn::after {',
+        '.gs-control-btn[hidden] { display: none; }',
+        '.gs-control-btn::after {',
         '  content: attr(data-tooltip);',
         '  position: absolute; right: 100%; top: 50%;',
         '  transform: translateY(-50%);',
         '  margin-right: 8px;',
-        '  background: var(--wfd-control-tooltip-bg, rgba(0,0,0,0.8));',
-        '  color: var(--wfd-control-tooltip-color, #fff);',
+        '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
+        '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
-        '.wfd-control-btn:hover::after { opacity: 1; }',
+        '.gs-control-btn:hover::after { opacity: 1; }',
         /* Speed row — just the +/- buttons, fits in button width */
-        '.wfd-speed-row {',
+        '.gs-speed-row {',
         '  display: flex; align-items: center; gap: 4px;',
-        '  width: var(--wfd-control-size, 44px);',
+        '  width: var(--gs-control-size, 44px);',
         '  justify-content: center;',
         '  position: relative;',
         '  opacity: 0; pointer-events: none;',
         '  transition: opacity 0.2s;',
         '}',
-        ':host(:hover) .wfd-speed-row, .wfd-speed-row--visible { opacity: 1; pointer-events: auto; }',
-        '.wfd-control-btn--speed {',
+        ':host(:hover) .gs-speed-row, .gs-speed-row--visible { opacity: 1; pointer-events: auto; }',
+        '.gs-control-btn--speed {',
         '  width: 20px; height: 20px;',
-        '  border-radius: var(--wfd-control-radius, 8px);',
+        '  border-radius: var(--gs-control-radius, 8px);',
         '  flex-shrink: 0;',
         '  position: static;',
         '}',
-        '.wfd-control-btn--speed svg {',
+        '.gs-control-btn--speed svg {',
         '  width: 14px; height: 14px;',
         '}',
-        '.wfd-speed-row > .wfd-control-btn--speed::after {',
+        '.gs-speed-row > .gs-control-btn--speed::after {',
         '  display: none;',
         '}',
-        '.wfd-speed-tooltip {',
+        '.gs-speed-tooltip {',
         '  position: absolute; right: 100%; top: 50%;',
         '  transform: translateY(-50%);',
         '  margin-right: 8px;',
-        '  background: var(--wfd-control-tooltip-bg, rgba(0,0,0,0.8));',
-        '  color: var(--wfd-control-tooltip-color, #fff);',
+        '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
+        '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
-        '.wfd-speed-tooltip--visible { opacity: 1; }',
+        '.gs-speed-tooltip--visible { opacity: 1; }',
         /* Speed label below play button */
-        '.wfd-speed-label {',
+        '.gs-speed-label {',
         '  font-size: 11px; font-weight: 600;',
-        '  width: var(--wfd-control-size, 44px);',
+        '  width: var(--gs-control-size, 44px);',
         '  height: 16px; line-height: 16px;',
-        '  text-align: center; color: var(--wfd-control-color, #fff);',
-        '  background: var(--wfd-timeline-bg, rgba(0,0,0,0.5));',
-        '  border-radius: var(--wfd-control-radius, 8px);',
+        '  text-align: center; color: var(--gs-control-color, #fff);',
+        '  background: var(--gs-timeline-bg, rgba(0,0,0,0.5));',
+        '  border-radius: var(--gs-control-radius, 8px);',
         '  user-select: none;',
         '  opacity: 0; pointer-events: none;',
         '  transition: opacity 0.2s;',
         '}',
-        ':host(:hover) .wfd-speed-label, .wfd-speed-label--visible, .wfd-speed-label--nondefault { opacity: 1; }',
+        ':host(:hover) .gs-speed-label, .gs-speed-label--visible, .gs-speed-label--nondefault { opacity: 1; }',
         /* Focus indicators */
-        '.wfd-control-btn:focus-visible {',
-        '  outline: 2px solid var(--wfd-control-color, #fff);',
+        '.gs-control-btn:focus-visible {',
+        '  outline: 2px solid var(--gs-control-color, #fff);',
         '  outline-offset: 2px;',
         '}',
-        '.wfd-control-btn--speed:focus-visible {',
-        '  outline: 2px solid var(--wfd-control-color, #fff);',
+        '.gs-control-btn--speed:focus-visible {',
+        '  outline: 2px solid var(--gs-control-color, #fff);',
         '  outline-offset: 1px;',
         '}',
         /* Reduced motion inside Shadow DOM */
         '@media (prefers-reduced-motion: reduce) {',
-        '  .wfd-control-btn { transition: none; }',
-        '  .wfd-control-btn:hover { transform: none; }',
-        '  .wfd-control-btn--pulse::before { animation: none; }',
+        '  .gs-control-btn { transition: none; }',
+        '  .gs-control-btn:hover { transform: none; }',
+        '  .gs-control-btn--pulse::before { animation: none; }',
         '}'
     ].join('\n');
 
@@ -320,7 +320,7 @@
 
     function createControlsHost(instance) {
         var host = document.createElement('div');
-        host.className = 'wfd-controls-host';
+        host.className = 'gs-controls-host';
         var shadow = host.attachShadow({ mode: 'open' });
 
         var style = document.createElement('style');
@@ -329,7 +329,7 @@
 
         // Restart button (hidden while playing, shown when paused)
         var restartBtn = document.createElement('button');
-        restartBtn.className = 'wfd-control-btn wfd-control-btn--restart';
+        restartBtn.className = 'gs-control-btn gs-control-btn--restart';
         restartBtn.setAttribute('aria-label', 'Restart demo');
         restartBtn.setAttribute('data-tooltip', 'Restart');
         restartBtn.innerHTML = ICON_RESTART;
@@ -338,34 +338,34 @@
 
         // Speed controls row (just +/- buttons, no label)
         var speedRow = document.createElement('div');
-        speedRow.className = 'wfd-speed-row';
+        speedRow.className = 'gs-speed-row';
 
         var speedTooltip = document.createElement('span');
-        speedTooltip.className = 'wfd-speed-tooltip';
+        speedTooltip.className = 'gs-speed-tooltip';
 
         var slowBtn = document.createElement('button');
-        slowBtn.className = 'wfd-control-btn wfd-control-btn--speed';
+        slowBtn.className = 'gs-control-btn gs-control-btn--speed';
         slowBtn.setAttribute('aria-label', 'Slow down');
         slowBtn.innerHTML = ICON_SPEED_DOWN;
 
         var fastBtn = document.createElement('button');
-        fastBtn.className = 'wfd-control-btn wfd-control-btn--speed';
+        fastBtn.className = 'gs-control-btn gs-control-btn--speed';
         fastBtn.setAttribute('aria-label', 'Speed up');
         fastBtn.innerHTML = ICON_SPEED_UP;
 
         slowBtn.addEventListener('mouseenter', function () {
             speedTooltip.textContent = 'Slower';
-            speedTooltip.classList.add('wfd-speed-tooltip--visible');
+            speedTooltip.classList.add('gs-speed-tooltip--visible');
         });
         slowBtn.addEventListener('mouseleave', function () {
-            speedTooltip.classList.remove('wfd-speed-tooltip--visible');
+            speedTooltip.classList.remove('gs-speed-tooltip--visible');
         });
         fastBtn.addEventListener('mouseenter', function () {
             speedTooltip.textContent = 'Faster';
-            speedTooltip.classList.add('wfd-speed-tooltip--visible');
+            speedTooltip.classList.add('gs-speed-tooltip--visible');
         });
         fastBtn.addEventListener('mouseleave', function () {
-            speedTooltip.classList.remove('wfd-speed-tooltip--visible');
+            speedTooltip.classList.remove('gs-speed-tooltip--visible');
         });
 
         speedRow.appendChild(speedTooltip);
@@ -375,7 +375,7 @@
 
         // Primary button (pause while playing, play while paused)
         var primaryBtn = document.createElement('button');
-        primaryBtn.className = 'wfd-control-btn';
+        primaryBtn.className = 'gs-control-btn';
         primaryBtn.setAttribute('aria-label', 'Pause demo');
         primaryBtn.setAttribute('data-tooltip', 'Pause');
         primaryBtn.innerHTML = ICON_PAUSE;
@@ -383,7 +383,7 @@
 
         // Speed label below play button
         var speedLabel = document.createElement('span');
-        speedLabel.className = 'wfd-speed-label';
+        speedLabel.className = 'gs-speed-label';
         speedLabel.textContent = '1\u00d7';
         shadow.appendChild(speedLabel);
 
@@ -415,7 +415,7 @@
             speedLabel.textContent = instance._speedFactor + '\u00d7';
             slowBtn.style.visibility = instance._speedFactor <= SPEED_STEPS[0] ? 'hidden' : '';
             fastBtn.style.visibility = '';
-            speedLabel.classList.toggle('wfd-speed-label--nondefault', instance._speedFactor !== 1);
+            speedLabel.classList.toggle('gs-speed-label--nondefault', instance._speedFactor !== 1);
             instance._announce('Speed: ' + instance._speedFactor + 'x');
         });
 
@@ -431,7 +431,7 @@
             speedLabel.textContent = instance._speedFactor + '\u00d7';
             fastBtn.style.visibility = instance._speedFactor >= SPEED_STEPS[SPEED_STEPS.length - 1] ? 'hidden' : '';
             slowBtn.style.visibility = '';
-            speedLabel.classList.toggle('wfd-speed-label--nondefault', instance._speedFactor !== 1);
+            speedLabel.classList.toggle('gs-speed-label--nondefault', instance._speedFactor !== 1);
             instance._announce('Speed: ' + instance._speedFactor + 'x');
         });
 
@@ -451,13 +451,13 @@
         _highlightInjected = true;
         var s = document.createElement('style');
         s.textContent = [
-            '@keyframes wfd-highlight-pulse {',
+            '@keyframes gs-highlight-pulse {',
             '  0%   { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.6); }',
             '  70%  { box-shadow: 0 0 0 8px rgba(255, 152, 0, 0); }',
             '  100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }',
             '}',
-            '.wfd-highlight {',
-            '  animation: wfd-highlight-pulse 0.8s ease-out;',
+            '.gs-highlight {',
+            '  animation: gs-highlight-pulse 0.8s ease-out;',
             '  outline: 2px solid rgba(255, 152, 0, 0.7);',
             '  outline-offset: 2px;',
             '  border-radius: 2px;',
@@ -466,11 +466,11 @@
         document.head.appendChild(s);
     }
 
-    // ── WireframeDemo class ─────────────────────────────────────────────
+    // ── Guidestar class ─────────────────────────────────────────────
 
-    function WireframeDemo(container, config) {
-        if (!(this instanceof WireframeDemo)) {
-            return new WireframeDemo(container, config);
+    function Guidestar(container, config) {
+        if (!(this instanceof Guidestar)) {
+            return new Guidestar(container, config);
         }
 
         this.container = container;
@@ -526,12 +526,12 @@
         this._init();
     }
 
-    WireframeDemo.prototype._init = function () {
+    Guidestar.prototype._init = function () {
         var self = this;
         var container = this.container;
 
         // Mark initialised to prevent double-init
-        container.setAttribute('data-wireframe-initialized', 'true');
+        container.setAttribute('data-guidestar-initialized', 'true');
 
         // ── Accessibility setup ─────────────────────────────────────────
         if (!container.getAttribute('tabindex')) {
@@ -543,7 +543,7 @@
         // Reduced motion preference
         this._reduceMotion = this._shouldReduceMotion();
         if (this._reduceMotion) {
-            container.classList.add('wfd-reduce-motion');
+            container.classList.add('gs-reduce-motion');
         }
         if (typeof window.matchMedia === 'function') {
             var mql = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -551,9 +551,9 @@
                 mql.addEventListener('change', function () {
                     self._reduceMotion = self._shouldReduceMotion();
                     if (self._reduceMotion) {
-                        container.classList.add('wfd-reduce-motion');
+                        container.classList.add('gs-reduce-motion');
                     } else {
-                        container.classList.remove('wfd-reduce-motion');
+                        container.classList.remove('gs-reduce-motion');
                     }
                 });
             }
@@ -582,7 +582,7 @@
 
         // Create content root (where fetched HTML goes)
         this._contentRoot = document.createElement('div');
-        this._contentRoot.className = 'wfd-content';
+        this._contentRoot.className = 'gs-content';
         container.appendChild(this._contentRoot);
 
         // Create controls overlay (Shadow DOM)
@@ -608,9 +608,9 @@
             container.addEventListener('click', function (e) {
                 if (!e.isTrusted) return;
                 // Ignore clicks on the controls host, timeline, or tooltip
-                if (e.target.closest && e.target.closest('.wfd-controls-host')) return;
-                if (e.target.closest && e.target.closest('.wfd-timeline')) return;
-                if (e.target.closest && e.target.closest('.wfd-timeline-tooltip')) return;
+                if (e.target.closest && e.target.closest('.gs-controls-host')) return;
+                if (e.target.closest && e.target.closest('.gs-timeline')) return;
+                if (e.target.closest && e.target.closest('.gs-timeline-tooltip')) return;
                 if (self._playing) {
                     self._userPaused = true;
                     self._hideCursor();
@@ -644,7 +644,7 @@
         }
     };
 
-    WireframeDemo.prototype._loadHTML = function (src, callback) {
+    Guidestar.prototype._loadHTML = function (src, callback) {
         var self = this;
         fetch(src)
             .then(function (resp) {
@@ -654,7 +654,7 @@
             .then(function (html) {
                 self._contentRoot.innerHTML = html;
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)
-                document.dispatchEvent(new CustomEvent('wireframe-demo-loaded', {
+                document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: self.container, instance: self }
                 }));
                 // Run init steps silently, then snapshot the post-init state as the restart baseline
@@ -664,7 +664,7 @@
                 });
             })
             .catch(function (err) {
-                console.error('[WireframeDemo] ' + err.message);
+                console.error('[Guidestar] ' + err.message);
                 self._contentRoot.innerHTML =
                     '<p style="color:red;padding:16px;">Error loading demo HTML: ' + err.message + '</p>';
             });
@@ -672,10 +672,10 @@
 
     /**
      * Run initSteps synchronously (no delay, no highlight, no caption).
-     * Called after HTML loads and wireframe-demo-loaded has fired, before
+     * Called after HTML loads and guidestar-loaded has fired, before
      * _initialHTML is snapshotted and before _onReady()/autoStart.
      */
-    WireframeDemo.prototype._runInitSteps = function (done) {
+    Guidestar.prototype._runInitSteps = function (done) {
         var steps = this._initSteps || [];
         for (var i = 0; i < steps.length; i++) {
             var step = steps[i];
@@ -695,14 +695,14 @@
         if (done) done();
     };
 
-    WireframeDemo.prototype._onReady = function () {
+    Guidestar.prototype._onReady = function () {
         if (!this.config.autoStart || !this._steps.length) return;
         this._waitForVisible();
     };
 
     // ── Viewport gating via IntersectionObserver ────────────────────────
 
-    WireframeDemo.prototype._waitForVisible = function () {
+    Guidestar.prototype._waitForVisible = function () {
         var self = this;
         if (typeof IntersectionObserver === 'undefined') {
             // Fallback: start immediately
@@ -724,7 +724,7 @@
 
     // ── Accessibility helpers ───────────────────────────────────────────
 
-    WireframeDemo.prototype._shouldReduceMotion = function () {
+    Guidestar.prototype._shouldReduceMotion = function () {
         var cfg = this.config.reduceMotion;
         if (cfg === true) return true;
         if (cfg === false) return false;
@@ -735,25 +735,25 @@
         return false;
     };
 
-    WireframeDemo.prototype._createLiveRegion = function () {
+    Guidestar.prototype._createLiveRegion = function () {
         var el = document.createElement('div');
         el.setAttribute('aria-live', 'polite');
         el.setAttribute('aria-atomic', 'true');
-        el.className = 'wfd-sr-only';
+        el.className = 'gs-sr-only';
         el.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;'
             + 'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
         this.container.appendChild(el);
         this._liveRegion = el;
     };
 
-    WireframeDemo.prototype._announce = function (message) {
+    Guidestar.prototype._announce = function (message) {
         if (!this._liveRegion) return;
         var region = this._liveRegion;
         region.textContent = '';
         setTimeout(function () { region.textContent = message; }, 50);
     };
 
-    WireframeDemo.prototype._handleKeydown = function (e) {
+    Guidestar.prototype._handleKeydown = function (e) {
         // Don't intercept when focus is on form controls inside the demo
         var tag = e.target.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) {
@@ -807,7 +807,7 @@
         }
     };
 
-    WireframeDemo.prototype._adjustSpeed = function (direction) {
+    Guidestar.prototype._adjustSpeed = function (direction) {
         var SPEED_STEPS = [0.25, 0.5, 1, 2, 4];
         var cur = this._speedFactor;
         var newSpeed = cur;
@@ -825,7 +825,7 @@
             this._speedFactor = newSpeed;
             if (this._speedLabel) {
                 this._speedLabel.textContent = newSpeed + '\u00d7';
-                this._speedLabel.classList.toggle('wfd-speed-label--nondefault', newSpeed !== 1);
+                this._speedLabel.classList.toggle('gs-speed-label--nondefault', newSpeed !== 1);
             }
             this._announce('Speed: ' + newSpeed + 'x');
         }
@@ -833,7 +833,7 @@
 
     // ── Playback controls ───────────────────────────────────────────────
 
-    WireframeDemo.prototype.play = function () {
+    Guidestar.prototype.play = function () {
         if (this._playing) return;
         this._playing = true;
         this._started = true;
@@ -844,7 +844,7 @@
         this._runStep();
     };
 
-    WireframeDemo.prototype.pause = function () {
+    Guidestar.prototype.pause = function () {
         if (!this._playing) return;
         this._playing = false;
         if (this._timer) {
@@ -856,7 +856,7 @@
         this._announce('Paused at step ' + (this._stepIndex + 1) + ' of ' + this._steps.length);
     };
 
-    WireframeDemo.prototype.restart = function () {
+    Guidestar.prototype.restart = function () {
         this._userPaused = false;
         this.pause();
         this._showRestartOverlay();
@@ -872,7 +872,7 @@
             this._contentRoot.innerHTML = this._initialHTML;
             // Re-dispatch so external code (e.g. jdaviz-wireframe-actions)
             // can re-wire toolbar clicks, icons, etc.
-            document.dispatchEvent(new CustomEvent('wireframe-demo-loaded', {
+            document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                 detail: { container: this.container, instance: this }
             }));
         }
@@ -881,7 +881,7 @@
         this.play();
     };
 
-    WireframeDemo.prototype._updateControlBtn = function (pulse) {
+    Guidestar.prototype._updateControlBtn = function (pulse) {
         var btn = this._controlBtn;
         var restartBtn = this._restartBtn;
         if (!btn) return;
@@ -889,21 +889,21 @@
             btn.innerHTML = ICON_PAUSE;
             btn.setAttribute('aria-label', 'Pause demo');
             btn.setAttribute('data-tooltip', 'Pause');
-            btn.classList.remove('wfd-control-btn--pulse');
+            btn.classList.remove('gs-control-btn--pulse');
             if (restartBtn) restartBtn.hidden = true;
-            if (this._speedRow) this._speedRow.classList.remove('wfd-speed-row--visible');
-            if (this._speedLabel) this._speedLabel.classList.remove('wfd-speed-label--visible');
+            if (this._speedRow) this._speedRow.classList.remove('gs-speed-row--visible');
+            if (this._speedLabel) this._speedLabel.classList.remove('gs-speed-label--visible');
         } else {
             btn.innerHTML = ICON_PLAY;
             btn.setAttribute('aria-label', 'Play demo');
             btn.setAttribute('data-tooltip', 'Play');
             if (restartBtn) restartBtn.hidden = false;
-            if (this._speedRow) this._speedRow.classList.add('wfd-speed-row--visible');
-            if (this._speedLabel) this._speedLabel.classList.add('wfd-speed-label--visible');
+            if (this._speedRow) this._speedRow.classList.add('gs-speed-row--visible');
+            if (this._speedLabel) this._speedLabel.classList.add('gs-speed-label--visible');
             if (pulse) {
-                btn.classList.remove('wfd-control-btn--pulse');
+                btn.classList.remove('gs-control-btn--pulse');
                 void btn.offsetWidth;
-                btn.classList.add('wfd-control-btn--pulse');
+                btn.classList.add('gs-control-btn--pulse');
             }
         }
     };
@@ -914,9 +914,9 @@
         + '<path d="M5 3l14 8-7 2-3 7z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>'
         + '</svg>';
 
-    WireframeDemo.prototype._createCursor = function () {
+    Guidestar.prototype._createCursor = function () {
         var el = document.createElement('div');
-        el.className = 'wfd-cursor';
+        el.className = 'gs-cursor';
         el.innerHTML = CURSOR_SVG;
         el.style.cssText = 'position:absolute;z-index:9999;pointer-events:none;'
             + 'top:0;left:0;width:20px;height:20px;opacity:0;'
@@ -933,7 +933,7 @@
     // Ease-out cubic: fast departure, gentle arrival (like a real hand)
     function _easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-    WireframeDemo.prototype._moveCursorTo = function (el, callback) {
+    Guidestar.prototype._moveCursorTo = function (el, callback) {
         if (!this._cursorEl || !el) {
             if (callback) callback();
             return;
@@ -1010,13 +1010,13 @@
         this._cursorAnim = requestAnimationFrame(tick);
     };
 
-    WireframeDemo.prototype._hideCursor = function () {
+    Guidestar.prototype._hideCursor = function () {
         if (this._cursorEl) {
             this._cursorEl.style.opacity = '0';
         }
     };
 
-    WireframeDemo.prototype._resetCursor = function () {
+    Guidestar.prototype._resetCursor = function () {
         if (!this._cursorEl) return;
         if (this._cursorAnim) {
             cancelAnimationFrame(this._cursorAnim);
@@ -1031,35 +1031,35 @@
 
     // ── Restart overlay ──────────────────────────────────────────────────────
 
-    WireframeDemo.prototype._createRestartOverlay = function () {
+    Guidestar.prototype._createRestartOverlay = function () {
         var el = document.createElement('div');
-        el.className = 'wfd-restart-overlay';
+        el.className = 'gs-restart-overlay';
         var iconWrap = document.createElement('div');
-        iconWrap.className = 'wfd-restart-overlay__icon';
+        iconWrap.className = 'gs-restart-overlay__icon';
         iconWrap.innerHTML = ICON_RESTART;
         el.appendChild(iconWrap);
         this.container.appendChild(el);
         this._restartOverlay = el;
     };
 
-    WireframeDemo.prototype._showRestartOverlay = function () {
+    Guidestar.prototype._showRestartOverlay = function () {
         if (!this._restartOverlay || this._reduceMotion) return;
         var overlay = this._restartOverlay;
-        overlay.classList.remove('wfd-restart-overlay--active');
+        overlay.classList.remove('gs-restart-overlay--active');
         void overlay.offsetWidth;
-        overlay.classList.add('wfd-restart-overlay--active');
+        overlay.classList.add('gs-restart-overlay--active');
     };
 
     // ── Caption overlay ───────────────────────────────────────────────────────
 
-    WireframeDemo.prototype._createCaption = function () {
+    Guidestar.prototype._createCaption = function () {
         var el = document.createElement('div');
-        el.className = 'wfd-caption';
+        el.className = 'gs-caption';
         this.container.appendChild(el);
         this._captionEl = el;
     };
 
-    WireframeDemo.prototype._showCaption = function (step, el) {
+    Guidestar.prototype._showCaption = function (step, el) {
         var captionEl = this._captionEl;
         if (!captionEl) return;
 
@@ -1096,8 +1096,8 @@
         }
 
         // Apply position class
-        captionEl.classList.remove('wfd-caption--top', 'wfd-caption--bottom');
-        captionEl.classList.add(position === 'top' ? 'wfd-caption--top' : 'wfd-caption--bottom');
+        captionEl.classList.remove('gs-caption--top', 'gs-caption--bottom');
+        captionEl.classList.add(position === 'top' ? 'gs-caption--top' : 'gs-caption--bottom');
 
         // Apply optional custom class
         if (opts.className) {
@@ -1109,25 +1109,25 @@
         captionEl.textContent = step.caption;
 
         // Show
-        captionEl.classList.add('wfd-caption--visible');
+        captionEl.classList.add('gs-caption--visible');
 
         // Announce for screen readers
         this._announce(step.caption);
     };
 
-    WireframeDemo.prototype._hideCaption = function () {
+    Guidestar.prototype._hideCaption = function () {
         if (!this._captionEl) return;
-        this._captionEl.classList.remove('wfd-caption--visible');
+        this._captionEl.classList.remove('gs-caption--visible');
     };
 
-    WireframeDemo.prototype._showCaptionForStep = function (stepIndex) {
+    Guidestar.prototype._showCaptionForStep = function (stepIndex) {
         if (!this._captionEl) return;
         var step = this._steps[stepIndex];
         if (step && step.caption) {
-            this._captionEl.classList.remove('wfd-caption--top', 'wfd-caption--bottom');
-            this._captionEl.classList.add('wfd-caption--bottom');
+            this._captionEl.classList.remove('gs-caption--top', 'gs-caption--bottom');
+            this._captionEl.classList.add('gs-caption--bottom');
             this._captionEl.textContent = step.caption;
-            this._captionEl.classList.add('wfd-caption--visible');
+            this._captionEl.classList.add('gs-caption--visible');
         } else {
             this._hideCaption();
         }
@@ -1135,20 +1135,20 @@
 
     // ── Timeline overlay ────────────────────────────────────────────────
 
-    WireframeDemo.prototype._createTimeline = function () {
+    Guidestar.prototype._createTimeline = function () {
         if (this.config.timeline === false) return;
         if (this._steps.length <= 1) return;
 
         var self = this;
         var el = document.createElement('div');
-        el.className = 'wfd-timeline';
+        el.className = 'gs-timeline';
         el.setAttribute('role', 'group');
         el.setAttribute('aria-label', 'Demo steps');
         this._timelineDots = [];
 
         for (var i = 0; i < this._steps.length; i++) {
             var dot = document.createElement('button');
-            dot.className = 'wfd-timeline__dot';
+            dot.className = 'gs-timeline__dot';
             dot.setAttribute('data-step-index', String(i));
             if (this._steps[i].caption) {
                 dot.setAttribute('data-caption', this._steps[i].caption);
@@ -1160,20 +1160,20 @@
 
         // ── Dot hover tooltip with mini playback controls ───────────
         var tooltip = document.createElement('div');
-        tooltip.className = 'wfd-timeline-tooltip';
+        tooltip.className = 'gs-timeline-tooltip';
 
         var ttBack = document.createElement('button');
-        ttBack.className = 'wfd-timeline-tooltip__btn';
+        ttBack.className = 'gs-timeline-tooltip__btn';
         ttBack.setAttribute('aria-label', 'Step back');
         ttBack.innerHTML = ICON_STEP_BACK;
 
         var ttPlay = document.createElement('button');
-        ttPlay.className = 'wfd-timeline-tooltip__btn wfd-timeline-tooltip__btn--play';
+        ttPlay.className = 'gs-timeline-tooltip__btn gs-timeline-tooltip__btn--play';
         ttPlay.setAttribute('aria-label', 'Play from here');
         ttPlay.innerHTML = ICON_PLAY;
 
         var ttForward = document.createElement('button');
-        ttForward.className = 'wfd-timeline-tooltip__btn';
+        ttForward.className = 'gs-timeline-tooltip__btn';
         ttForward.setAttribute('aria-label', 'Step forward');
         ttForward.innerHTML = ICON_STEP_FORWARD;
 
@@ -1250,7 +1250,7 @@
         // Click-to-jump (event delegation on dots)
         el.addEventListener('click', function (e) {
             e.stopPropagation(); // prevent pauseOnInteraction
-            var dotEl = e.target.closest ? e.target.closest('.wfd-timeline__dot') : null;
+            var dotEl = e.target.closest ? e.target.closest('.gs-timeline__dot') : null;
             if (!dotEl) return;
             var idx = parseInt(dotEl.getAttribute('data-step-index'), 10);
             if (isNaN(idx)) return;
@@ -1263,7 +1263,7 @@
 
         // Dot hover → show tooltip + caption preview
         el.addEventListener('mouseenter', function (e) {
-            var dotEl = e.target.closest ? e.target.closest('.wfd-timeline__dot') : null;
+            var dotEl = e.target.closest ? e.target.closest('.gs-timeline__dot') : null;
             if (!dotEl) return;
             self._cancelTooltipHide();
             self._timelineHovering = true;
@@ -1275,17 +1275,17 @@
             }
             var captionText = dotEl.getAttribute('data-caption');
             if (captionText && self._captionEl) {
-                self._captionEl.classList.remove('wfd-caption--top', 'wfd-caption--bottom');
-                self._captionEl.classList.add('wfd-caption--bottom');
+                self._captionEl.classList.remove('gs-caption--top', 'gs-caption--bottom');
+                self._captionEl.classList.add('gs-caption--bottom');
                 self._captionEl.textContent = captionText;
-                self._captionEl.classList.add('wfd-caption--visible');
+                self._captionEl.classList.add('gs-caption--visible');
             } else {
                 self._hideCaption();
             }
         }, true);
 
         el.addEventListener('mouseleave', function (e) {
-            var dotEl = e.target.closest ? e.target.closest('.wfd-timeline__dot') : null;
+            var dotEl = e.target.closest ? e.target.closest('.gs-timeline__dot') : null;
             if (!dotEl) return;
             self._scheduleTooltipHide();
         }, true);
@@ -1298,7 +1298,7 @@
         // Hide tooltip when mouse leaves it
         tooltip.addEventListener('mouseleave', function (e) {
             var related = e.relatedTarget;
-            if (related && related.closest && related.closest('.wfd-timeline__dot')) {
+            if (related && related.closest && related.closest('.gs-timeline__dot')) {
                 return;
             }
             self._scheduleTooltipHide();
@@ -1312,10 +1312,10 @@
             }
             if (self._userPaused) return;
             if (self._timelineEl) {
-                self._timelineEl.classList.add('wfd-timeline--visible');
+                self._timelineEl.classList.add('gs-timeline--visible');
             }
             if (self._captionEl) {
-                self._captionEl.classList.add('wfd-caption--timeline-visible');
+                self._captionEl.classList.add('gs-caption--timeline-visible');
             }
         });
 
@@ -1323,10 +1323,10 @@
             self._timelineLeaveTimer = setTimeout(function () {
                 self._timelineLeaveTimer = null;
                 if (self._timelineEl) {
-                    self._timelineEl.classList.remove('wfd-timeline--visible');
+                    self._timelineEl.classList.remove('gs-timeline--visible');
                 }
                 if (self._captionEl) {
-                    self._captionEl.classList.remove('wfd-caption--timeline-visible');
+                    self._captionEl.classList.remove('gs-caption--timeline-visible');
                 }
                 self._timelineHovering = false;
                 self._hideTooltip();
@@ -1344,21 +1344,21 @@
      * Show the tooltip centered above a specific dot.
      * Called on fresh dot hover (before any button click).
      */
-    WireframeDemo.prototype._showTooltipAtDot = function (dotEl, stepIndex) {
+    Guidestar.prototype._showTooltipAtDot = function (dotEl, stepIndex) {
         var tooltip = this._tooltipEl;
         if (!tooltip) return;
         this._tooltipDotIndex = stepIndex;
         this._tooltipDotEl = dotEl;
 
         this._updateTooltipButtons();
-        tooltip.classList.add('wfd-timeline-tooltip--visible');
+        tooltip.classList.add('gs-timeline-tooltip--visible');
         this._repositionTooltip();
     };
 
     /**
      * After a button click, re-anchor the tooltip to the current step.
      */
-    WireframeDemo.prototype._anchorTooltipToCurrentStep = function () {
+    Guidestar.prototype._anchorTooltipToCurrentStep = function () {
         var idx = this._stepIndex;
         var dotEl = this._timelineDots[idx];
         if (dotEl) {
@@ -1369,7 +1369,7 @@
         this._repositionTooltip();
     };
 
-    WireframeDemo.prototype._updateTooltipButtons = function () {
+    Guidestar.prototype._updateTooltipButtons = function () {
         if (!this._tooltipPlayBtn) return;
 
         // Play/pause icon
@@ -1398,7 +1398,7 @@
         }
     };
 
-    WireframeDemo.prototype._repositionTooltip = function () {
+    Guidestar.prototype._repositionTooltip = function () {
         var tooltip = this._tooltipEl;
         var dotEl = this._tooltipDotEl;
         if (!tooltip || !dotEl) return;
@@ -1419,21 +1419,21 @@
      * Called from play()/pause() to keep tooltip in sync with playback state.
      * Updates button icons/visibility in place without moving the tooltip.
      */
-    WireframeDemo.prototype._updateTooltip = function () {
+    Guidestar.prototype._updateTooltip = function () {
         if (!this._tooltipEl || this._tooltipDotIndex < 0) return;
         this._updateTooltipButtons();
         this._repositionTooltip(); // re-measure in case button count changed tooltip width
     };
 
-    WireframeDemo.prototype._hideTooltip = function () {
+    Guidestar.prototype._hideTooltip = function () {
         if (!this._tooltipEl) return;
-        this._tooltipEl.classList.remove('wfd-timeline-tooltip--visible');
+        this._tooltipEl.classList.remove('gs-timeline-tooltip--visible');
         this._tooltipDotIndex = -1;
         this._tooltipDotEl = null;
         this._tooltipActivated = false;
     };
 
-    WireframeDemo.prototype._scheduleTooltipHide = function () {
+    Guidestar.prototype._scheduleTooltipHide = function () {
         var self = this;
         this._cancelTooltipHide();
         this._tooltipHideTimer = setTimeout(function () {
@@ -1454,27 +1454,27 @@
         }, 120);
     };
 
-    WireframeDemo.prototype._cancelTooltipHide = function () {
+    Guidestar.prototype._cancelTooltipHide = function () {
         if (this._tooltipHideTimer) {
             clearTimeout(this._tooltipHideTimer);
             this._tooltipHideTimer = null;
         }
     };
 
-    WireframeDemo.prototype._updateTimelineDots = function () {
+    Guidestar.prototype._updateTimelineDots = function () {
         if (!this._timelineDots.length) return;
         for (var i = 0; i < this._timelineDots.length; i++) {
             var dot = this._timelineDots[i];
             if (i <= this._stepIndex) {
-                dot.classList.add('wfd-timeline__dot--filled');
+                dot.classList.add('gs-timeline__dot--filled');
             } else {
-                dot.classList.remove('wfd-timeline__dot--filled');
+                dot.classList.remove('gs-timeline__dot--filled');
             }
             if (i === this._stepIndex) {
-                dot.classList.add('wfd-timeline__dot--current');
+                dot.classList.add('gs-timeline__dot--current');
                 dot.setAttribute('aria-current', 'step');
             } else {
-                dot.classList.remove('wfd-timeline__dot--current');
+                dot.classList.remove('gs-timeline__dot--current');
                 dot.removeAttribute('aria-current');
             }
         }
@@ -1487,7 +1487,7 @@
      * _stepIndex there, then visually play that step (cursor, caption,
      * highlight) so the user sees what that step does.
      */
-    WireframeDemo.prototype.jumpToStep = function (targetIndex) {
+    Guidestar.prototype.jumpToStep = function (targetIndex) {
         if (targetIndex < 0 || targetIndex >= this._steps.length) return;
         if (targetIndex === this._stepIndex && !this._playing) return;
 
@@ -1574,11 +1574,11 @@
      * Restore the content DOM to the state just before the given step
      * index by using cached snapshots or replaying from initial HTML.
      */
-    WireframeDemo.prototype._restoreDOMBeforeStep = function (targetIndex) {
+    Guidestar.prototype._restoreDOMBeforeStep = function (targetIndex) {
         if (this._htmlSnapshots[targetIndex]) {
             // Direct snapshot exists for this step — use it
             this._contentRoot.innerHTML = this._htmlSnapshots[targetIndex];
-            document.dispatchEvent(new CustomEvent('wireframe-demo-loaded', {
+            document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                 detail: { container: this.container, instance: this }
             }));
         } else {
@@ -1595,7 +1595,7 @@
             } else if (this._initialHTML !== undefined) {
                 this._contentRoot.innerHTML = this._initialHTML;
             }
-            document.dispatchEvent(new CustomEvent('wireframe-demo-loaded', {
+            document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                 detail: { container: this.container, instance: this }
             }));
             // Replay steps from restoreFrom (or 0) up to targetIndex-1
@@ -1628,7 +1628,7 @@
 
     // ── Step execution engine ───────────────────────────────────────────
 
-    WireframeDemo.prototype._runStep = function () {
+    Guidestar.prototype._runStep = function () {
         if (!this._playing) return;
         if (this._stepIndex >= this._steps.length) {
             this._onSequenceEnd();
@@ -1706,7 +1706,7 @@
         }
     };
 
-    WireframeDemo.prototype._onSequenceEnd = function () {
+    Guidestar.prototype._onSequenceEnd = function () {
         this._clearHighlights();
         this._hideCaption();
         if (this.config.onComplete) {
@@ -1720,7 +1720,7 @@
             // Restore the content DOM to its initial state before replaying
             if (this._initialHTML !== undefined) {
                 this._contentRoot.innerHTML = this._initialHTML;
-                document.dispatchEvent(new CustomEvent('wireframe-demo-loaded', {
+                document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: this.container, instance: this }
                 }));
             }
@@ -1739,7 +1739,7 @@
         }
     };
 
-    WireframeDemo.prototype._executeAction = function (step, el, callback) {
+    Guidestar.prototype._executeAction = function (step, el, callback) {
         // Multi-action step: execute sub-actions, optionally with delays between them
         if (step.actions && Array.isArray(step.actions)) {
             var self = this;
@@ -1791,7 +1791,7 @@
         this._executeSingleAction(step.action, step.value, el, step, callback);
     };
 
-    WireframeDemo.prototype._executeSingleAction = function (action, value, el, step, callback) {
+    Guidestar.prototype._executeSingleAction = function (action, value, el, step, callback) {
 
         // Check custom actions first
         if (_customActions[action]) {
@@ -1912,28 +1912,28 @@
                 break;
 
             default:
-                console.warn('[WireframeDemo] Unknown action: ' + action);
+                console.warn('[Guidestar] Unknown action: ' + action);
         }
         if (callback) callback();
     };
 
     // ── Highlight helpers ───────────────────────────────────────────────
 
-    WireframeDemo.prototype._highlight = function (el, duration) {
+    Guidestar.prototype._highlight = function (el, duration) {
         var self = this;
-        el.classList.add('wfd-highlight');
+        el.classList.add('gs-highlight');
         this._highlightedEls.push(el);
         var dur = Math.max(duration - 200, 400);
         setTimeout(function () {
-            el.classList.remove('wfd-highlight');
+            el.classList.remove('gs-highlight');
             var idx = self._highlightedEls.indexOf(el);
             if (idx !== -1) self._highlightedEls.splice(idx, 1);
         }, dur);
     };
 
-    WireframeDemo.prototype._clearHighlights = function () {
+    Guidestar.prototype._clearHighlights = function () {
         for (var i = 0; i < this._highlightedEls.length; i++) {
-            this._highlightedEls[i].classList.remove('wfd-highlight');
+            this._highlightedEls[i].classList.remove('gs-highlight');
         }
         this._highlightedEls = [];
     };
@@ -1951,7 +1951,7 @@
      * Sets .value for input/textarea elements, .textContent otherwise.
      * Dispatches "input" events on each keystroke for inputs.
      */
-    WireframeDemo.prototype._typeText = function (el, text, step, callback) {
+    Guidestar.prototype._typeText = function (el, text, step, callback) {
         var self = this;
         var isInput = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA');
         var baseDelay = typeof step.delay === 'number' ? step.delay : 2000;
@@ -2036,7 +2036,7 @@
 
     // ── Cleanup ─────────────────────────────────────────────────────────
 
-    WireframeDemo.prototype.destroy = function () {
+    Guidestar.prototype.destroy = function () {
         this.pause();
         this._clearHighlights();
         this._hideCaption();
@@ -2067,7 +2067,7 @@
             this._restartOverlay = null;
         }
         this._htmlSnapshots = [];
-        this.container.removeAttribute('data-wireframe-initialized');
+        this.container.removeAttribute('data-guidestar-initialized');
     };
 
     // ── Static: register custom action ──────────────────────────────────
@@ -2078,34 +2078,34 @@
      * @param {string}   name    Action name (e.g. "select-tab")
      * @param {Function} handler Called as handler.call(instance, step, el, contentRoot)
      */
-    WireframeDemo.registerAction = function (name, handler) {
+    Guidestar.registerAction = function (name, handler) {
         _customActions[name] = handler;
     };
 
     // ── Export ───────────────────────────────────────────────────────────
 
-    root.WireframeDemo = WireframeDemo;
+    root.Guidestar = Guidestar;
 
-    // Signal that WireframeDemo is available for action registration.
+    // Signal that Guidestar is available for action registration.
     // Scripts loaded before the controller (e.g. directive :js: files) can
     // listen for this event to register custom actions before auto-discover.
-    document.dispatchEvent(new CustomEvent('wireframe-demo-ready'));
+    document.dispatchEvent(new CustomEvent('guidestar-ready'));
 
     // ── Auto-discovery ──────────────────────────────────────────────────
 
     function autoDiscover() {
         var containers = document.querySelectorAll(
-            '[data-wireframe-demo]:not([data-wireframe-initialized])'
+            '[data-guidestar]:not([data-guidestar-initialized])'
         );
         for (var i = 0; i < containers.length; i++) {
             var el = containers[i];
-            var configAttr = el.getAttribute('data-wireframe-config');
+            var configAttr = el.getAttribute('data-guidestar-config');
             var config = {};
             if (configAttr) {
                 try { config = JSON.parse(configAttr); }
-                catch (e) { console.error('[WireframeDemo] Bad config JSON:', e); }
+                catch (e) { console.error('[Guidestar] Bad config JSON:', e); }
             }
-            new WireframeDemo(el, config);
+            new Guidestar(el, config);
         }
     }
 
@@ -2115,6 +2115,6 @@
     } else {
         autoDiscover();
     }
-    document.addEventListener('wireframe-demo-loaded', autoDiscover);
+    document.addEventListener('guidestar-loaded', autoDiscover);
 
 })(typeof window !== 'undefined' ? window : this);

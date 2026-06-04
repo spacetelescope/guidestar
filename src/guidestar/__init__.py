@@ -1,5 +1,5 @@
 """
-docs-wireframe-demo: Reusable wireframe demo infrastructure for Sphinx and standalone HTML.
+guidestar: Reusable wireframe demo infrastructure for Sphinx and standalone HTML.
 """
 
 __version__ = "0.1.0"

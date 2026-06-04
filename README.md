@@ -1,20 +1,23 @@
-# docs-wireframe-demo
+# guidestar
 
-A reusable Sphinx extension for embedding interactive wireframe demos in
-documentation. Fetches arbitrary HTML into a container, overlays
-play/pause/restart controls, and steps through a configurable sequence of
-actions (clicks, class toggles, custom handlers, …).
+<img src="src/guidestar/static/guidestar-logo.png" alt="Guidestar" width="160">
+
+A set of tools to help keep demos and documentation up to date with the source code 
+of a package.  This includes a reusable Sphinx extension for embedding interactive wireframe demos into the documentation as well as a GitHub action workflow which helps to ensure the wireframe and scripts themselves stay in sync with changes to the source code.  The rendered
+demos step through a configurable sequence of actions, including optional transcripts, and provides play/pause/start controls.
+
+**Disclaimer**: this project was largely developed using agentic AI assistants.
 
 ## Installation
 
 ```bash
-pip install docs-wireframe-demo
+pip install guidestar
 ```
 
 Or for development:
 
 ```bash
-pip install -e /path/to/docs-wireframe-demo
+pip install -e /path/to/guidestar
 ```
 
 ## Quick start
@@ -23,14 +26,14 @@ Enable the extension in your Sphinx `conf.py`:
 
 ```python
 extensions = [
-    "docs_wireframe_demo",
+    "guidestar",
 ]
 ```
 
 Then use the directive in any RST file:
 
 ```rst
-.. wireframe-demo:: _static/my-app.html
+.. guidestar-demo:: _static/my-app.html
    :steps: #btn@1500:click, .panel@1000:toggle-class=open
    :repeat: true
    :height: 500px
@@ -110,8 +113,8 @@ it to the **bottom**. Without a prefix the position is chosen automatically
 Register custom actions from a separate JS file loaded via the `:js:` option:
 
 ```js
-WireframeDemo.registerAction('my-action', function (step, el, contentRoot) {
-    // `this` is the WireframeDemo instance
+Guidestar.registerAction('my-action', function (step, el, contentRoot) {
+    // `this` is the Guidestar instance
     // `step` has .target, .action, .value, .delay
     // `el` is the resolved DOM element (or null)
     // `contentRoot` is the container holding the fetched HTML
@@ -122,24 +125,24 @@ WireframeDemo.registerAction('my-action', function (step, el, contentRoot) {
 
 The play/pause/restart button lives inside a Shadow DOM for style isolation.
 It exposes **CSS custom properties** that you can set on the
-`[data-wireframe-demo]` container (or any ancestor) to theme the button
+`[data-guidestar]` container (or any ancestor) to theme the button
 without breaking encapsulation.
 
 ### Available custom properties
 
 | Custom property              | What it controls           | Default                 |
 | ---------------------------- | -------------------------- | ----------------------- |
-| `--wfd-control-size`         | Button width & height      | `44px`                  |
-| `--wfd-control-radius`       | Border-radius              | `8px`                   |
-| `--wfd-control-bg`           | Background color           | `rgba(0,0,0,0.55)`     |
-| `--wfd-control-bg-hover`     | Background on hover        | `rgba(0,0,0,0.75)`     |
-| `--wfd-control-border`       | Border shorthand           | `none`                  |
-| `--wfd-control-color`        | Icon / text color          | `#fff`                  |
-| `--wfd-control-icon-size`    | SVG icon width & height    | `22px`                  |
-| `--wfd-control-bottom`       | Bottom offset              | `12px`                  |
-| `--wfd-control-right`        | Right offset               | `12px`                  |
-| `--wfd-control-tooltip-bg`   | Tooltip background         | `rgba(0,0,0,0.8)`      |
-| `--wfd-control-tooltip-color`| Tooltip text color         | `#fff`                  |
+| `--gs-control-size`         | Button width & height      | `44px`                  |
+| `--gs-control-radius`       | Border-radius              | `8px`                   |
+| `--gs-control-bg`           | Background color           | `rgba(0,0,0,0.55)`     |
+| `--gs-control-bg-hover`     | Background on hover        | `rgba(0,0,0,0.75)`     |
+| `--gs-control-border`       | Border shorthand           | `none`                  |
+| `--gs-control-color`        | Icon / text color          | `#fff`                  |
+| `--gs-control-icon-size`    | SVG icon width & height    | `22px`                  |
+| `--gs-control-bottom`       | Bottom offset              | `12px`                  |
+| `--gs-control-right`        | Right offset               | `12px`                  |
+| `--gs-control-tooltip-bg`   | Tooltip background         | `rgba(0,0,0,0.8)`      |
+| `--gs-control-tooltip-color`| Tooltip text color         | `#fff`                  |
 
 ### Example: theming the control downstream
 
@@ -148,41 +151,41 @@ any combination of properties:
 
 ```css
 /* Dark teal button matching jdaviz branding */
-[data-wireframe-demo] {
-    --wfd-control-bg: rgba(0, 59, 77, 0.9);
-    --wfd-control-bg-hover: rgba(0, 125, 164, 0.9);
-    --wfd-control-border: 2px solid rgba(255, 255, 255, 0.2);
-    --wfd-control-radius: 8px;
-    --wfd-control-size: 44px;
+[data-guidestar] {
+    --gs-control-bg: rgba(0, 59, 77, 0.9);
+    --gs-control-bg-hover: rgba(0, 125, 164, 0.9);
+    --gs-control-border: 2px solid rgba(255, 255, 255, 0.2);
+    --gs-control-radius: 8px;
+    --gs-control-size: 44px;
 }
 ```
 
 You can also scope overrides to light/dark themes:
 
 ```css
-html[data-theme="light"] [data-wireframe-demo] {
-    --wfd-control-bg: rgba(0, 0, 0, 0.6);
-    --wfd-control-bg-hover: rgba(0, 0, 0, 0.8);
+html[data-theme="light"] [data-guidestar] {
+    --gs-control-bg: rgba(0, 0, 0, 0.6);
+    --gs-control-bg-hover: rgba(0, 0, 0, 0.8);
 }
 ```
 
 ### Styling captions
 
 Caption overlays are styled via CSS custom properties on the
-`[data-wireframe-demo]` container:
+`[data-guidestar]` container:
 
 | Custom property              | What it controls           | Default                 |
 | ---------------------------- | -------------------------- | ----------------------- |
-| `--wfd-caption-bg`           | Background color           | `rgba(0,0,0,0.72)`     |
-| `--wfd-caption-color`        | Text color                 | `#fff`                  |
-| `--wfd-caption-font-size`    | Font size                  | `14px`                  |
-| `--wfd-caption-padding`      | Padding                    | `10px 16px`             |
-| `--wfd-caption-inset`        | Left & right inset (keeps clear of controls) | `68px` |
+| `--gs-caption-bg`           | Background color           | `rgba(0,0,0,0.72)`     |
+| `--gs-caption-color`        | Text color                 | `#fff`                  |
+| `--gs-caption-font-size`    | Font size                  | `14px`                  |
+| `--gs-caption-padding`      | Padding                    | `10px 16px`             |
+| `--gs-caption-inset`        | Left & right inset (keeps clear of controls) | `68px` |
 
 ```css
-[data-wireframe-demo] {
-    --wfd-caption-bg: rgba(0, 0, 80, 0.8);
-    --wfd-caption-font-size: 16px;
+[data-guidestar] {
+    --gs-caption-bg: rgba(0, 0, 80, 0.8);
+    --gs-caption-font-size: 16px;
 }
 ```
 
@@ -196,7 +199,7 @@ standard CSS specificity applies:
 
 ```css
 /* Change highlight to blue */
-.wfd-highlight {
+.gs-highlight {
     animation: none;
     outline-color: rgba(0, 120, 255, 0.7);
 }
@@ -204,12 +207,12 @@ standard CSS specificity applies:
 
 ### Overriding controls host positioning
 
-The `.wfd-controls-host` class is in the light DOM and can be targeted
+The `.gs-controls-host` class is in the light DOM and can be targeted
 directly:
 
 ```css
 /* Move button to bottom-left */
-.wfd-controls-host {
+.gs-controls-host {
     right: auto;
     left: 12px;
 }
@@ -218,7 +221,7 @@ directly:
 ## Programmatic usage
 
 ```js
-const demo = new WireframeDemo(containerElement, {
+const demo = new Guidestar(containerElement, {
     htmlSrc: '_static/app.html',
     steps: [
         '#btn@1500:click|Click the button',
