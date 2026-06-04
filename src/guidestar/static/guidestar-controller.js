@@ -577,6 +577,9 @@
         this._steps = parseSteps(this.config.steps);
         this._initSteps = parseSteps(this.config.initSteps);
 
+        // Static mode: no steps means no playback controls or timeline
+        this._isStatic = this._steps.length === 0;
+
         // Inject highlight style
         ensureHighlightStyle();
 
@@ -585,9 +588,11 @@
         this._contentRoot.className = 'gs-content';
         container.appendChild(this._contentRoot);
 
-        // Create controls overlay (Shadow DOM)
-        var controlsHost = createControlsHost(this);
-        container.appendChild(controlsHost);
+        // Create controls overlay (Shadow DOM) — not needed in static mode
+        if (!this._isStatic) {
+            var controlsHost = createControlsHost(this);
+            container.appendChild(controlsHost);
+        }
 
         // Create animated cursor if enabled
         if (this.config.cursor) {
@@ -598,10 +603,15 @@
         this._createCaption();
 
         // Create timeline overlay (after caption, before pauseOnInteraction)
-        this._createTimeline();
+        // Not needed in static mode
+        if (!this._isStatic) {
+            this._createTimeline();
+        }
 
-        // Create restart indicator overlay
-        this._createRestartOverlay();
+        // Create restart indicator overlay — not needed in static mode
+        if (!this._isStatic) {
+            this._createRestartOverlay();
+        }
 
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
@@ -671,15 +681,21 @@
     };
 
     /**
-     * Run initSteps synchronously (no delay, no highlight, no caption).
+     * Run initSteps synchronously (no delay, no highlight).
      * Called after HTML loads and guidestar-loaded has fired, before
      * _initialHTML is snapshotted and before _onReady()/autoStart.
+     *
+     * Supports non-time-based step fields: target, action, actions,
+     * caption, captionOptions, noHighlight.  In static mode the last
+     * caption shown and the last targeted element are preserved so the
+     * cursor can be placed there by _onReady().
      */
     Guidestar.prototype._runInitSteps = function (done) {
         var steps = this._initSteps || [];
+        this._lastInitEl = null;
         for (var i = 0; i < steps.length; i++) {
             var step = steps[i];
-            // Force noHighlight so actions skip visual highlighting
+            // Build a clean copy with time-based fields stripped
             var initStep = {};
             for (var k in step) { if (Object.prototype.hasOwnProperty.call(step, k)) initStep[k] = step[k]; }
             initStep.noHighlight = true;
@@ -689,13 +705,33 @@
             if (target) {
                 el = this._contentRoot.querySelector(target) || this.container.querySelector(target);
             }
+            // Track last targeted element for static cursor placement
+            if (el) this._lastInitEl = el;
             // Pass null callback so _executeAction runs synchronously (no sub-action timeouts)
             this._executeAction(initStep, el, null);
+            // Show caption if provided (persists until next step or _hideCaption)
+            if (step.caption) {
+                this._showCaption(step, el);
+            }
         }
         if (done) done();
     };
 
     Guidestar.prototype._onReady = function () {
+        // Static mode: place cursor at last init-step target (if cursor enabled)
+        if (this._isStatic) {
+            if (this._cursorEl && this._lastInitEl) {
+                var containerRect = this.container.getBoundingClientRect();
+                var elRect = this._lastInitEl.getBoundingClientRect();
+                var x = (elRect.left - containerRect.left) + elRect.width / 2;
+                var y = (elRect.top - containerRect.top) + elRect.height / 2;
+                this._cursorX = x;
+                this._cursorY = y;
+                this._cursorEl.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+                this._cursorEl.style.opacity = '1';
+            }
+            return;
+        }
         if (!this.config.autoStart || !this._steps.length) return;
         this._waitForVisible();
     };

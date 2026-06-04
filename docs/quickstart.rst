@@ -45,6 +45,46 @@ Minimal Sphinx example
    * Step through the actions, highlighting each target element
    * Pause if the user clicks anywhere inside the demo
 
+4. To show a **static snapshot** instead — no controls, just the wireframe
+   frozen at a specific state — omit ``:steps:`` and use ``:init-steps-json:``
+   to set up the scene:
+
+   .. code-block:: rst
+
+      .. guidestar-demo:: _static/my-app.html
+         :init-steps-json:
+            [
+              {"target": "#panel", "action": "add-class", "value": "open"},
+              {"target": "#action-btn", "action": "add-class", "value": "active",
+               "caption": "Click Action to run the pipeline",
+               "captionOptions": {"position": "bottom"}}
+            ]
+         :height: 400px
+
+   This will:
+
+   * Fetch ``my-app.html`` and silently apply the init steps (open the panel,
+     activate the button)
+   * Render the wireframe frozen at that state — no play/pause controls
+   * Show the cursor resting on ``#action-btn`` (the last targeted init step)
+   * Display the caption as a persistent overlay
+
+   Set ``:cursor: false`` to hide the cursor if you want a clean screenshot-
+   like embed with no cursor visible.
+
+Static live example
+^^^^^^^^^^^^^^^^^^^
+
+.. guidestar-demo:: _static/example-wireframe.html
+   :init-steps-json:
+      [
+        {"target": "#demo-panel", "action": "add-class", "value": "open"},
+        {"target": "#demo-btn-2", "action": "add-class", "value": "active",
+         "caption": "Click Action to run the pipeline",
+         "captionOptions": {"position": "bottom"}}
+      ]
+   :height: 300px
+
 
 Live example
 ------------
