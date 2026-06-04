@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sphinx-guidestar"
+name = "guidestar"
 version = "0.1.0"
 description = "Reusable infrastructure for embedding interactive wireframe demos in Sphinx documentation and standalone HTML pages"
 readme = "README.md"

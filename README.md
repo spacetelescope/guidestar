@@ -11,13 +11,13 @@ demos step through a configurable sequence of actions, including optional transc
 ## Installation
 
 ```bash
-pip install sphinx-guidestar
+pip install guidestar
 ```
 
 Or for development:
 
 ```bash
-pip install -e /path/to/sphinx-guidestar
+pip install -e /path/to/guidestar
 ```
 
 ## Quick start

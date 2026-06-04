@@ -68,13 +68,13 @@ Using from an external package
 Suppose your package **mypackage** ships its own wireframe HTML and wants
 to embed demos in its Sphinx documentation.
 
-1. Add ``sphinx-guidestar`` as a docs dependency:
+1. Add ``guidestar`` as a docs dependency:
 
    .. code-block:: toml
 
       # pyproject.toml
       [project.optional-dependencies]
-      docs = ["sphinx-guidestar"]
+      docs = ["guidestar"]
 
 2. Enable the extension in ``conf.py``:
 

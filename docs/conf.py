@@ -13,7 +13,7 @@ html_static_path = ['_static']
 html_logo = '_static/guidestar-logo.png'
 
 html_theme_options = {
-    'github_url': 'https://github.com/spacetelescope/sphinx-guidestar',
+    'github_url': 'https://github.com/spacetelescope/guidestar',
     'logo': {
         'image_light': '_static/guidestar-logo.png',
         'image_dark': '_static/guidestar-logo.png',

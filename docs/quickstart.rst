@@ -8,13 +8,13 @@ Install from source (or from PyPI once published):
 
 .. code-block:: bash
 
-   pip install sphinx-guidestar
+   pip install guidestar
 
 For building documentation locally you will also need the theme:
 
 .. code-block:: bash
 
-   pip install sphinx-guidestar[docs]
+   pip install guidestar[docs]
 
 
 Minimal Sphinx example
