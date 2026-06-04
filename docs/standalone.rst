@@ -1,7 +1,7 @@
 Standalone HTML
 ===============
 
-You can use docs-wireframe-demo in any HTML page without Sphinx.
+You can use guidestar in any HTML page without Sphinx.
 Just include the two asset files and set up your containers.
 
 
@@ -10,25 +10,25 @@ Include the assets
 
 Copy (or serve) these two files from the package's ``static/`` directory:
 
-* ``wireframe-demo-controller.js``
-* ``wireframe-demo-controls.css``
+* ``guidestar-controller.js``
+* ``guidestar-controls.css``
 
 .. code-block:: html
 
-   <link rel="stylesheet" href="wireframe-demo-controls.css">
-   <script src="wireframe-demo-controller.js"></script>
+   <link rel="stylesheet" href="guidestar-controls.css">
+   <script src="guidestar-controller.js"></script>
 
 
 Declarative usage
 -----------------
 
-Add a ``data-wireframe-demo`` attribute and a ``data-wireframe-config``
+Add a ``data-guidestar`` attribute and a ``data-guidestar-config``
 JSON attribute to any element:
 
 .. code-block:: html
 
-   <div data-wireframe-demo
-        data-wireframe-config='{
+   <div data-guidestar
+        data-guidestar-config='{
      "htmlSrc": "my-wireframe.html",
      "steps": [
        {"target": "#btn", "action": "click", "delay": 1500},
@@ -48,7 +48,7 @@ Programmatic usage
    <div id="my-demo"></div>
 
    <script>
-   var demo = new WireframeDemo(document.getElementById('my-demo'), {
+   var demo = new Guidestar(document.getElementById('my-demo'), {
        htmlSrc: 'my-wireframe.html',
        steps: [
            { target: '#btn', action: 'click', delay: 1500 },
@@ -72,13 +72,13 @@ Dynamically loaded HTML
 -----------------------
 
 If your wireframe HTML is loaded after the page (e.g. via a framework
-router), dispatch the ``wireframe-demo-loaded`` event to trigger
+router), dispatch the ``guidestar-loaded`` event to trigger
 auto-discovery of any new containers:
 
 .. code-block:: javascript
 
-   // After injecting new wireframe-demo containers into the DOM:
-   document.dispatchEvent(new CustomEvent('wireframe-demo-loaded'));
+   // After injecting new guidestar containers into the DOM:
+   document.dispatchEvent(new CustomEvent('guidestar-loaded'));
 
 
 Full standalone example
@@ -91,7 +91,7 @@ Full standalone example
    <head>
        <meta charset="UTF-8">
        <title>Wireframe Demo — Standalone</title>
-       <link rel="stylesheet" href="wireframe-demo-controls.css">
+       <link rel="stylesheet" href="guidestar-controls.css">
        <style>
            body { font-family: sans-serif; max-width: 800px; margin: 40px auto; }
            #demo-container { border: 1px solid #ccc; border-radius: 8px; }
@@ -100,8 +100,8 @@ Full standalone example
    <body>
        <h1>My Application Demo</h1>
        <div id="demo-container"
-            data-wireframe-demo
-            data-wireframe-config='{
+            data-guidestar
+            data-guidestar-config='{
               "htmlSrc": "my-app-wireframe.html",
               "steps": [
                 "#start-btn@2000:click",
@@ -113,6 +113,6 @@ Full standalone example
               ]
             }'>
        </div>
-       <script src="wireframe-demo-controller.js"></script>
+       <script src="guidestar-controller.js"></script>
    </body>
    </html>

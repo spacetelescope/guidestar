@@ -5,7 +5,7 @@ on:
     branches: [main, confluence-support]
     paths:
       - 'examples/**'
-      - 'src/docs_wireframe_demo/static/**'
+      - 'src/guidestar/static/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 

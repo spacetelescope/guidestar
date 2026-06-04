@@ -1,7 +1,7 @@
 Sphinx Directive
 ================
 
-The ``.. wireframe-demo::`` directive embeds an interactive wireframe demo
+The ``.. guidestar-demo::`` directive embeds an interactive wireframe demo
 into any Sphinx-built documentation page.
 
 Basic syntax
@@ -9,7 +9,7 @@ Basic syntax
 
 .. code-block:: rst
 
-   .. wireframe-demo:: _static/my-wireframe.html
+   .. guidestar-demo:: _static/my-wireframe.html
       :steps: #btn@1500:click, #panel@1000:toggle-class=open
       :height: 400px
 
@@ -68,20 +68,20 @@ Using from an external package
 Suppose your package **mypackage** ships its own wireframe HTML and wants
 to embed demos in its Sphinx documentation.
 
-1. Add ``docs-wireframe-demo`` as a docs dependency:
+1. Add ``sphinx-guidestar`` as a docs dependency:
 
    .. code-block:: toml
 
       # pyproject.toml
       [project.optional-dependencies]
-      docs = ["docs-wireframe-demo"]
+      docs = ["sphinx-guidestar"]
 
 2. Enable the extension in ``conf.py``:
 
    .. code-block:: python
 
       extensions = [
-          'docs_wireframe_demo',
+          'guidestar',
           # ... your other extensions
       ]
 
@@ -91,7 +91,7 @@ to embed demos in its Sphinx documentation.
 
    .. code-block:: rst
 
-      .. wireframe-demo:: _static/mypackage-wireframe.html
+      .. guidestar-demo:: _static/mypackage-wireframe.html
          :steps: #load-btn@1500:click, #sidebar@1000:add-class=visible
          :height: 500px
 
@@ -101,7 +101,7 @@ to embed demos in its Sphinx documentation.
    .. code-block:: javascript
 
       // docs/_static/mypackage-demo-actions.js
-      WireframeDemo.registerAction('open-sidebar', function(step, el, root) {
+      Guidestar.registerAction('open-sidebar', function(step, el, root) {
           root.querySelector('.sidebar').classList.add('visible');
       });
 
@@ -109,7 +109,7 @@ to embed demos in its Sphinx documentation.
 
    .. code-block:: rst
 
-      .. wireframe-demo:: _static/mypackage-wireframe.html
+      .. guidestar-demo:: _static/mypackage-wireframe.html
          :js: _static/mypackage-demo-actions.js
          :steps: #toolbar@1500:open-sidebar
 
@@ -117,7 +117,7 @@ to embed demos in its Sphinx documentation.
 Multiple instances
 ------------------
 
-You can place multiple ``.. wireframe-demo::`` directives on the same page.
+You can place multiple ``.. guidestar-demo::`` directives on the same page.
 Each gets its own independent container, playback state, and controls:
 
 .. code-block:: rst
@@ -125,14 +125,14 @@ Each gets its own independent container, playback state, and controls:
    First demo
    ----------
 
-   .. wireframe-demo:: _static/demo-a.html
+   .. guidestar-demo:: _static/demo-a.html
       :steps: #a1@1500:click, #a2@1000:toggle-class=on
       :height: 300px
 
    Second demo
    -----------
 
-   .. wireframe-demo:: _static/demo-b.html
+   .. guidestar-demo:: _static/demo-b.html
       :steps: #b1@1500:click
       :height: 300px
 
@@ -151,7 +151,7 @@ step string.  Use ``^`` or ``v`` to force top or bottom positioning:
 
 .. code-block:: rst
 
-   .. wireframe-demo:: _static/my-wireframe.html
+   .. guidestar-demo:: _static/my-wireframe.html
       :steps: #btn@1500:click|Click the button, #panel@1000:toggle-class=open|^Panel opens, pause@2000|vDone!
       :height: 400px
 
@@ -160,7 +160,7 @@ optionally ``captionOptions`` on each step object:
 
 .. code-block:: rst
 
-   .. wireframe-demo:: _static/my-wireframe.html
+   .. guidestar-demo:: _static/my-wireframe.html
       :steps-json: [
          {"target": "#btn", "action": "click", "delay": 1500,
           "caption": "Click the button"},

@@ -3,7 +3,7 @@ Sphinx directive for embedding interactive wireframe demos.
 
 Usage in RST::
 
-    .. wireframe-demo:: _static/my-wireframe.html
+    .. guidestar-demo:: _static/my-wireframe.html
        :steps: #btn@1500:click, #panel@1000:toggle-class=open
        :repeat: true
        :height: 500px
@@ -18,7 +18,7 @@ from docutils import nodes
 from sphinx.util.docutils import SphinxDirective
 
 
-class WireframeDemoDirective(SphinxDirective):
+class GuidestarDirective(SphinxDirective):
     """Embed an interactive wireframe demo with playback controls.
 
     Required argument: path to the HTML file (relative to the source directory
@@ -99,7 +99,7 @@ class WireframeDemoDirective(SphinxDirective):
             except json.JSONDecodeError as exc:
                 error = nodes.error()
                 error += nodes.paragraph(
-                    text=f'wireframe-demo: invalid :steps-json:: {exc}')
+                    text=f'guidestar: invalid :steps-json:: {exc}')
                 return [error]
         elif steps_str:
             config['steps'] = [s.strip() for s in steps_str.split(',')]
@@ -111,7 +111,7 @@ class WireframeDemoDirective(SphinxDirective):
             except json.JSONDecodeError as exc:
                 error = nodes.error()
                 error += nodes.paragraph(
-                    text=f'wireframe-demo: invalid :init-steps-json:: {exc}')
+                    text=f'guidestar: invalid :init-steps-json:: {exc}')
                 return [error]
 
         # Boolean options
@@ -146,7 +146,7 @@ class WireframeDemoDirective(SphinxDirective):
 
         # Container id
         container_id = self.options.get(
-            'id', f'wfd-{int(time.time() * 1000000) % 1000000}')
+            'id', f'gs-{int(time.time() * 1000000) % 1000000}')
 
         # Height
         height = self.options.get('height', '')
@@ -178,8 +178,8 @@ class WireframeDemoDirective(SphinxDirective):
 {extra_css}
 {extra_js}
 <div id="{container_id}"
-     data-wireframe-demo
-     data-wireframe-config="{config_escaped}"{style_attr}>
+     data-guidestar
+     data-guidestar-config="{config_escaped}"{style_attr}>
 </div>
 """
         node = nodes.raw('', raw_html, format='html')

@@ -1,7 +1,7 @@
 Accessibility
 =============
 
-docs-wireframe-demo includes built-in support for keyboard navigation,
+guidestar includes built-in support for keyboard navigation,
 screen readers, and reduced-motion preferences to meet WCAG 2.1 and
 Section 508 requirements.
 
@@ -51,7 +51,7 @@ the keyboard (using the ``:focus-visible`` pseudo-class). This includes:
 * Timeline step dots
 * Timeline tooltip buttons (step back, play, step forward)
 
-Focus rings use the ``--wfd-control-color`` custom property (default
+Focus rings use the ``--gs-control-color`` custom property (default
 white) to stay consistent with the control theme.
 
 
@@ -99,7 +99,7 @@ You can also control this behaviour programmatically with the
 
 .. code-block:: javascript
 
-   new WireframeDemo(container, {
+   new Guidestar(container, {
        htmlSrc: 'my-wireframe.html',
        steps: [...],
        reduceMotion: 'auto'   // 'auto' | true | false
@@ -121,7 +121,7 @@ You can also control this behaviour programmatically with the
      - Always allow animations, regardless of OS preference.
 
 When reduced motion is active (either via OS preference or ``true``), the
-container receives the CSS class ``wfd-reduce-motion``, which you can also
+container receives the CSS class ``gs-reduce-motion``, which you can also
 target in your own stylesheets.
 
 

@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 WIREFRAMES_DIR = EXAMPLES / "wireframes"
 DEMOS_DIR = EXAMPLES / "demos"
-STATIC_DIR = ROOT / "src" / "docs_wireframe_demo" / "static"
+STATIC_DIR = ROOT / "src" / "guidestar" / "static"
 
 
 def extract_body_and_styles(wireframe_html: str) -> tuple[str, str]:
@@ -84,24 +84,24 @@ def build_page(demo_config: dict, wireframe_path: Path, controller_js: str, cont
     overflow: hidden;
     background: transparent;
   }}
-  [data-wireframe-demo] {{
+  [data-guidestar] {{
     width: 100%;
     height: {height};
   }}
 </style>
 <style>
-/* wireframe-demo-controls.css (inlined) */
+/* guidestar-controls.css (inlined) */
 {controls_css}
 </style>
 {styles_html}
 </head>
 <body>
-<div data-wireframe-demo
-     data-wireframe-config="{config_json}">
+<div data-guidestar
+     data-guidestar-config="{config_json}">
 {body_html}
 </div>
 <script>
-// wireframe-demo-controller.js (inlined)
+// guidestar-controller.js (inlined)
 {controller_js}
 </script>
 </body>
@@ -120,8 +120,8 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Read controller assets once
-    controller_js = (STATIC_DIR / "wireframe-demo-controller.js").read_text(encoding="utf-8")
-    controls_css = (STATIC_DIR / "wireframe-demo-controls.css").read_text(encoding="utf-8")
+    controller_js = (STATIC_DIR / "guidestar-controller.js").read_text(encoding="utf-8")
+    controls_css = (STATIC_DIR / "guidestar-controls.css").read_text(encoding="utf-8")
 
     demo_files = sorted(DEMOS_DIR.glob("*.json"))
     if not demo_files:

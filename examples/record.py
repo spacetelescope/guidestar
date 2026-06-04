@@ -86,7 +86,7 @@ def record_demo(html_path: Path, output_path: Path, config: dict,
         page.goto(f"file://{html_path.resolve()}", wait_until="domcontentloaded")
 
         # Hide playback controls — they don't work in a GIF
-        page.add_style_tag(content=".wfd-controls-host { display: none !important; }")
+        page.add_style_tag(content=".gs-controls-host { display: none !important; }")
 
         # Wait for the controller to initialise and auto-play to start
         # The demo waits for 50% visibility via IntersectionObserver,
