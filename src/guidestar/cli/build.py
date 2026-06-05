@@ -57,7 +57,7 @@ def build_page(demo_config: dict, wireframe_path: Path, controller_js: str, cont
         "repeat": demo_config.get("repeat", True),
         "autoStart": demo_config.get("autoStart", True),
     }
-    for key in ("pauseOnInteraction", "initialClass", "cursor", "cursorSpeed", "viewport"):
+    for key in ("initSteps", "pauseOnInteraction", "initialClass", "cursor", "cursorSpeed", "viewport"):
         if demo_config.get(key) is not None:
             config[key] = demo_config[key]
 

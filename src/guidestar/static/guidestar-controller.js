@@ -325,6 +325,8 @@
     var ICON_SPEED_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>';
     var ICON_FULLSCREEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7,14H5v5h5v-2H7V14M5,10H7V7h3V5H5V10M17,17H14v2h5V14h-2V17M14,5v2h3v3h2V5H14Z"/></svg>';
     var ICON_FULLSCREEN_EXIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5,16H8v3h2V14H5V16M8,8H5v2h5V5H8V8M14,19h2V16h3V14H14V19M16,8V5H14v5h5V8H16Z"/></svg>';
+    // Simplified guidestar constellation logo for the branding badge
+    var ICON_BRANDING_LOGO = '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="20" height="20" rx="3" fill="#0c0818"/><g stroke="#B88800" stroke-width="0.75" stroke-linecap="round" opacity="0.8"><line x1="3.5" y1="14" x2="6" y2="10.5"/><line x1="6" y1="10.5" x2="10" y2="9.5"/><line x1="10" y1="9.5" x2="12" y2="5.5"/><line x1="12" y1="5.5" x2="15" y2="4"/><line x1="10" y1="9.5" x2="13" y2="10.5"/><line x1="13" y1="10.5" x2="15.5" y2="14.5"/><line x1="11.5" y1="14.5" x2="15.5" y2="14.5"/><line x1="6.5" y1="14.5" x2="11.5" y2="14.5"/><line x1="3.5" y1="14" x2="6.5" y2="14.5"/></g><g stroke="#FFD060" stroke-width="0.65" stroke-linecap="round"><line x1="4.5" y1="10.5" x2="7.5" y2="10.5"/><line x1="6" y1="9" x2="6" y2="12"/><line x1="8.5" y1="9.5" x2="11.5" y2="9.5"/><line x1="10" y1="8" x2="10" y2="11"/><line x1="10.5" y1="5.5" x2="13.5" y2="5.5"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="2" y1="14" x2="5" y2="14"/><line x1="3.5" y1="12.5" x2="3.5" y2="15.5"/></g><circle cx="15.5" cy="14.5" r="2.2" fill="#3AACEE" opacity="0.9"/></svg>';
 
     function createControlsHost(instance) {
         var host = document.createElement('div');
@@ -496,6 +498,7 @@
             autoScroll: true,
             fullscreen: true,
             resizable: true,
+            poweredby: true,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -517,6 +520,7 @@
         this._captionEl = null;
         this._captionClass = null; // tracks custom className for removal
         this._speedFactor = 1;
+        this._brandingEl = null;
         this._timelineEl = null;
         this._timelineDots = [];
         this._tooltipEl = null;
@@ -645,6 +649,11 @@
             this._createResizeHandle();
         }
 
+        // Create branding badge — not needed in static mode
+        if (!this._isStatic && this.config.poweredby !== false) {
+            this._createBrandingBadge();
+        }
+
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
             container.addEventListener('click', function (e) {
@@ -655,6 +664,7 @@
                 if (e.target.closest && e.target.closest('.gs-resize-handle')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline-tooltip')) return;
+                if (e.target.closest && e.target.closest('.gs-branding')) return;
                 if (self._playing) {
                     self._userPaused = true;
                     self._hideCursor();
@@ -823,6 +833,21 @@
             handle.removeEventListener('pointerup', onUp);
             handle.removeEventListener('pointercancel', onUp);
         }
+    };
+
+    // ── Branding badge ───────────────────────────────────────────────────────
+
+    Guidestar.prototype._createBrandingBadge = function () {
+        var el = document.createElement('a');
+        el.className = 'gs-branding';
+        el.href = 'https://guidestar.readthedocs.io';
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+        el.setAttribute('aria-label', 'demo powered by guidestar');
+        el.setAttribute('data-tooltip', 'demo powered by guidestar');
+        el.innerHTML = ICON_BRANDING_LOGO;
+        this.container.appendChild(el);
+        this._brandingEl = el;
     };
 
     // ── Scroll helpers ───────────────────────────────────────────────────────
