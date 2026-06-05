@@ -30,3 +30,4 @@ This package handles:
    standalone
    embedding
    ci-integration
+   wireframe/index
