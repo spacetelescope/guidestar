@@ -169,6 +169,24 @@ scales it correctly at any container size.
       tree snapshot as references, then write clean minimal HTML from scratch
       that reproduces the layout visible in the screenshots.
 
+      Pay special attention to **sticky/fixed bars** (headers, footers,
+      toolbars that remain on screen while the main content scrolls).
+      These are easy to under-represent because they sit outside the
+      scrollable area and may be partially off-screen when you take a
+      full-page screenshot.  For each bar:
+
+      - Take a dedicated screenshot of the bar at full viewport width
+        before reconstructing it.  List every control it contains,
+        including secondary buttons that flank the primary action — they
+        are easy to miss if you only read the DOM without looking.
+      - Reproduce relative button widths faithfully: use ``flex: 1`` (or
+        equivalent proportional sizing) on buttons that visually dominate
+        the row; avoid fixed padding values that produce wrong proportions
+        at different container widths.
+      - If a status or summary line appears on a separate row within the
+        bar, render it as a distinct child element beneath the button row,
+        not as an inline sibling in the same flex row.
+
    6. **Add IDs to interactive elements.**
       For every button, input, select, tab, accordion, and toggleable panel,
       ensure there is a unique ``id`` attribute so that guidestar step
