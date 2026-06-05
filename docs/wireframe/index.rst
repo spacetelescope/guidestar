@@ -1,5 +1,5 @@
-Wireframe
-=========
+Creating Wireframes
+===================
 
 A guidestar demo is driven by a self-contained HTML wireframe — a static
 mockup of the UI that the animation system can interact with.  This section

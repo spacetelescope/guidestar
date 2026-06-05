@@ -4,6 +4,11 @@ Sphinx Directive
 The ``.. guidestar-demo::`` directive embeds an interactive wireframe demo
 into any Sphinx-built documentation page.
 
+.. note::
+
+   For a full list of configuration parameters, their types, defaults, and
+   descriptions, see the :doc:`configuration`.
+
 Basic syntax
 ------------
 
@@ -90,7 +95,7 @@ Directive options
 
 
 Using from an external package
-------------------------------
+-------------------------------
 
 Suppose your package **mypackage** ships its own wireframe HTML and wants
 to embed demos in its Sphinx documentation.

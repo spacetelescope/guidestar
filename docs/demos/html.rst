@@ -4,6 +4,11 @@ Standalone HTML
 You can use guidestar in any HTML page without Sphinx.
 Just include the two asset files and set up your containers.
 
+.. note::
+
+   For a full list of configuration parameters, their types, defaults, and
+   descriptions, see the :doc:`configuration`.
+
 
 Include the assets
 ------------------

@@ -20,14 +20,8 @@ This package handles:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
 
    quickstart
-   configuration
-   sphinx-directive
-   styling
-   accessibility
-   standalone
-   embedding
-   ci-integration
    wireframe/index
+   demos/index
+   workflows/index
