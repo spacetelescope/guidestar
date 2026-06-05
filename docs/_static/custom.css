@@ -1,0 +1,128 @@
+/*
+ * guidestar docs theme
+ * Colors drawn from the Leo constellation favicon:
+ *   Gold star:   #FFD060  /  #B88800 (amber)
+ *   Blue accent: #3AACEE  /  #7DD8FF (Regulus)
+ *   Dark bg:     #0e1119
+ */
+
+/* ── CSS custom property overrides (pydata-sphinx-theme uses RGB triplets) ── */
+
+/* Light mode */
+html[data-theme="light"] {
+  --pst-color-primary:         21, 120, 180;  /* #1578B4 rich blue   */
+  --pst-color-secondary:       58, 172, 238;  /* #3AACEE sky blue    */
+  --pst-color-link:            21, 120, 180;
+  --pst-color-link-hover:      58, 172, 238;  /* #3AACEE             */
+  --pst-color-inline-code-links: 184, 136, 0;
+}
+
+/* Dark mode */
+html[data-theme="dark"] {
+  --pst-color-primary:         58, 172, 238;  /* #3AACEE sky blue    */
+  --pst-color-secondary:      125, 216, 255;  /* #7DD8FF light blue  */
+  --pst-color-link:            58, 172, 238;
+  --pst-color-link-hover:     125, 216, 255;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+
+.bd-header {
+  background-color: #062a45 !important;
+  border-bottom: 1px solid #3AACEE55;
+}
+
+/* navbar links & site name */
+.bd-header .navbar-nav .nav-link,
+.bd-header .navbar-brand,
+.bd-header .navbar-brand span {
+  color: #c8e8f8 !important;
+}
+
+.bd-header .navbar-nav .nav-link:hover {
+  color: #7DD8FF !important;
+}
+
+/* active nav item */
+.bd-header .navbar-nav .nav-link.active,
+.bd-header .navbar-nav .active > .nav-link {
+  color: #7DD8FF !important;
+  border-bottom: 2px solid #3AACEE;
+}
+
+/* search box in navbar */
+.bd-header .search-button-field {
+  background-color: #0a3a58;
+  border-color: #3AACEE55;
+  color: #c8e8f8;
+}
+
+/* ── Logo sizing in navbar ───────────────────────────────────────────────── */
+
+.bd-header .navbar-brand {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar-brand img,
+.bd-header img.logo__image {
+  height: 100%;
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+
+/* Active sidebar item highlight */
+.bd-sidebar-primary .current > a,
+.bd-sidebar-primary .current > a:hover {
+  color: #3AACEE !important;
+  font-weight: 600;
+}
+
+/* ── Headings ────────────────────────────────────────────────────────────── */
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3 {
+  color: #0e5a8a;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3 {
+  color: #7DD8FF;
+}
+
+/* ── Inline code ─────────────────────────────────────────────────────────── */
+
+html[data-theme="light"] code.literal {
+  background-color: #fff8e6;
+  border: 1px solid #e8c84488;
+  color: #7a4e00;
+}
+
+html[data-theme="dark"] code.literal {
+  background-color: #1e1a08;
+  border: 1px solid #B8880066;
+  color: #FFD060;
+}
+
+/* ── Admonitions: note / tip ─────────────────────────────────────────────── */
+
+.bd-content .admonition.note,
+.bd-content .admonition.tip {
+  border-left-color: #3AACEE;
+}
+
+.bd-content .admonition.note > .admonition-title,
+.bd-content .admonition.tip > .admonition-title {
+  background-color: #3AACEE22;
+  color: #0e5a8a;
+}
+
+html[data-theme="dark"] .bd-content .admonition.note > .admonition-title,
+html[data-theme="dark"] .bd-content .admonition.tip > .admonition-title {
+  color: #7DD8FF;
+}
