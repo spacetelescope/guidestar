@@ -880,5 +880,38 @@
   </div><!-- /results-view -->
 
 </div><!-- /app -->
+
+<script>
+/* Interaction handlers — toggling CSS classes only, no external calls.
+ * Uses .onclick property assignment (not addEventListener) so that
+ * guidestar's _runScripts() can safely re-execute this block on restart
+ * without stacking duplicate listeners. */
+(function () {
+  // Toggle-group buttons: click toggles .active on the clicked button
+  document.querySelectorAll('.toggle-btn').forEach(function (btn) {
+    btn.onclick = function () { btn.classList.toggle('active'); };
+  });
+
+  // Mission dropdown: click the header button to open/close
+  var missionBtn = document.getElementById('btn-mission');
+  if (missionBtn) {
+    missionBtn.onclick = function (e) {
+      e.stopPropagation(); // prevent document handler closing it immediately
+      missionBtn.classList.toggle('open');
+    };
+    // Click anywhere outside the dropdown to close it
+    document.onclick = function () {
+      missionBtn.classList.remove('open');
+    };
+  }
+
+  // Banner close button: add .banner-closed to #mast-app
+  var closeBtn = document.getElementById('btn-close-banner');
+  var mastApp  = document.getElementById('mast-app');
+  if (closeBtn && mastApp) {
+    closeBtn.onclick = function () { mastApp.classList.add('banner-closed'); };
+  }
+}());
+</script>
 </body>
 </html>

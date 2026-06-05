@@ -655,6 +655,24 @@
         }
     };
 
+    /**
+     * Re-execute any <script> elements inside _contentRoot.
+     * Browsers do not run scripts injected via innerHTML; calling this
+     * method after each innerHTML assignment ensures wireframe interaction
+     * scripts (click-to-toggle-class handlers) are active.
+     * Uses .onclick-style property assignment so re-running on restart
+     * replaces rather than stacks handlers.
+     */
+    Guidestar.prototype._runScripts = function () {
+        var scripts = this._contentRoot.querySelectorAll('script');
+        for (var i = 0; i < scripts.length; i++) {
+            var old = scripts[i];
+            var s = document.createElement('script');
+            s.textContent = old.textContent;
+            old.parentNode.replaceChild(s, old);
+        }
+    };
+
     Guidestar.prototype._loadHTML = function (src, callback) {
         var self = this;
         fetch(src)
@@ -664,6 +682,7 @@
             })
             .then(function (html) {
                 self._contentRoot.innerHTML = html;
+                self._runScripts();
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)
                 document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: self.container, instance: self }
@@ -935,6 +954,7 @@
         // starts fresh (removes dynamically added viewers, sidebars, etc.)
         if (this._initialHTML !== undefined) {
             this._contentRoot.innerHTML = this._initialHTML;
+            this._runScripts();
             // Re-dispatch so external code (e.g. jdaviz-wireframe-actions)
             // can re-wire toolbar clicks, icons, etc.
             document.dispatchEvent(new CustomEvent('guidestar-loaded', {

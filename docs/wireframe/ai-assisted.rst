@@ -205,18 +205,30 @@ scales it correctly at any container size.
         #app.results-open .search-view  { display: none; }
         #app.results-open .results-view { display: flex; }
 
-      Do NOT use JavaScript.
+      The CSS class toggles above are what guidestar's ``add-class`` /
+      ``remove-class`` steps modify during the automated demo.  They should
+      also be wired up so a user who clicks manually gets the same result.
+      After writing the CSS, add a small ``<script>`` block at the bottom of
+      ``<body>`` that attaches a ``.onclick`` handler for each interactive
+      element (use ``.onclick =`` not ``addEventListener`` so that guidestar
+      can safely re-run the block on restart without stacking duplicate
+      listeners).  The handlers should only toggle the same CSS classes the
+      guidestar steps use — no ``fetch()``, timers, or DOM creation.
 
    8. **Sanitize external references.**
-      - Remove or stub out all ``<script>`` tags (inline and external).
+      - Remove or stub out any ``<script>`` tags other than the interaction
+        handler block added in step 7 (i.e. remove framework bundles,
+        analytics, loaders).
       - Replace ``href`` / ``action`` on ``<a>`` and ``<form>`` with ``"#"``.
-      - Remove all event-handler attributes (``onclick``, ``onsubmit``, etc.).
+      - Remove all framework event-handler attributes (``onclick``,
+        ``onsubmit``, etc.) that came from the original DOM — the interaction
+        handlers from step 7 use ``.onclick`` property assignment instead.
       - Replace any remaining external image URLs with neutral placeholders
         (light-grey background or inline SVG) if not already inlined in
         step 3.
       - Remove ``<meta http-equiv="...">`` refresh or CSP tags.
-      - Double-check: no ``fetch()``, ``XMLHttpRequest``, or ``WebSocket``
-        calls should remain (there should be none after removing scripts).
+      - Double-check: no ``fetch()``, ``XMLHttpRequest``, ``WebSocket``, or
+        timer calls should remain in the final script block.
 
    9. **Write wireframe.html.**
       One self-contained HTML file: single ``<style>`` block in ``<head>``,

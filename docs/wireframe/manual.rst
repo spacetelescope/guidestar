@@ -27,9 +27,17 @@ A well-formed wireframe follows this pattern:
 
 Key conventions:
 
-* **No ``<script>`` tags.** All state changes are handled by guidestar's
-  action system (``click``, ``toggle-class``, ``add-class``, ``type-text``,
-  …). Do not embed JavaScript.
+* **Scripts: interaction-only, no external calls.**
+  The wireframe should not fetch remote resources or manipulate the page
+  outside its own root element.  However, a small ``<script>`` block is
+  permitted — and encouraged — for click-to-toggle-class handlers that let
+  users interact with the wireframe manually (e.g. opening a dropdown,
+  dismissing a banner, toggling a checkbox state).  Use ``.onclick``
+  property assignment rather than ``addEventListener`` so that guidestar
+  can safely re-execute the script on demo restart without stacking
+  duplicate listeners.  Do **not** embed any ``fetch()``,
+  ``XMLHttpRequest``, ``WebSocket``, or ``setTimeout``/``setInterval``
+  calls; all timed state changes are driven by guidestar steps.
 * **IDs on every interactive element.** Steps address elements by CSS
   selector; each element that will be targeted by a step should have a
   unique ``id``.
