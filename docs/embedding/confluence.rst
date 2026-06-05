@@ -76,7 +76,8 @@ Embedding in Confluence with Bobswift
         allowfullscreen>
       </iframe>
 
-3. Adjust ``height`` to match the ``height`` set in the demo config JSON
+3. Adjust ``height`` to match the ``height`` set in the demo
+   :ref:`config JSON <json-object-format>`
    (add ~40 px for the page chrome).
 
 The demo loads with full play/pause/restart controls and auto-starts when

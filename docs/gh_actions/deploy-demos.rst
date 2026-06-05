@@ -131,9 +131,10 @@ is required; all others are optional.
      "autoStart": true
    }
 
-The ``steps`` array uses the same shorthand syntax as the Sphinx directive's
-``:steps:`` option — see :doc:`../demos/configuration` for the complete step
-syntax and all available config fields.
+The ``steps`` array accepts the same shorthand strings or
+:ref:`JSON object format <json-object-format>` as the
+Sphinx directive's ``:steps:`` option — see :doc:`../demos/configuration` for
+the complete step syntax and all available config fields.
 
 
 Examples
