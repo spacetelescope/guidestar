@@ -28,7 +28,7 @@ JavaScript.  The built demo page is at
 `_site/mast-hst.html <../../_site/mast-hst.html>`_.
 
 .. guidestar-demo:: _static/mast-hst.html
-   :steps: #input-objects@1800:type-text=M31|Enter a target name, #toggle-dtype-all@800:remove-class=checked, #toggle-dtype-spectrum@800:add-class=checked|Filter to spectra only, #mast-app@200:add-class=banner-closed, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@2000, #row-3@1200:add-class=highlighted|Inspect a dataset, pause@1500, #row-3@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
+   :steps: #input-objects@1800:type-text=M31|Enter a target name, #toggle-dtype-all@800:remove-class=active, #toggle-dtype-spectrum@800:add-class=active|Filter to spectra only, #mast-app@200:add-class=banner-closed, #input-dataset-id@1200:scroll-to|Scroll to additional filters, #input-program-id@1200:type-text=14657|Enter a program ID, #input-target-class@1200:type-text=GALAXY|Auto-scroll to Target Class field, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@2000, #row-3@1200:add-class=highlighted|Inspect a dataset, pause@1500, #row-3@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
    :height: 540px
    :viewport: 1440
    :repeat: true

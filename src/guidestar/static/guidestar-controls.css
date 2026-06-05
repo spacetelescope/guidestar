@@ -270,6 +270,39 @@
     background: rgba(255, 255, 255, 0.25);
 }
 
+/* ── Scroll indicator ────────────────────────────────────────────────────── */
+
+@keyframes gs-scroll-flash {
+    0%   { opacity: 0; transform: translateY(-6px) scale(0.85); }
+    18%  { opacity: 1; transform: translateY(0)    scale(1);    }
+    65%  { opacity: 1; transform: translateY(0)    scale(1);    }
+    100% { opacity: 0; transform: translateY(4px)  scale(0.9);  }
+}
+
+.gs-scroll-indicator {
+    position: absolute;
+    z-index: 9992;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--gs-control-bg, rgba(0, 0, 0, 0.55));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.gs-scroll-indicator--active {
+    animation: gs-scroll-flash 0.75s ease-out forwards;
+}
+
+.gs-scroll-indicator svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--gs-control-color, #fff);
+}
+
 /* ── Restart overlay ─────────────────────────────────────────────────────── */
 
 @keyframes gs-restart-expand {
@@ -354,6 +387,10 @@
         animation: none;
         opacity: 0;
     }
+    .gs-scroll-indicator--active {
+        animation: none;
+        opacity: 0;
+    }
 }
 
 /* Config-driven reduced motion (reduceMotion: true) */
@@ -375,6 +412,10 @@
     transform: translate(-50%, -50%);
 }
 .gs-reduce-motion .gs-restart-overlay--active {
+    animation: none;
+    opacity: 0;
+}
+.gs-reduce-motion .gs-scroll-indicator--active {
     animation: none;
     opacity: 0;
 }

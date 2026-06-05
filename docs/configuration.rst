@@ -74,6 +74,16 @@ When creating a ``Guidestar`` programmatically or via the
        all animations off regardless of OS preference. ``false`` keeps
        animations on even when the OS requests reduced motion. See
        :doc:`accessibility` for details.
+   * - ``autoScroll``
+     - bool
+     - ``true``
+     - When ``true`` (the default), guidestar automatically scrolls a step's
+       target element into view before executing the action, if the element
+       is not already fully visible in its scrollable ancestor.  The scroll
+       is smooth and accompanied by a brief ↓ indicator badge.  Set to
+       ``false`` to disable all automatic scrolling.  Individual steps can
+       also opt out by appending ``~`` to the delay (e.g.
+       ``#el@800~:click``).
    * - ``viewport``
      - number / null
      - ``null``
@@ -244,8 +254,7 @@ Examples:
 
    #btn@1500:click                    → click #btn, hold 1500ms
    #panel@1000:toggle-class=open      → toggle “open” class, hold 1000ms
-   #btn@1500!:click                   → click (no highlight), hold 1500ms
-   pause@3000                         → wait 3 seconds
+   #btn@1500!:click                   → click (no highlight), hold 1500ms   #btn@1500~:click                   → click, skip auto-scroll for this step   pause@3000                         → wait 3 seconds
    #el:highlight                      → highlight with default 2000ms delay
    #input@1000:set-value=Hello        → set input value to “Hello”   #input@1500:type-text=Hello World   → type "Hello World" letter-by-letter   #btn@1500:click|Click me           → click with auto-positioned caption
    #btn@1500:click|^Click me          → click with caption forced to top
@@ -301,7 +310,17 @@ Supported actions
      - Set ``.innerHTML`` of the target. Use with caution.
    * - ``scroll-into-view``
      - —
-     - Smoothly scroll the target into view.
+     - Smoothly scroll the target into view using the browser's native
+       ``scrollIntoView`` API.  Use ``scroll-to`` instead when you want
+       guidestar's auto-scroll behaviour (centres the element, shows the
+       \u2193 indicator badge).
+   * - ``scroll-to``
+     - —
+     - Scroll the target element into view within its nearest scrollable
+       ancestor, centring it vertically.  Shows the animated \u2193 scroll
+       indicator badge.  This is the explicit form of the auto-scroll that
+       normally happens automatically before every action when
+       ``autoScroll: true``.
    * - ``dispatch-event``
      - ``eventName`` or ``eventName:detailJSON``
      - Dispatch a ``CustomEvent`` on the target.

@@ -46,6 +46,7 @@
     function parseStepString(str) {
         var delay = 2000;
         var noHighlight = false;
+        var noScroll = false;
         var caption = undefined;
         var captionOptions = undefined;
         var working = str;
@@ -87,6 +88,10 @@
                 noHighlight = true;
                 delayPart = delayPart.slice(0, -1);
             }
+            if (delayPart.endsWith('~')) {
+                noScroll = true;
+                delayPart = delayPart.slice(0, -1);
+            }
             delay = parseInt(delayPart, 10) || 2000;
             working = before + rest;
         }
@@ -112,13 +117,13 @@
         }
 
         if (target === 'pause') {
-            var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight };
+            var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight, noScroll: noScroll };
             if (caption !== undefined) pauseStep.caption = caption;
             if (captionOptions) pauseStep.captionOptions = captionOptions;
             return pauseStep;
         }
 
-        var step = { target: target, action: action, delay: delay, noHighlight: noHighlight };
+        var step = { target: target, action: action, delay: delay, noHighlight: noHighlight, noScroll: noScroll };
         if (value !== undefined) step.value = value;
         if (caption !== undefined) step.caption = caption;
         if (captionOptions) step.captionOptions = captionOptions;
@@ -485,6 +490,7 @@
             timeline: true,
             reduceMotion: 'auto',
             viewport: null,
+            autoScroll: true,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -523,6 +529,7 @@
         this._reduceMotion = false;
         this._userPaused = false;
         this._restartOverlay = null;
+        this._scrollIndicatorEl = null;
 
         this._init();
     }
@@ -614,6 +621,11 @@
             this._createRestartOverlay();
         }
 
+        // Create scroll indicator overlay — not needed in static mode
+        if (!this._isStatic) {
+            this._createScrollIndicator();
+        }
+
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
             container.addEventListener('click', function (e) {
@@ -671,6 +683,120 @@
             s.textContent = old.textContent;
             old.parentNode.replaceChild(s, old);
         }
+    };
+
+    // ── Scroll helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Find the nearest ancestor of el (within _contentRoot) that is
+     * actually scrollable (overflows in the Y axis).
+     * Falls back to _contentRoot itself.
+     */
+    Guidestar.prototype._findScrollParent = function (el) {
+        var root = this._contentRoot;
+        var node = el.parentElement;
+        while (node && node !== root) {
+            var style = window.getComputedStyle(node);
+            var overflow = style.overflowY;
+            if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
+                return node;
+            }
+            node = node.parentElement;
+        }
+        // Fall back: check _contentRoot itself
+        var rootStyle = window.getComputedStyle(root);
+        if (rootStyle.overflowY === 'auto' || rootStyle.overflowY === 'scroll') {
+            return root;
+        }
+        return null; // not scrollable — nothing to scroll
+    };
+
+    /**
+     * Returns true if el is fully visible within scroller's viewport.
+     */
+    Guidestar.prototype._isInViewOf = function (el, scroller) {
+        var scrollerRect = scroller.getBoundingClientRect();
+        var elRect = el.getBoundingClientRect();
+        return (
+            elRect.top    >= scrollerRect.top    - 2 &&
+            elRect.bottom <= scrollerRect.bottom + 2
+        );
+    };
+
+    /**
+     * Create the scroll indicator overlay (once per instance).
+     * A small badge with a ↓ icon that briefly flashes at the edge of a
+     * scrolling container to signal that an auto-scroll occurred.
+     */
+    Guidestar.prototype._createScrollIndicator = function () {
+        var el = document.createElement('div');
+        el.className = 'gs-scroll-indicator';
+        el.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4v12.17l-5.59-5.58L4 12l8 8 8-8-1.41-1.41L13 16.17V4h-2z"/></svg>';
+        this.container.appendChild(el);
+        this._scrollIndicatorEl = el;
+    };
+
+    /**
+     * Flash the scroll indicator badge at the bottom-right of scroller.
+     * Position is calculated relative to this.container.
+     */
+    Guidestar.prototype._showScrollIndicator = function (scroller) {
+        var indicator = this._scrollIndicatorEl;
+        if (!indicator || this._reduceMotion) return;
+        var containerRect = this.container.getBoundingClientRect();
+        var scrollerRect  = scroller.getBoundingClientRect();
+        // Place the badge at the bottom-right of the scroller, inset from edges
+        var right  = containerRect.right  - scrollerRect.right  + 12;
+        var bottom = containerRect.bottom - scrollerRect.bottom + 12;
+        indicator.style.right  = Math.max(right,  8) + 'px';
+        indicator.style.bottom = Math.max(bottom, 8) + 'px';
+        indicator.classList.remove('gs-scroll-indicator--active');
+        void indicator.offsetWidth; // force reflow
+        indicator.classList.add('gs-scroll-indicator--active');
+    };
+
+    /**
+     * Scroll el into view within its scrollable parent, then call callback.
+     * Shows the scroll indicator and waits for the scroll animation before
+     * calling callback.
+     */
+    Guidestar.prototype._scrollTo = function (el, callback) {
+        var scroller = this._findScrollParent(el);
+        if (!scroller || this._isInViewOf(el, scroller)) {
+            if (callback) callback();
+            return;
+        }
+
+        // Calculate target scrollTop to centre el within scroller
+        var scrollerRect = scroller.getBoundingClientRect();
+        var elRect = el.getBoundingClientRect();
+        var elRelTop = elRect.top - scrollerRect.top + scroller.scrollTop;
+        var target = elRelTop - (scroller.clientHeight / 2) + (elRect.height / 2);
+        scroller.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+        this._showScrollIndicator(scroller);
+
+        // Wait for smooth scroll to finish (max 600 ms) then invoke callback
+        var startTop = scroller.scrollTop;
+        var self = this;
+        var waited = 0;
+        var POLL = 40;
+        var MAX_WAIT = 600;
+        function poll() {
+            waited += POLL;
+            if (waited >= MAX_WAIT) {
+                if (callback) callback();
+                return;
+            }
+            // Detect when scroll position has stabilised
+            var now = scroller.scrollTop;
+            if (Math.abs(now - target) < 2 || now === startTop) {
+                if (callback) callback();
+                return;
+            }
+            startTop = now;
+            setTimeout(poll, POLL);
+        }
+        setTimeout(poll, POLL);
     };
 
     Guidestar.prototype._loadHTML = function (src, callback) {
@@ -1785,9 +1911,21 @@
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
             }
-            this._executeAction(step, el, function () {
-                afterAction(0);
-            });
+            // Auto-scroll target into view (unless disabled for this step)
+            var shouldScroll = this.config.autoScroll && !step.noScroll && el &&
+                               step.action !== 'pause';
+            if (shouldScroll) {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(0);
+                    });
+                });
+            } else {
+                this._executeAction(step, el, function () {
+                    afterAction(0);
+                });
+            }
         }
     };
 
@@ -1805,6 +1943,7 @@
             // Restore the content DOM to its initial state before replaying
             if (this._initialHTML !== undefined) {
                 this._contentRoot.innerHTML = this._initialHTML;
+                this._runScripts();
                 document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: this.container, instance: this }
                 }));
@@ -1961,6 +2100,16 @@
                 if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     if (!step.noHighlight) this._highlight(el, step.delay);
+                }
+                break;
+
+            case 'scroll-to':
+                // Explicit scroll — auto-scroll helper handles the animation;
+                // callback must be called asynchronously, so we return early.
+                if (el) {
+                    var self = this;
+                    this._scrollTo(el, function () { if (callback) callback(); });
+                    return;
                 }
                 break;
 
