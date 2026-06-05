@@ -133,6 +133,64 @@
     }
 }
 
+/* ── Resize handle ───────────────────────────────────────────────── */
+
+/*
+ * .gs-resize-handle — 16×16 px drag target in the bottom-right corner.
+ * Shows a standard se-resize cursor; a grippy diagonal-lines visual
+ * (using a repeating-linear-gradient) mirrors the browser/devtools style.
+ *
+ * .gs-resize-badge — live "W × H" label shown only while dragging.
+ */
+
+.gs-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: se-resize;
+    z-index: 10001;
+    /* diagonal grip dots */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.45) 0px,
+        rgba(255, 255, 255, 0.45) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    background-size: 16px 16px;
+    background-position: bottom right;
+    border-radius: 0 0 2px 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+[data-guidestar]:hover .gs-resize-handle {
+    opacity: 1;
+}
+
+.gs-resize-badge {
+    position: absolute;
+    bottom: 20px;
+    right: 4px;
+    background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--gs-control-tooltip-color, #fff);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10002;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.gs-resize-badge--visible {
+    opacity: 1;
+}
+
 /* ── Highlight animation applied to targeted elements ────────────── */
 
 @keyframes gs-highlight-pulse {

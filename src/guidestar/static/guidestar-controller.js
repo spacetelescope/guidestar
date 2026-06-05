@@ -537,6 +537,8 @@
         this._scrollIndicatorEl = null;
         this._fullscreenHost = null;
         this._fullscreenBtn = null;
+        this._resizeHandle = null;
+        this._resizeBadge = null;
 
         this._init();
     }
@@ -638,13 +640,19 @@
             this._createFullscreenHost();
         }
 
+        // Create resize handle
+        if (this.config.resizable !== false) {
+            this._createResizeHandle();
+        }
+
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
             container.addEventListener('click', function (e) {
                 if (!e.isTrusted) return;
-                // Ignore clicks on the controls host, fullscreen button, timeline, or tooltip
+                // Ignore clicks on the controls host, fullscreen button, resize handle, timeline, or tooltip
                 if (e.target.closest && e.target.closest('.gs-controls-host')) return;
                 if (e.target.closest && e.target.closest('.gs-fullscreen-host')) return;
+                if (e.target.closest && e.target.closest('.gs-resize-handle')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline-tooltip')) return;
                 if (self._playing) {
@@ -753,6 +761,68 @@
         this._fullscreenBtn.innerHTML = isFS ? ICON_FULLSCREEN_EXIT : ICON_FULLSCREEN;
         this._fullscreenBtn.setAttribute('aria-label', isFS ? 'Exit full screen' : 'Full screen');
         this._fullscreenBtn.setAttribute('data-tooltip', isFS ? 'Exit full screen' : 'Full screen');
+    };
+
+    // ── Resize handle ────────────────────────────────────────────────────────
+
+    /**
+     * Create a drag handle in the bottom-right corner of the container.
+     * Dragging it resizes the container width (and height) via pointer events.
+     * A dimension badge is shown during the drag.
+     */
+    Guidestar.prototype._createResizeHandle = function () {
+        var self = this;
+        var container = this.container;
+
+        var handle = document.createElement('div');
+        handle.className = 'gs-resize-handle';
+        handle.setAttribute('aria-hidden', 'true');
+        handle.setAttribute('title', 'Drag to resize');
+        container.appendChild(handle);
+        this._resizeHandle = handle;
+
+        var badge = document.createElement('div');
+        badge.className = 'gs-resize-badge';
+        container.appendChild(badge);
+        this._resizeBadge = badge;
+
+        var startX, startY, startW, startH;
+
+        handle.addEventListener('pointerdown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handle.setPointerCapture(e.pointerId);
+
+            var rect = container.getBoundingClientRect();
+            startX = e.clientX;
+            startY = e.clientY;
+            startW = rect.width;
+            startH = rect.height;
+
+            badge.textContent = Math.round(startW) + ' \u00d7 ' + Math.round(startH);
+            badge.classList.add('gs-resize-badge--visible');
+
+            handle.addEventListener('pointermove', onMove);
+            handle.addEventListener('pointerup', onUp);
+            handle.addEventListener('pointercancel', onUp);
+        });
+
+        function onMove(e) {
+            var dX = e.clientX - startX;
+            var dY = e.clientY - startY;
+            var newW = Math.max(150, startW + dX);
+            var newH = Math.max(100, startH + dY);
+            container.style.width = newW + 'px';
+            container.style.height = newH + 'px';
+            badge.textContent = Math.round(newW) + ' \u00d7 ' + Math.round(newH);
+        }
+
+        function onUp() {
+            badge.classList.remove('gs-resize-badge--visible');
+            handle.removeEventListener('pointermove', onMove);
+            handle.removeEventListener('pointerup', onUp);
+            handle.removeEventListener('pointercancel', onUp);
+        }
     };
 
     // ── Scroll helpers ───────────────────────────────────────────────────────

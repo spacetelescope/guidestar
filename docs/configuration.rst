@@ -112,10 +112,12 @@ When creating a ``Guidestar`` programmatically or via the
    * - ``resizable``
      - bool
      - ``true``
-     - Reserved for a future drag-to-resize handle (bottom-right corner).
-       Setting this to ``false`` now will prevent the handle from appearing
-       when it is implemented.  Has no visible effect in the current
-       release.
+     - Show a drag handle in the bottom-right corner of the container.
+       Dragging it resizes the container's width and height; a live
+       ``W × H`` badge is shown while dragging.  The handle is hidden by
+       default and fades in on hover.  Set to ``false`` to disable.
+
+       In the Sphinx directive, use ``:resizable: false``.
    * - ``onStepStart``
      - function
      - ``null``
