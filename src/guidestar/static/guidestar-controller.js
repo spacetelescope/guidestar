@@ -471,6 +471,16 @@
             '  outline: 2px solid rgba(255, 152, 0, 0.7);',
             '  outline-offset: 2px;',
             '  border-radius: 2px;',
+            '}',
+            '@keyframes gs-highlight-blink {',
+            '  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7); outline-color: rgba(255, 152, 0, 0.9); }',
+            '  50%      { box-shadow: 0 0 0 7px rgba(255, 152, 0, 0); outline-color: rgba(255, 152, 0, 0.35); }',
+            '}',
+            '.gs-highlight-persist {',
+            '  animation: gs-highlight-blink 1.4s ease-in-out infinite;',
+            '  outline: 2px solid rgba(255, 152, 0, 0.9);',
+            '  outline-offset: 2px;',
+            '  border-radius: 2px;',
             '}'
         ].join('\n');
         document.head.appendChild(s);
@@ -1059,6 +1069,7 @@
             }
         }
         // Static mode: place cursor at last init-step target (if cursor enabled)
+        // and convert any gs-highlight elements to the persistent blinking variant.
         if (this._isStatic) {
             if (this._cursorEl && this._lastInitEl) {
                 var containerRect = this.container.getBoundingClientRect();
@@ -1069,6 +1080,15 @@
                 this._cursorY = y;
                 this._cursorEl.style.transform = 'translate(' + x + 'px,' + y + 'px)';
                 this._cursorEl.style.opacity = '1';
+            }
+            var highlighted = this._contentRoot.querySelectorAll('.gs-highlight');
+            for (var i = 0; i < highlighted.length; i++) {
+                highlighted[i].classList.remove('gs-highlight');
+                highlighted[i].classList.add('gs-highlight-persist');
+            }
+            if (this._lastInitEl) {
+                this._lastInitEl.classList.remove('gs-highlight');
+                this._lastInitEl.classList.add('gs-highlight-persist');
             }
             return;
         }
