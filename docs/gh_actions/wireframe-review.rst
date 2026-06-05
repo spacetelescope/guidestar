@@ -1,5 +1,5 @@
-CI Integration — Wireframe Review Action
-=========================================
+Wireframe Review Action (CI Integration)
+========================================
 
 A reusable GitHub Action that automatically reviews pull requests for changes
 that may require wireframe demo updates. It auto-discovers wireframe demos in
