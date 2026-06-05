@@ -45,6 +45,13 @@ Minimal Sphinx example
    * Step through the actions, highlighting each target element
    * Pause if the user clicks anywhere inside the demo
 
+
+.. guidestar-demo:: _static/example-wireframe.html
+   :steps: #demo-btn-1@1500:click|Click the first button, #demo-panel@1000:toggle-class=open|^Toggle the panel open, #demo-btn-2@1500:add-class=active|Activate the second button, #demo-input@1500:type-text=Hello World|Type into the input, #demo-btn-2@1500:remove-class=active, #demo-panel@1000:toggle-class=open|vClose the panel
+   :height: 300px
+   :repeat: true
+
+
 4. To show a **static snapshot** instead — no controls, just the wireframe
    frozen at a specific state — omit ``:steps:`` and use ``:init-steps-json:``
    to set up the scene:
@@ -72,9 +79,6 @@ Minimal Sphinx example
    Set ``:cursor: false`` to hide the cursor if you want a clean screenshot-
    like embed with no cursor visible.
 
-Static live example
-^^^^^^^^^^^^^^^^^^^
-
 .. guidestar-demo:: _static/example-wireframe.html
    :init-steps-json:
       [
@@ -86,13 +90,7 @@ Static live example
    :height: 300px
 
 
-Live example
-------------
 
-.. guidestar-demo:: _static/example-wireframe.html
-   :steps: #demo-btn-1@1500:click|Click the first button, #demo-panel@1000:toggle-class=open|^Toggle the panel open, #demo-btn-2@1500:add-class=active|Activate the second button, #demo-input@1500:type-text=Hello World|Type into the input, #demo-btn-2@1500:remove-class=active, #demo-panel@1000:toggle-class=open|vClose the panel
-   :height: 300px
-   :repeat: true
 
 
 Minimal standalone HTML example
