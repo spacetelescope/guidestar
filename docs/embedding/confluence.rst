@@ -27,7 +27,7 @@ Confluence macro that renders iframes without the ``sandbox`` restriction).
 Setting up GitHub Pages
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The :doc:`../workflows/deploy-demos` reusable workflow builds self-contained
+The :doc:`../../gh_actions/deploy-demos` reusable workflow builds self-contained
 HTML pages from your demo configs and deploys them to GitHub Pages.  See that
 page for the full setup guide, but in brief — add this to your repo:
 
@@ -62,7 +62,8 @@ Embedding in Confluence with Bobswift
    <https://marketplace.atlassian.com/apps/1210-html-macro>`_ from the
    Atlassian Marketplace (requires Confluence admin access).
 
-2. On the Confluence page, insert the **HTML macro** and paste:
+2. On the Confluence page, insert the **HTML macro** (leave all options as default) 
+   and paste the following into the macro body (replacing the ``src`` URL with your GitHub Pages demo URL):
 
    .. code-block:: html
 
@@ -94,7 +95,7 @@ For instructions on how to generate the GIF itself, see :doc:`recording`.
 Setting up GitHub Pages for GIF hosting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pass ``record-gifs: true`` to the :doc:`../workflows/deploy-demos` workflow
+Pass ``record-gifs: true`` to the :doc:`../../gh_actions/deploy-demos` workflow
 and it will record GIFs alongside the HTML pages:
 
 .. code-block:: yaml

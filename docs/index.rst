@@ -23,4 +23,4 @@ This package handles:
 
    quickstart
    demos/index
-   workflows/index
+   gh_actions/index

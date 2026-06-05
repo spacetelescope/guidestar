@@ -21,7 +21,7 @@ Wireframe Demos
    :maxdepth: 1
    :caption: Embedding
 
-   sphinx
-   html
-   recording
-   confluence
+   ../embedding/sphinx
+   ../embedding/html
+   ../embedding/recording
+   ../embedding/confluence
