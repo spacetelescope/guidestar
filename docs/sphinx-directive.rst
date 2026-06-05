@@ -77,6 +77,16 @@ Directive options
      - ``auto``
      - Reduced-motion behaviour (``auto`` / ``true`` / ``false``). See
        :doc:`accessibility`.
+   * - ``:viewport:``
+     - —
+     - Fixed design width in CSS pixels (e.g. ``1440``).  When set, the
+       wireframe is rendered internally at that width and scaled uniformly
+       to fit the demo container (scale mode).  Omit to let the wireframe
+       reflow responsively to the container width (responsive mode).
+
+       Set this when the wireframe was generated from a live URL at a
+       specific desktop resolution — it ensures the content always matches
+       the captured design at any container size.
 
 
 Using from an external package

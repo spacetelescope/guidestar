@@ -69,6 +69,8 @@ def build_page(demo_config: dict, wireframe_path: Path, controller_js: str, cont
         config["cursor"] = demo_config["cursor"]
     if demo_config.get("cursorSpeed") is not None:
         config["cursorSpeed"] = demo_config["cursorSpeed"]
+    if demo_config.get("viewport") is not None:
+        config["viewport"] = demo_config["viewport"]
 
     config_json = html.escape(json.dumps(config), quote=True)
 

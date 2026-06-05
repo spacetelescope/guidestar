@@ -46,6 +46,7 @@
     function parseStepString(str) {
         var delay = 2000;
         var noHighlight = false;
+        var noScroll = false;
         var caption = undefined;
         var captionOptions = undefined;
         var working = str;
@@ -87,6 +88,10 @@
                 noHighlight = true;
                 delayPart = delayPart.slice(0, -1);
             }
+            if (delayPart.endsWith('~')) {
+                noScroll = true;
+                delayPart = delayPart.slice(0, -1);
+            }
             delay = parseInt(delayPart, 10) || 2000;
             working = before + rest;
         }
@@ -112,13 +117,13 @@
         }
 
         if (target === 'pause') {
-            var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight };
+            var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight, noScroll: noScroll };
             if (caption !== undefined) pauseStep.caption = caption;
             if (captionOptions) pauseStep.captionOptions = captionOptions;
             return pauseStep;
         }
 
-        var step = { target: target, action: action, delay: delay, noHighlight: noHighlight };
+        var step = { target: target, action: action, delay: delay, noHighlight: noHighlight, noScroll: noScroll };
         if (value !== undefined) step.value = value;
         if (caption !== undefined) step.caption = caption;
         if (captionOptions) step.captionOptions = captionOptions;
@@ -484,6 +489,8 @@
             cursorSpeed: 300,
             timeline: true,
             reduceMotion: 'auto',
+            viewport: null,
+            autoScroll: true,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -522,6 +529,7 @@
         this._reduceMotion = false;
         this._userPaused = false;
         this._restartOverlay = null;
+        this._scrollIndicatorEl = null;
 
         this._init();
     }
@@ -613,6 +621,11 @@
             this._createRestartOverlay();
         }
 
+        // Create scroll indicator overlay — not needed in static mode
+        if (!this._isStatic) {
+            this._createScrollIndicator();
+        }
+
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
             container.addEventListener('click', function (e) {
@@ -654,6 +667,139 @@
         }
     };
 
+    /**
+     * Re-execute any <script> elements inside _contentRoot.
+     * Browsers do not run scripts injected via innerHTML; calling this
+     * method after each innerHTML assignment ensures wireframe interaction
+     * scripts (click-to-toggle-class handlers) are active.
+     * Uses .onclick-style property assignment so re-running on restart
+     * replaces rather than stacks handlers.
+     */
+    Guidestar.prototype._runScripts = function () {
+        var scripts = this._contentRoot.querySelectorAll('script');
+        for (var i = 0; i < scripts.length; i++) {
+            var old = scripts[i];
+            var s = document.createElement('script');
+            s.textContent = old.textContent;
+            old.parentNode.replaceChild(s, old);
+        }
+    };
+
+    // ── Scroll helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Find the nearest ancestor of el (within _contentRoot) that is
+     * actually scrollable (overflows in the Y axis).
+     * Falls back to _contentRoot itself.
+     */
+    Guidestar.prototype._findScrollParent = function (el) {
+        var root = this._contentRoot;
+        var node = el.parentElement;
+        while (node && node !== root) {
+            var style = window.getComputedStyle(node);
+            var overflow = style.overflowY;
+            if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
+                return node;
+            }
+            node = node.parentElement;
+        }
+        // Fall back: check _contentRoot itself
+        var rootStyle = window.getComputedStyle(root);
+        if (rootStyle.overflowY === 'auto' || rootStyle.overflowY === 'scroll') {
+            return root;
+        }
+        return null; // not scrollable — nothing to scroll
+    };
+
+    /**
+     * Returns true if el is fully visible within scroller's viewport.
+     */
+    Guidestar.prototype._isInViewOf = function (el, scroller) {
+        var scrollerRect = scroller.getBoundingClientRect();
+        var elRect = el.getBoundingClientRect();
+        return (
+            elRect.top    >= scrollerRect.top    - 2 &&
+            elRect.bottom <= scrollerRect.bottom + 2
+        );
+    };
+
+    /**
+     * Create the scroll indicator overlay (once per instance).
+     * A small badge with a ↓ icon that briefly flashes at the edge of a
+     * scrolling container to signal that an auto-scroll occurred.
+     */
+    Guidestar.prototype._createScrollIndicator = function () {
+        var el = document.createElement('div');
+        el.className = 'gs-scroll-indicator';
+        el.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4v12.17l-5.59-5.58L4 12l8 8 8-8-1.41-1.41L13 16.17V4h-2z"/></svg>';
+        this.container.appendChild(el);
+        this._scrollIndicatorEl = el;
+    };
+
+    /**
+     * Flash the scroll indicator badge at the bottom-right of scroller.
+     * Position is calculated relative to this.container.
+     */
+    Guidestar.prototype._showScrollIndicator = function (scroller) {
+        var indicator = this._scrollIndicatorEl;
+        if (!indicator || this._reduceMotion) return;
+        var containerRect = this.container.getBoundingClientRect();
+        var scrollerRect  = scroller.getBoundingClientRect();
+        // Place the badge at the bottom-right of the scroller, inset from edges
+        var right  = containerRect.right  - scrollerRect.right  + 12;
+        var bottom = containerRect.bottom - scrollerRect.bottom + 12;
+        indicator.style.right  = Math.max(right,  8) + 'px';
+        indicator.style.bottom = Math.max(bottom, 8) + 'px';
+        indicator.classList.remove('gs-scroll-indicator--active');
+        void indicator.offsetWidth; // force reflow
+        indicator.classList.add('gs-scroll-indicator--active');
+    };
+
+    /**
+     * Scroll el into view within its scrollable parent, then call callback.
+     * Shows the scroll indicator and waits for the scroll animation before
+     * calling callback.
+     */
+    Guidestar.prototype._scrollTo = function (el, callback) {
+        var scroller = this._findScrollParent(el);
+        if (!scroller || this._isInViewOf(el, scroller)) {
+            if (callback) callback();
+            return;
+        }
+
+        // Calculate target scrollTop to centre el within scroller
+        var scrollerRect = scroller.getBoundingClientRect();
+        var elRect = el.getBoundingClientRect();
+        var elRelTop = elRect.top - scrollerRect.top + scroller.scrollTop;
+        var target = Math.max(0, Math.min(
+            elRelTop - (scroller.clientHeight / 2) + (elRect.height / 2),
+            scroller.scrollHeight - scroller.clientHeight
+        ));
+
+        // Use a manual RAF animation instead of scrollTo({ behavior:'smooth' })
+        // because CSS smooth-scroll is broken inside CSS transform: scale() contexts.
+        var startTop = scroller.scrollTop;
+        var startTime = null;
+        var DURATION = 400;
+        this._showScrollIndicator(scroller);
+
+        function easeInOut(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        }
+
+        function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / DURATION, 1);
+            scroller.scrollTop = startTop + (target - startTop) * easeInOut(progress);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                if (callback) callback();
+            }
+        }
+        requestAnimationFrame(step);
+    };
+
     Guidestar.prototype._loadHTML = function (src, callback) {
         var self = this;
         fetch(src)
@@ -663,6 +809,7 @@
             })
             .then(function (html) {
                 self._contentRoot.innerHTML = html;
+                self._runScripts();
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)
                 document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: self.container, instance: self }
@@ -717,7 +864,35 @@
         if (done) done();
     };
 
+    Guidestar.prototype._applyViewportScale = function () {
+        var vp = this.config.viewport;
+        if (!vp) return;
+        var containerW = this.container.clientWidth;
+        if (!containerW) return;
+        var scale = containerW / vp;
+        this._contentRoot.style.width = vp + 'px';
+        this._contentRoot.style.transform = 'scale(' + scale + ')';
+        this._contentRoot.style.transformOrigin = 'top left';
+        // Expand the content root's effective height so the scaled content
+        // fills the container vertically — avoids a gap at the bottom.
+        var containerH = this.container.clientHeight;
+        if (containerH) {
+            this._contentRoot.style.height = Math.ceil(containerH / scale) + 'px';
+        }
+    };
+
     Guidestar.prototype._onReady = function () {
+        var self = this;
+        // Apply viewport scaling now and whenever the container is resized.
+        if (this.config.viewport) {
+            this._applyViewportScale();
+            if (typeof ResizeObserver !== 'undefined') {
+                this._resizeObserver = new ResizeObserver(function () {
+                    self._applyViewportScale();
+                });
+                this._resizeObserver.observe(this.container);
+            }
+        }
         // Static mode: place cursor at last init-step target (if cursor enabled)
         if (this._isStatic) {
             if (this._cursorEl && this._lastInitEl) {
@@ -906,6 +1081,7 @@
         // starts fresh (removes dynamically added viewers, sidebars, etc.)
         if (this._initialHTML !== undefined) {
             this._contentRoot.innerHTML = this._initialHTML;
+            this._runScripts();
             // Re-dispatch so external code (e.g. jdaviz-wireframe-actions)
             // can re-wire toolbar clicks, icons, etc.
             document.dispatchEvent(new CustomEvent('guidestar-loaded', {
@@ -1736,9 +1912,21 @@
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
             }
-            this._executeAction(step, el, function () {
-                afterAction(0);
-            });
+            // Auto-scroll target into view (unless disabled for this step)
+            var shouldScroll = this.config.autoScroll && !step.noScroll && el &&
+                               step.action !== 'pause';
+            if (shouldScroll) {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(0);
+                    });
+                });
+            } else {
+                this._executeAction(step, el, function () {
+                    afterAction(0);
+                });
+            }
         }
     };
 
@@ -1756,6 +1944,7 @@
             // Restore the content DOM to its initial state before replaying
             if (this._initialHTML !== undefined) {
                 this._contentRoot.innerHTML = this._initialHTML;
+                this._runScripts();
                 document.dispatchEvent(new CustomEvent('guidestar-loaded', {
                     detail: { container: this.container, instance: this }
                 }));
@@ -1912,6 +2101,16 @@
                 if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     if (!step.noHighlight) this._highlight(el, step.delay);
+                }
+                break;
+
+            case 'scroll-to':
+                // Explicit scroll — auto-scroll helper handles the animation;
+                // callback must be called asynchronously, so we return early.
+                if (el) {
+                    var self = this;
+                    this._scrollTo(el, function () { if (callback) callback(); });
+                    return;
                 }
                 break;
 

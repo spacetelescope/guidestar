@@ -106,7 +106,7 @@ it to the **bottom**. Without a prefix the position is chosen automatically
 
 `highlight`, `click`, `add-class`, `remove-class`, `toggle-class`,
 `set-attribute`, `remove-attribute`, `set-value`, `set-text`, `set-html`,
-`scroll-into-view`, `dispatch-event`, `pause`.
+`scroll-into-view`, `scroll-to`, `dispatch-event`, `pause`.
 
 ### Custom actions
 

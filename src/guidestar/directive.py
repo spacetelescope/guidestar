@@ -65,6 +65,7 @@ class GuidestarDirective(SphinxDirective):
         'cursor': str,
         'cursor-speed': str,
         'reduce-motion': str,
+        'viewport': str,
     }
 
     def run(self):
@@ -155,6 +156,14 @@ class GuidestarDirective(SphinxDirective):
         initial_class = self.options.get('initial-class', '')
         if initial_class:
             config['initialClass'] = initial_class
+
+        # Viewport width for scale mode (integer px; omit for responsive mode)
+        viewport = self.options.get('viewport')
+        if viewport is not None:
+            try:
+                config['viewport'] = int(viewport)
+            except ValueError:
+                pass
 
         config_json = json.dumps(config)
         config_escaped = html_module.escape(config_json)
