@@ -74,6 +74,21 @@ When creating a ``Guidestar`` programmatically or via the
        all animations off regardless of OS preference. ``false`` keeps
        animations on even when the OS requests reduced motion. See
        :doc:`accessibility` for details.
+   * - ``viewport``
+     - number / null
+     - ``null``
+     - Fixed viewport width (in CSS pixels) at which the wireframe was
+       designed.  When set, the wireframe content is rendered internally at
+       that width and then scaled uniformly (``transform: scale()``) to fit
+       the demo container, preserving the exact layout of the original
+       design.  When ``null`` (the default), the wireframe reflows
+       responsively to match the container width.
+
+       Use **scale mode** (set a number) for wireframes captured from a
+       live URL at a specific desktop viewport — this guarantees the
+       content always looks exactly like the captured screenshot.
+       Use **responsive mode** (``null``) for wireframes hand-authored
+       to adapt to their container, such as the kitchen-sink example.
    * - ``onStepStart``
      - function
      - ``null``

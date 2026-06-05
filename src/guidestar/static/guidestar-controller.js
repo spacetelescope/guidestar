@@ -484,6 +484,7 @@
             cursorSpeed: 300,
             timeline: true,
             reduceMotion: 'auto',
+            viewport: null,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -717,7 +718,35 @@
         if (done) done();
     };
 
+    Guidestar.prototype._applyViewportScale = function () {
+        var vp = this.config.viewport;
+        if (!vp) return;
+        var containerW = this.container.clientWidth;
+        if (!containerW) return;
+        var scale = containerW / vp;
+        this._contentRoot.style.width = vp + 'px';
+        this._contentRoot.style.transform = 'scale(' + scale + ')';
+        this._contentRoot.style.transformOrigin = 'top left';
+        // Expand the content root's effective height so the scaled content
+        // fills the container vertically — avoids a gap at the bottom.
+        var containerH = this.container.clientHeight;
+        if (containerH) {
+            this._contentRoot.style.height = Math.ceil(containerH / scale) + 'px';
+        }
+    };
+
     Guidestar.prototype._onReady = function () {
+        var self = this;
+        // Apply viewport scaling now and whenever the container is resized.
+        if (this.config.viewport) {
+            this._applyViewportScale();
+            if (typeof ResizeObserver !== 'undefined') {
+                this._resizeObserver = new ResizeObserver(function () {
+                    self._applyViewportScale();
+                });
+                this._resizeObserver.observe(this.container);
+            }
+        }
         // Static mode: place cursor at last init-step target (if cursor enabled)
         if (this._isStatic) {
             if (this._cursorEl && this._lastInitEl) {

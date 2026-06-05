@@ -17,6 +17,18 @@
     isolation: isolate;
 }
 
+/* ── Content root ────────────────────────────────────────────────── */
+
+/*
+ * .gs-content holds the injected wireframe HTML.
+ * transform-origin is set here so viewport-scale mode (transform: scale())
+ * always anchors to the top-left corner of the container.
+ */
+
+.gs-content {
+    transform-origin: top left;
+}
+
 /* ── Highlight animation applied to targeted elements ────────────── */
 
 @keyframes gs-highlight-pulse {
