@@ -113,7 +113,7 @@ Demo config reference
      - ``""``
      - CSS class(es) applied to the content root on load
 
-See :doc:`../configuration` for full details on step syntax and options.
+See :doc:`../demos/configuration` for full details on step syntax and options.
 
 
 Reusing wireframes with different step sequences

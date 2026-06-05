@@ -27,7 +27,7 @@ Confluence macro that renders iframes without the ``sandbox`` restriction).
 Setting up GitHub Pages
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The :doc:`../../gh_actions/deploy-demos` reusable workflow builds self-contained
+The :doc:`../gh_actions/deploy-demos` reusable workflow builds self-contained
 HTML pages from your demo configs and deploys them to GitHub Pages.  See that
 page for the full setup guide, but in brief — add this to your repo:
 
@@ -82,6 +82,12 @@ Embedding in Confluence with Bobswift
 The demo loads with full play/pause/restart controls and auto-starts when
 scrolled into view.
 
+.. guidestar-demo:: _static/confluence-bobswift.html
+   :steps: #search-input@1000:click|Click "Search macros", #search-input@2200:type-text=bobswift|Type "bobswift", #app@500:add-class=searched, #bobswift-result@1500:click|^Click Html-bobswift, #app@400:add-class=inserting, #insert-btn@1800:click|Click Insert, #app@400:add-class=inserted, pause@700, #macro-content@5000:type-text=<iframe src="https://org.github.io/repo/demo.html" width="100%" height="460" frameborder="0"></iframe>|^Paste the iframe embed code, pause@2000
+   :height: 580px
+   :viewport: 860
+   :repeat: true
+
 
 Embed GIF Hosted by GitHub Pages
 --------------------------------
@@ -95,7 +101,7 @@ For instructions on how to generate the GIF itself, see :doc:`recording`.
 Setting up GitHub Pages for GIF hosting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pass ``record-gifs: true`` to the :doc:`../../gh_actions/deploy-demos` workflow
+Pass ``record-gifs: true`` to the :doc:`../gh_actions/deploy-demos` workflow
 and it will record GIFs alongside the HTML pages:
 
 .. code-block:: yaml

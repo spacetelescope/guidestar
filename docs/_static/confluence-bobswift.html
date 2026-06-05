@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    color: #172b4d;
+    background: #f4f5f7;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #app {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── shared dialog chrome ─────────────────────── */
+  .dialog {
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 4px 24px rgba(9,30,66,.28);
+    width: 820px;
+    height: 540px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .dlg-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 54px;
+    border-bottom: 1px solid #dfe1e6;
+    flex-shrink: 0;
+  }
+  .dlg-hd h1 { font-size: 20px; font-weight: 600; color: #172b4d; }
+  .dlg-bd { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  .dlg-ft {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 52px;
+    border-top: 1px solid #dfe1e6;
+    flex-shrink: 0;
+  }
+
+  /* ── select macro dialog ─────────────────────── */
+  #dlg-select { display: flex; }
+
+  .search-row { display: flex; align-items: center; gap: 12px; }
+  #search-input {
+    border: 2px solid #4c9aff;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 210px;
+    outline: none;
+    color: #172b4d;
+  }
+  .help-link { color: #0052cc; text-decoration: none; font-size: 14px; }
+
+  .sidebar {
+    width: 196px;
+    flex-shrink: 0;
+    border-right: 1px solid #dfe1e6;
+    padding: 6px 0;
+    overflow-y: auto;
+  }
+  .sidebar li {
+    list-style: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #172b4d;
+    cursor: pointer;
+  }
+  .sidebar li.active { background: #deebff; color: #0052cc; font-weight: 500; }
+  .sidebar li:hover:not(.active) { background: #f4f5f7; }
+
+  .macro-area { flex: 1; overflow-y: auto; }
+  .macro-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .macro-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f4f5f7;
+  }
+  .macro-item:hover { background: #f4f5f7; }
+
+  .macro-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .macro-icon svg { display: block; width: 100%; height: 100%; }
+  .icon-teal { background: #00b8d9; }
+  .icon-red  { background: #de350b; }
+  .icon-grey { background: #f4f5f7; border: 1px solid #e0e3e7; }
+  .icon-dark { background: #1a2332; }
+
+  .macro-name    { font-size: 14px; font-weight: 600; color: #0052cc; margin-bottom: 2px; }
+  .macro-subtext { font-size: 12px; color: #0052cc; margin-bottom: 3px; }
+  .macro-desc    { font-size: 12px; color: #5e6c84; line-height: 1.4; }
+
+  .find-more {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #0052cc;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .btn-cancel { background: none; border: none; color: #0052cc; font-size: 14px; cursor: pointer; }
+
+  /* filtered state */
+  #grid-default  { display: grid; }
+  #grid-filtered { display: none; grid-template-columns: 1fr; }
+  #app.searched #grid-default  { display: none; }
+  #app.searched #grid-filtered { display: grid; }
+
+  /* ── insert macro dialog ─────────────────────── */
+  #dlg-insert { height: 520px; }
+
+  .ins-left {
+    width: 310px;
+    flex-shrink: 0;
+    border-right: 1px solid #dfe1e6;
+    padding: 16px 20px;
+    overflow-y: auto;
+  }
+  .ins-right { flex: 1; padding: 16px 20px; }
+  .ins-desc  { font-size: 13px; color: #5e6c84; line-height: 1.5; margin-bottom: 6px; }
+  .ins-link  { color: #0052cc; font-size: 13px; text-decoration: none; }
+  .ins-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #172b4d;
+    margin: 14px 0 5px;
+  }
+  .ins-select {
+    width: 100%;
+    padding: 6px 28px 6px 10px;
+    border: 2px solid #4c9aff;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #172b4d;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235e6c84'/%3E%3C/svg%3E") no-repeat right 10px center;
+    appearance: none;
+  }
+  .ins-select.plain { border-color: #dfe1e6; }
+  .fmt-notes { margin: 8px 0 0 16px; font-size: 12px; color: #5e6c84; line-height: 1.9; }
+  .fmt-notes li em { font-style: italic; color: #172b4d; font-weight: 500; }
+
+  .preview-hd {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #172b4d;
+    margin-bottom: 12px;
+  }
+  .preview-spin { color: #0052cc; font-size: 18px; }
+
+  .btn-primary {
+    background: #0052cc;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-link {
+    background: none;
+    border: none;
+    color: #0052cc;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+  .ft-right { display: flex; align-items: center; gap: 12px; }
+
+  /* state transitions */
+  #app.inserting #dlg-select { display: none; }
+  #app.inserting #dlg-insert { display: flex; }
+  #app.inserted  #dlg-insert { display: none; }
+  #app.inserted  #editor-view { display: block; }
+
+  /* ── confluence editor view ──────────────────── */
+  #editor-view {
+    display: none;
+    width: 820px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 4px 24px rgba(9,30,66,.15);
+    overflow: hidden;
+  }
+  .macro-block {
+    border: 1px solid #dfe1e6;
+    border-radius: 3px;
+    margin: 24px;
+    overflow: hidden;
+  }
+  .macro-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #dfe1e6;
+  }
+  .macro-bar-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #1a2332;
+  }
+  .macro-bar-icon svg { display: block; width: 100%; height: 100%; }
+  .macro-bar-name { font-size: 13px; font-weight: 500; color: #172b4d; }
+  #macro-content {
+    display: block;
+    width: 100%;
+    min-height: 130px;
+    padding: 14px 16px;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 13px;
+    color: #172b4d;
+    line-height: 1.5;
+  }
+  .macro-blk-ft { border-top: 1px solid #dfe1e6; padding: 5px 12px; }
+  .expand-btn { background: none; border: none; color: #5e6c84; cursor: pointer; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ STATE 0 / 1  Select macro ════════════════════════ -->
+  <div id="dlg-select" class="dialog">
+    <div class="dlg-hd">
+      <h1>Select macro</h1>
+      <div class="search-row">
+        <input id="search-input" type="text" placeholder="Search macros">
+        <a href="#" class="help-link">Help</a>
+      </div>
+    </div>
+
+    <div class="dlg-bd">
+      <ul class="sidebar">
+        <li class="active">All</li>
+        <li>Administration</li>
+        <li>Communication</li>
+        <li>Confluence content</li>
+        <li>Development</li>
+        <li>External content</li>
+        <li>Formatting</li>
+        <li>Media</li>
+        <li>Navigation</li>
+        <li>Reporting</li>
+        <li>Visuals &amp; images</li>
+      </ul>
+
+      <div class="macro-area">
+        <!-- default grid: full listing -->
+        <div id="grid-default" class="macro-grid">
+          <div class="macro-item">
+            <div class="macro-icon icon-grey"></div>
+            <div>
+              <div class="macro-name">Activity Stream</div>
+              <div class="macro-subtext">Gadget URL</div>
+              <div class="macro-desc">Lists recent activity in a single project, or in all projects.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-teal"></div>
+            <div>
+              <div class="macro-name">Alert</div>
+              <div class="macro-desc">Create custom pop up alerts to flag important context.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-teal"></div>
+            <div>
+              <div class="macro-name">Align</div>
+              <div class="macro-desc">Align the content of the macro as you choose.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-red"></div>
+            <div>
+              <div class="macro-name">Analytics List</div>
+              <div class="macro-desc">Display Confluence metrics as a list for a space or page using Viewtracker analytics data.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-red"></div>
+            <div>
+              <div class="macro-name">Analytics Tiles</div>
+              <div class="macro-desc">Display Confluence metrics as tiles for a space or page using Viewtracker analytics data.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-grey"></div>
+            <div>
+              <div class="macro-name">Assigned to Me</div>
+              <div class="macro-subtext">Gadget URL</div>
+              <div class="macro-desc">Displays all unresolved issues assigned to me</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-grey"></div>
+            <div>
+              <div class="macro-name">Category</div>
+              <div class="macro-desc">Create a link to a category from key.</div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-icon icon-grey"></div>
+            <div>
+              <div class="macro-name">Chart</div>
+              <div class="macro-desc">Display a chart</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- filtered grid: bobswift only (searched state) -->
+        <div id="grid-filtered">
+          <div id="bobswift-result" class="macro-item">
+            <div class="macro-icon icon-dark">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <rect width="48" height="48" rx="5" fill="#1a2332"/>
+                <rect x="11" y="9" width="26" height="5" rx="2.5" fill="#4dd0e1"/>
+                <path d="M11 17 L11 28 Q11 39 24 43 Q37 39 37 28 L37 17 Z"
+                      fill="none" stroke="#4dd0e1" stroke-width="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="macro-name">Html-bobswift</div>
+              <div class="macro-desc">Add HTML data to a Confluence page. (See documentation for information on coming removal of username/password parameters)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dlg-ft">
+      <a href="#" class="find-more">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="6" cy="6" r="5" stroke="#0052cc" stroke-width="1.5"/>
+          <line x1="10" y1="10" x2="13" y2="13" stroke="#0052cc" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Find more macros...
+      </a>
+      <button class="btn-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ STATE 2  Insert macro config ══════════════════════ -->
+  <div id="dlg-insert" class="dialog">
+    <div class="dlg-hd">
+      <h1>Insert 'Html-bobswift' Macro</h1>
+    </div>
+    <div class="dlg-bd">
+      <div class="ins-left">
+        <p class="ins-desc">Add HTML data to a Confluence page. (See documentation for information on coming removal of username/password parameters)</p>
+        <a href="#" class="ins-link">Documentation</a>
+        <label class="ins-label">Format</label>
+        <select class="ins-select">
+          <option>html</option>
+          <option>xhtml</option>
+          <option>wiki</option>
+        </select>
+        <ul class="fmt-notes">
+          <li><em>html</em> – data is treated as html.</li>
+          <li><em>xhtml</em> – data is treated as xhtml and rendered with the Confluence xhtml renderer.</li>
+          <li><em>wiki</em> – data surrounded by a noformat macro.</li>
+        </ul>
+        <label class="ins-label">Profile</label>
+        <select class="ins-select plain"><option value=""></option></select>
+        <p class="ins-desc" style="margin-top: 6px;">Choose a profile to access data from a remote system.</p>
+        <label class="ins-label">Location of HTML data</label>
+      </div>
+      <div class="ins-right">
+        <div class="preview-hd">
+          <span class="preview-spin">↻</span>
+          <span>Preview</span>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn-link">Select macro</button>
+      <div class="ft-right">
+        <button id="insert-btn" class="btn-primary">Insert</button>
+        <button class="btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATE 3  Confluence editor with macro block ═══════ -->
+  <div id="editor-view">
+    <div class="macro-block">
+      <div class="macro-bar">
+        <div class="macro-bar-icon">
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="5" fill="#1a2332"/>
+            <rect x="11" y="9" width="26" height="5" rx="2.5" fill="#4dd0e1"/>
+            <path d="M11 17 L11 28 Q11 39 24 43 Q37 39 37 28 L37 17 Z"
+                  fill="none" stroke="#4dd0e1" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <span class="macro-bar-name">Html-bobswift</span>
+      </div>
+      <textarea id="macro-content" rows="6"></textarea>
+      <div class="macro-blk-ft">
+        <button class="expand-btn">⌃</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+document.querySelectorAll('.sidebar li').forEach(function(li) {
+  li.onclick = function() {
+    document.querySelectorAll('.sidebar li').forEach(function(l) { l.classList.remove('active'); });
+    li.classList.add('active');
+  };
+});
+</script>
+</body>
+</html>
