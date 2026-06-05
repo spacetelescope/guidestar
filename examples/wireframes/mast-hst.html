@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+  }
+
+  /* ── App shell ───────────────────────────────────────────────── */
+
+  .app {
+    background: #02171c;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(0,40,55,0.9) 0%, transparent 70%),
+      radial-gradient(circle at 15% 85%, rgba(0,30,42,0.8) 0%, transparent 50%);
+    color: #fff;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Top bar ─────────────────────────────────────────────────── */
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #000;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 4px;
+  }
+
+  .topbar-brand .logo-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1a4060;
+    border: 2px solid #4a8aac;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #c6f0fd;
+    flex-shrink: 0;
+  }
+
+  .topbar-brand .brand-text {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .topbar-brand .brand-text .word-mast {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: #ccc;
+  }
+
+  .topbar-brand .for-text {
+    font-size: 20px;
+    font-weight: 400;
+    color: #ddd;
+  }
+
+  .mission-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #00617e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+
+  .mission-dropdown .arrow { font-size: 14px; }
+
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-left: auto;
+    font-size: 13px;
+  }
+
+  .topbar-nav .sep { color: rgba(255,255,255,0.4); margin: 0 8px; }
+
+  .topbar-nav button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+  }
+
+  .topbar-nav button .icon {
+    font-size: 16px;
+    opacity: 0.8;
+  }
+
+  /* ── Search view ─────────────────────────────────────────────── */
+
+  .search-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px 12px;
+    gap: 12px;
+  }
+
+  .app.results-open .search-view { display: none; }
+
+  /* ── Welcome banner ──────────────────────────────────────────── */
+
+  .welcome-banner {
+    background: #003b4d;
+    border-left: 4px solid #00617e;
+    border-radius: 4px;
+    padding: 12px 40px 12px 14px;
+    position: relative;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e8f8ff;
+  }
+
+  .app.banner-closed .welcome-banner { display: none; }
+
+  .welcome-banner p { margin: 0 0 6px; }
+  .welcome-banner p:last-child { margin: 0; }
+  .welcome-banner .link { color: #f5a623; text-decoration: underline; cursor: pointer; }
+
+  .welcome-banner .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px;
+  }
+
+  /* ── Object input row ────────────────────────────────────────── */
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { font-size: 12px; color: #b0ccd8; }
+
+  .object-field {
+    flex: 1;
+    min-width: 240px;
+  }
+
+  .object-actions {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .outline-btn {
+    background: transparent;
+    border: 1px solid #00617e;
+    color: #c6f0fd;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+  }
+
+  .object-input-wrap {
+    background: #09303c;
+    border: 1px solid #1a5060;
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .object-input-wrap .input-label {
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+
+  .object-input-wrap input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+
+  .radius-field { min-width: 220px; }
+
+  .radius-row {
+    display: flex;
+    gap: 0;
+  }
+
+  .radius-segment {
+    background: #09303c;
+    border: 1px solid #1a5060;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 10px;
+  }
+
+  .radius-segment:first-child { border-radius: 4px 0 0 4px; flex: 1; }
+  .radius-segment:last-child  { border-radius: 0 4px 4px 0; border-left: none; min-width: 90px; }
+
+  .radius-segment .seg-label {
+    font-size: 10px;
+    color: #7aafbe;
+    margin-bottom: 2px;
+  }
+
+  .radius-segment input,
+  .radius-segment select {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  /* ── Filter groups ───────────────────────────────────────────── */
+
+  .filter-group {
+    background: #092730;
+    border: 1px solid #1a4a58;
+    border-radius: 4px;
+    padding: 10px 12px;
+  }
+
+  .filter-group-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #e8f8ff;
+  }
+
+  .toggle-row {
+    display: flex;
+    gap: 1px;
+    flex-wrap: wrap;
+  }
+
+  .toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    background: #0d3545;
+    border: 1px solid #2a5f70;
+    color: #ddd;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+
+  .toggle-btn:first-child { border-radius: 4px 0 0 4px; }
+  .toggle-btn:last-child  { border-radius: 0 4px 4px 0; }
+
+  .toggle-btn .cb { font-size: 14px; }
+
+  .toggle-btn.checked {
+    background: #133e50;
+    color: #c6f0fd;
+  }
+
+  .toggle-btn.checked .cb::before { content: "☑"; }
+  .toggle-btn:not(.checked) .cb::before { content: "□"; }
+
+  /* ── Instruments sub-section ─────────────────────────────────── */
+
+  .instruments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .instruments-section { margin-bottom: 10px; }
+  .instruments-section-label {
+    font-size: 11px;
+    color: #7aafbe;
+    margin-bottom: 5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+
+  .icon-btn {
+    background: #0d3545;
+    border: 1px solid #2a5f70;
+    color: #9ee4f5;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Action bar ──────────────────────────────────────────────── */
+
+  .action-bar {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 4px 0;
+  }
+
+  .action-bar .count {
+    margin-left: auto;
+    font-size: 13px;
+    color: #c6f0fd;
+  }
+
+  .btn-clear {
+    background: #09303c;
+    border: 1px solid #2a5f70;
+    color: #c6f0fd;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+  }
+
+  .btn-search {
+    background: #a04c00;
+    border: 1px solid #c05800;
+    color: #fff;
+    border-radius: 4px;
+    padding: 10px 40px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+  }
+
+  .btn-search:hover { background: #b85600; }
+
+  .btn-api-query {
+    background: #09303c;
+    border: 1px solid #2a5f70;
+    color: #c6f0fd;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+  }
+
+  /* ── Results view ────────────────────────────────────────────── */
+
+  .results-view {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .app.results-open .results-view { display: flex; }
+
+  /* ── Results toolbar ─────────────────────────────────────────── */
+
+  .results-toolbar {
+    background: #000;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .results-toolbar .edit-search-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #4a8aac;
+    color: #c6f0fd;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .results-toolbar .summary {
+    font-size: 12px;
+    color: #a0c8d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .results-toolbar .summary strong { color: #fff; }
+
+  /* ── Results tabs ────────────────────────────────────────────── */
+
+  .results-tabs {
+    background: #000;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+
+  .results-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+  }
+
+  .results-tab.active {
+    color: #fff;
+    border-bottom-color: #00617e;
+  }
+
+  /* ── Table controls ──────────────────────────────────────────── */
+
+  .table-controls {
+    background: #02171c;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #1a3a45;
+    flex-shrink: 0;
+  }
+
+  .table-btn {
+    background: transparent;
+    border: 1px solid #2a5f70;
+    color: #c6f0fd;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+  }
+
+  .table-btn.icon-only { padding: 5px 8px; }
+
+  .table-controls .spacer { flex: 1; }
+
+  .table-controls .pagination-info {
+    font-size: 12px;
+    color: #a0c8d8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .table-controls .pagination-info select {
+    background: #09303c;
+    border: 1px solid #2a5f70;
+    color: #fff;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  .page-btn {
+    background: transparent;
+    border: 1px solid #2a5f70;
+    color: #c6f0fd;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+
+  /* ── Data table ──────────────────────────────────────────────── */
+
+  .table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: #003b4d;
+    position: sticky;
+    top: 0;
+  }
+
+  thead th {
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid #c6f0fd;
+    white-space: nowrap;
+    color: #fff;
+  }
+
+  thead th:first-child { width: 32px; padding: 9px 8px; }
+
+  tbody tr {
+    border-bottom: 1px solid #0d2f3a;
+  }
+
+  tbody tr:hover { background: rgba(0,97,126,0.15); }
+
+  tbody td {
+    padding: 7px 10px;
+    color: #e0eef3;
+    white-space: nowrap;
+  }
+
+  tbody td:first-child { padding: 7px 8px; }
+
+  .dataset-link {
+    color: #f5a623;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* ── Table footer ────────────────────────────────────────────── */
+
+  .table-footer {
+    background: #02171c;
+    border-top: 1px solid #1a3a45;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #a0c8d8;
+  }
+
+  .table-footer select {
+    background: #09303c;
+    border: 1px solid #2a5f70;
+    color: #fff;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  /* ── Highlighted row (for animation step) ────────────────────── */
+
+  tbody tr.highlighted {
+    background: rgba(0,97,126,0.35);
+    outline: 1px solid #00617e;
+    outline-offset: -1px;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="mast-app">
+
+  <!-- ── Top bar ─────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="logo-circle">&#9684;</div>
+      <div>
+        <span class="brand-text">Search
+          <span class="word-mast">MAST</span>
+        </span>
+      </div>
+      <span class="for-text">&nbsp;for</span>
+      <button class="mission-dropdown" id="dropdown-mission">
+        Hubble <span class="arrow">&#9660;</span>
+      </button>
+    </div>
+    <nav class="topbar-nav">
+      <button id="btn-theme" title="Switch theme"><span class="icon">&#9728;</span></button>
+      <span class="sep">|</span>
+      <button id="btn-api">API</button>
+      <span class="sep">|</span>
+      <button id="btn-help">Help &#9660;</button>
+      <span class="sep">|</span>
+      <button id="btn-about">ABOUT</button>
+      <span class="sep">|</span>
+      <button id="btn-my-st">MY ST &#9660;</button>
+    </nav>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SEARCH VIEW                                                 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="search-view" id="search-view">
+
+    <!-- Welcome banner -->
+    <div class="welcome-banner" id="welcome-banner">
+      <button class="close-btn" id="btn-close-banner">&#x2715;</button>
+      <p>Welcome to HST search. For help getting started, visit the
+        <span class="link">Mission Search Guide</span>.
+        Remember using the retired HST form? Side-by-side comparisons of both forms are
+        available on the <span class="link">Basic Search Page</span>.
+      </p>
+      <p>This form is a filter — press SEARCH immediately to return all Hubble
+        observations, or enter values to focus your results.</p>
+    </div>
+
+    <!-- Object + Radius row -->
+    <div class="form-row">
+      <div class="field-group object-field">
+        <div class="field-label">Object name(s) and/or RA and Dec pair(s)</div>
+        <div class="object-actions">
+          <button class="outline-btn" id="btn-upload">&#128196; UPLOAD LIST</button>
+          <button class="outline-btn" id="btn-resolve">&#9989; RESOLVE</button>
+        </div>
+        <div class="object-input-wrap">
+          <span class="input-label">Object(s)=</span>
+          <input type="text" id="input-objects" placeholder="" />
+        </div>
+      </div>
+
+      <div class="field-group radius-field">
+        <div class="field-label">Search radius (max: 30 arcminutes)</div>
+        <div class="radius-row">
+          <div class="radius-segment">
+            <span class="seg-label">Radius=</span>
+            <input type="number" id="input-radius" value="3" min="0" max="30" />
+          </div>
+          <div class="radius-segment">
+            <span class="seg-label">Unit=</span>
+            <select id="select-unit">
+              <option value="arcmin">arcmin</option>
+              <option value="arcsec">arcsec</option>
+              <option value="deg">deg</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Types -->
+    <div class="filter-group" id="filter-data-types">
+      <div class="filter-group-title">Data Types=</div>
+      <div class="toggle-row">
+        <button class="toggle-btn checked" id="toggle-dtype-all"><span class="cb"></span> ALL</button>
+        <button class="toggle-btn" id="toggle-dtype-spectrum"><span class="cb"></span> SPECTRUM</button>
+        <button class="toggle-btn" id="toggle-dtype-image"><span class="cb"></span> IMAGE</button>
+      </div>
+    </div>
+
+    <!-- Observations -->
+    <div class="filter-group" id="filter-observations">
+      <div class="filter-group-title">Observations=</div>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="toggle-obs-all"><span class="cb"></span> ALL</button>
+        <button class="toggle-btn checked" id="toggle-obs-science"><span class="cb"></span> SCIENCE</button>
+        <button class="toggle-btn" id="toggle-obs-calibration"><span class="cb"></span> CALIBRATION</button>
+      </div>
+    </div>
+
+    <!-- Instruments -->
+    <div class="filter-group" id="filter-instruments">
+      <div class="instruments-header">
+        <div></div>
+        <div style="display:flex;gap:4px;">
+          <button class="icon-btn" id="btn-instr-check-all" title="Select all">&#9745;</button>
+          <button class="icon-btn" id="btn-instr-copy" title="Copy">&#128203;</button>
+        </div>
+      </div>
+      <div class="instruments-section">
+        <div class="instruments-section-label">Active Instruments=</div>
+        <div class="toggle-row">
+          <button class="toggle-btn checked" id="toggle-acs"><span class="cb"></span> ACS</button>
+          <button class="toggle-btn checked" id="toggle-cos"><span class="cb"></span> COS</button>
+          <button class="toggle-btn checked" id="toggle-fgs"><span class="cb"></span> FGS</button>
+          <button class="toggle-btn checked" id="toggle-stis"><span class="cb"></span> STIS</button>
+          <button class="toggle-btn checked" id="toggle-wfc3"><span class="cb"></span> WFC3</button>
+        </div>
+      </div>
+      <div class="instruments-section">
+        <div class="instruments-section-label">Legacy Instruments=</div>
+        <div class="toggle-row">
+          <button class="toggle-btn checked" id="toggle-foc"><span class="cb"></span> FOC</button>
+          <button class="toggle-btn checked" id="toggle-fos"><span class="cb"></span> FOS</button>
+          <button class="toggle-btn checked" id="toggle-ghrs"><span class="cb"></span> GHRS</button>
+          <button class="toggle-btn checked" id="toggle-hsp"><span class="cb"></span> HSP</button>
+          <button class="toggle-btn checked" id="toggle-nicmos"><span class="cb"></span> NICMOS</button>
+          <button class="toggle-btn checked" id="toggle-wfpc1"><span class="cb"></span> WFPC1</button>
+          <button class="toggle-btn checked" id="toggle-wfpc2"><span class="cb"></span> WFPC2</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="btn-clear" id="btn-clear">&#x21BA; CLEAR FORM</button>
+      <button class="btn-search" id="btn-search">SEARCH</button>
+      <button class="btn-api-query" id="btn-api-query">SHOW API QUERY</button>
+      <span class="count">Filtered results: 712,192 of 1,062,605</span>
+    </div>
+
+  </div><!-- /search-view -->
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- RESULTS VIEW                                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="results-view" id="results-view">
+
+    <!-- Results toolbar -->
+    <div class="results-toolbar">
+      <button class="edit-search-btn" id="btn-edit-search">&#11015; EDIT SEARCH</button>
+      <span class="summary">
+        <strong>AEC=</strong> S &nbsp;
+        <strong>Columns=</strong> Dataset, Target Name, HAP, HASP, HSLA, Instrument, Apertures, Filters/Gratings, Exp&nbsp;…
+      </span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="results-tabs">
+      <button class="results-tab active" id="tab-results">RESULTS &#8862;</button>
+      <button class="results-tab" id="tab-previews">PREVIEWS &#128247;</button>
+    </div>
+
+    <!-- Table controls -->
+    <div class="table-controls">
+      <button class="table-btn" id="btn-download">&#11015; DOWNLOAD &#9660;</button>
+      <button class="table-btn" id="btn-export">EXPORT TABLE &#9660;</button>
+      <button class="table-btn icon-only" id="btn-more">&#8942;</button>
+      <div class="spacer"></div>
+      <div class="pagination-info">
+        Items per page:
+        <select id="select-per-page">
+          <option>25</option>
+          <option>100</option>
+          <option selected>1000</option>
+        </select>
+        &nbsp;1–1000 of 712,192&nbsp;
+        <button class="page-btn" id="btn-next-page">&#62;</button>
+        <button class="page-btn" id="btn-last-page">&#x21E5;</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chk-all" /></th>
+            <th>Dataset</th>
+            <th>Target Name</th>
+            <th>HAP</th>
+            <th>HASP</th>
+            <th>HSLA</th>
+            <th>Instrument</th>
+            <th>Apertures</th>
+            <th>Filters/Gratings</th>
+            <th>Exp Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="row-1">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z06G0101T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td></td><td>SAF</td><td>1019.207</td>
+          </tr>
+          <tr id="row-2">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z06G0201T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td></td><td>SAF</td><td>1019.207</td>
+          </tr>
+          <tr id="row-3">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z06G0301T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td></td><td>SAF</td><td>1019.207</td>
+          </tr>
+          <tr id="row-4">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z0DD0104T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td>2.0</td><td>MIRROR-N2</td><td></td>
+          </tr>
+          <tr id="row-5">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z14Z0102T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td>2.0</td><td>MIRROR-N2</td><td></td>
+          </tr>
+          <tr id="row-6">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z14Z0202T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td>
+          </tr>
+          <tr id="row-7">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z17X0202T</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td>
+          </tr>
+          <tr id="row-8">
+            <td><input type="checkbox" /></td>
+            <td><a class="dataset-link" href="#">Z18W0102M</a></td>
+            <td></td>
+            <td>0</td><td>0</td><td>0</td>
+            <td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table footer -->
+    <div class="table-footer">
+      Items per page:
+      <select id="select-per-page-foot">
+        <option>25</option><option>100</option><option selected>1000</option>
+      </select>
+      &nbsp;1–1000 of 712,192&nbsp;
+      <button class="page-btn" id="btn-next-page-foot">&#62;</button>
+      <button class="page-btn" id="btn-last-page-foot">&#x21E5;</button>
+    </div>
+
+  </div><!-- /results-view -->
+
+</div><!-- /app -->
+</body>
+</html>
