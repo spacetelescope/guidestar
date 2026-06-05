@@ -99,6 +99,25 @@ When creating a ``Guidestar`` programmatically or via the
        content always looks exactly like the captured screenshot.
        Use **responsive mode** (``null``) for wireframes hand-authored
        to adapt to their container, such as the kitchen-sink example.
+   * - ``fullscreen``
+     - bool
+     - ``true``
+     - Show a fullscreen toggle button in the top-right corner of the
+       container.  The button is hidden by default and becomes visible on
+       hover or when the demo is paused.  Clicking it calls the browser's
+       Fullscreen API on the container element; pressing :kbd:`Escape`
+       exits.  Set to ``false`` to hide the button.
+
+       In the Sphinx directive, use ``:fullscreen: false``.
+   * - ``resizable``
+     - bool
+     - ``true``
+     - Show a drag handle in the bottom-right corner of the container.
+       Dragging it resizes the container's width and height; a live
+       ``W × H`` badge is shown while dragging.  The handle is hidden by
+       default and fades in on hover.  Set to ``false`` to disable.
+
+       In the Sphinx directive, use ``:resizable: false``.
    * - ``onStepStart``
      - function
      - ``null``
@@ -452,6 +471,20 @@ Caption appearance is controlled via CSS custom properties set on the
      - Left & right inset — centres the caption and keeps it clear of the
        control button
      - ``68px``
+
+The following additional custom properties control the new fullscreen button
+and can be set on the ``[data-guidestar]`` container:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 40 30
+
+   * - Property
+     - What it controls
+     - Default
+   * - ``--gs-control-top``
+     - Top offset of the fullscreen button
+     - ``12px``
 
 Example:
 

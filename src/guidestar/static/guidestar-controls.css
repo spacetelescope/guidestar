@@ -29,6 +29,168 @@
     transform-origin: top left;
 }
 
+/* ── Fullscreen button ───────────────────────────────────────────── */
+
+/*
+ * .gs-fullscreen-host wraps the fullscreen toggle button in the
+ * top-right corner of the container.  It is a plain DOM element
+ * (not Shadow DOM) so it inherits the same --gs-control-* custom
+ * properties used by the play/pause controls.
+ *
+ * Visibility: hidden by default; revealed on container hover or when
+ * the demo is paused (JS adds .gs-fullscreen-host--visible).
+ *
+ * Themeable via the same --gs-control-* custom properties as the
+ * bottom-right controls.  Use --gs-control-top to adjust the offset
+ * (default: 12px).
+ */
+
+.gs-fullscreen-host {
+    position: absolute;
+    top: var(--gs-control-top, 12px);
+    right: var(--gs-control-right, 12px);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+[data-guidestar]:hover .gs-fullscreen-host,
+.gs-fullscreen-host--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.gs-fullscreen-btn {
+    width: var(--gs-control-size, 44px);
+    height: var(--gs-control-size, 44px);
+    border-radius: var(--gs-control-radius, 8px);
+    border: var(--gs-control-border, none);
+    padding: 0;
+    background: var(--gs-control-bg, rgba(0, 0, 0, 0.55));
+    color: var(--gs-control-color, #fff);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    position: relative;
+}
+
+.gs-fullscreen-btn:hover {
+    background: var(--gs-control-bg-hover, rgba(0, 0, 0, 0.75));
+    transform: scale(1.05);
+}
+
+.gs-fullscreen-btn svg {
+    width: var(--gs-control-icon-size, 22px);
+    height: var(--gs-control-icon-size, 22px);
+    fill: currentColor;
+}
+
+.gs-fullscreen-btn:focus-visible {
+    outline: 2px solid var(--gs-control-color, #fff);
+    outline-offset: 2px;
+}
+
+/* Tooltip (appears to the left of the button) */
+.gs-fullscreen-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 8px;
+    background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--gs-control-tooltip-color, #fff);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.gs-fullscreen-btn:hover::after {
+    opacity: 1;
+}
+
+/* When the container itself is fullscreen, fill the screen */
+[data-guidestar]:fullscreen,
+[data-guidestar]:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gs-fullscreen-btn {
+        transition: none;
+    }
+    .gs-fullscreen-btn:hover {
+        transform: none;
+    }
+}
+
+/* ── Resize handle ───────────────────────────────────────────────── */
+
+/*
+ * .gs-resize-handle — 16×16 px drag target in the bottom-right corner.
+ * Shows a standard se-resize cursor; a grippy diagonal-lines visual
+ * (using a repeating-linear-gradient) mirrors the browser/devtools style.
+ *
+ * .gs-resize-badge — live "W × H" label shown only while dragging.
+ */
+
+.gs-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: se-resize;
+    z-index: 10001;
+    /* diagonal grip dots */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.45) 0px,
+        rgba(255, 255, 255, 0.45) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    background-size: 16px 16px;
+    background-position: bottom right;
+    border-radius: 0 0 2px 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+[data-guidestar]:hover .gs-resize-handle {
+    opacity: 1;
+}
+
+.gs-resize-badge {
+    position: absolute;
+    bottom: 20px;
+    right: 4px;
+    background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--gs-control-tooltip-color, #fff);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10002;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.gs-resize-badge--visible {
+    opacity: 1;
+}
+
 /* ── Highlight animation applied to targeted elements ────────────── */
 
 @keyframes gs-highlight-pulse {

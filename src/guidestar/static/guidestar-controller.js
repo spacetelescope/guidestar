@@ -188,6 +188,7 @@
     //   --gs-control-border        Border shorthand (default: none)
     //   --gs-control-color         Icon fill color (default: #fff)
     //   --gs-control-icon-size     SVG icon size (default: 22px)
+    //   --gs-control-top           Top offset for the fullscreen button (default: 12px)
     //   --gs-control-bottom        Bottom offset (default: 12px)
     //   --gs-control-right         Right offset (default: 12px)
     //   --gs-control-tooltip-bg    Tooltip background (default: rgba(0,0,0,0.8))
@@ -322,6 +323,8 @@
 
     var ICON_SPEED_DOWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,13H5V11H19V13Z"/></svg>';
     var ICON_SPEED_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>';
+    var ICON_FULLSCREEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7,14H5v5h5v-2H7V14M5,10H7V7h3V5H5V10M17,17H14v2h5V14h-2V17M14,5v2h3v3h2V5H14Z"/></svg>';
+    var ICON_FULLSCREEN_EXIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5,16H8v3h2V14H5V16M8,8H5v2h5V5H8V8M14,19h2V16h3V14H14V19M16,8V5H14v5h5V8H16Z"/></svg>';
 
     function createControlsHost(instance) {
         var host = document.createElement('div');
@@ -491,6 +494,8 @@
             reduceMotion: 'auto',
             viewport: null,
             autoScroll: true,
+            fullscreen: true,
+            resizable: true,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -530,6 +535,10 @@
         this._userPaused = false;
         this._restartOverlay = null;
         this._scrollIndicatorEl = null;
+        this._fullscreenHost = null;
+        this._fullscreenBtn = null;
+        this._resizeHandle = null;
+        this._resizeBadge = null;
 
         this._init();
     }
@@ -626,12 +635,24 @@
             this._createScrollIndicator();
         }
 
+        // Create fullscreen button — not needed in static mode
+        if (!this._isStatic && this.config.fullscreen !== false) {
+            this._createFullscreenHost();
+        }
+
+        // Create resize handle
+        if (this.config.resizable !== false) {
+            this._createResizeHandle();
+        }
+
         // Pause on user interaction
         if (this.config.pauseOnInteraction) {
             container.addEventListener('click', function (e) {
                 if (!e.isTrusted) return;
-                // Ignore clicks on the controls host, timeline, or tooltip
+                // Ignore clicks on the controls host, fullscreen button, resize handle, timeline, or tooltip
                 if (e.target.closest && e.target.closest('.gs-controls-host')) return;
+                if (e.target.closest && e.target.closest('.gs-fullscreen-host')) return;
+                if (e.target.closest && e.target.closest('.gs-resize-handle')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline')) return;
                 if (e.target.closest && e.target.closest('.gs-timeline-tooltip')) return;
                 if (self._playing) {
@@ -682,6 +703,125 @@
             var s = document.createElement('script');
             s.textContent = old.textContent;
             old.parentNode.replaceChild(s, old);
+        }
+    };
+
+    // ── Fullscreen helpers ───────────────────────────────────────────────────
+
+    /**
+     * Create the fullscreen toggle button, positioned in the top-right corner.
+     * It lives in the main DOM (not Shadow DOM) so it picks up the same CSS
+     * custom properties as the rest of the container.
+     */
+    Guidestar.prototype._createFullscreenHost = function () {
+        var self = this;
+        var container = this.container;
+
+        var host = document.createElement('div');
+        host.className = 'gs-fullscreen-host';
+
+        var btn = document.createElement('button');
+        btn.className = 'gs-fullscreen-btn';
+        btn.setAttribute('aria-label', 'Full screen');
+        btn.setAttribute('data-tooltip', 'Full screen');
+        btn.innerHTML = ICON_FULLSCREEN;
+        host.appendChild(btn);
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            self._toggleFullscreen();
+        });
+
+        container.appendChild(host);
+        this._fullscreenHost = host;
+        this._fullscreenBtn = btn;
+
+        // Sync icon when Escape or external code exits fullscreen
+        document.addEventListener('fullscreenchange', function () { self._onFullscreenChange(); });
+        document.addEventListener('webkitfullscreenchange', function () { self._onFullscreenChange(); });
+    };
+
+    Guidestar.prototype._toggleFullscreen = function () {
+        var fsEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+        if (!fsEnabled) return;
+        var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fsEl) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        } else {
+            var c = this.container;
+            if (c.requestFullscreen) c.requestFullscreen();
+            else if (c.webkitRequestFullscreen) c.webkitRequestFullscreen();
+        }
+    };
+
+    Guidestar.prototype._onFullscreenChange = function () {
+        if (!this._fullscreenBtn) return;
+        var isFS = (document.fullscreenElement || document.webkitFullscreenElement) === this.container;
+        this._fullscreenBtn.innerHTML = isFS ? ICON_FULLSCREEN_EXIT : ICON_FULLSCREEN;
+        this._fullscreenBtn.setAttribute('aria-label', isFS ? 'Exit full screen' : 'Full screen');
+        this._fullscreenBtn.setAttribute('data-tooltip', isFS ? 'Exit full screen' : 'Full screen');
+    };
+
+    // ── Resize handle ────────────────────────────────────────────────────────
+
+    /**
+     * Create a drag handle in the bottom-right corner of the container.
+     * Dragging it resizes the container width (and height) via pointer events.
+     * A dimension badge is shown during the drag.
+     */
+    Guidestar.prototype._createResizeHandle = function () {
+        var self = this;
+        var container = this.container;
+
+        var handle = document.createElement('div');
+        handle.className = 'gs-resize-handle';
+        handle.setAttribute('aria-hidden', 'true');
+        handle.setAttribute('title', 'Drag to resize');
+        container.appendChild(handle);
+        this._resizeHandle = handle;
+
+        var badge = document.createElement('div');
+        badge.className = 'gs-resize-badge';
+        container.appendChild(badge);
+        this._resizeBadge = badge;
+
+        var startX, startY, startW, startH;
+
+        handle.addEventListener('pointerdown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handle.setPointerCapture(e.pointerId);
+
+            var rect = container.getBoundingClientRect();
+            startX = e.clientX;
+            startY = e.clientY;
+            startW = rect.width;
+            startH = rect.height;
+
+            badge.textContent = Math.round(startW) + ' \u00d7 ' + Math.round(startH);
+            badge.classList.add('gs-resize-badge--visible');
+
+            handle.addEventListener('pointermove', onMove);
+            handle.addEventListener('pointerup', onUp);
+            handle.addEventListener('pointercancel', onUp);
+        });
+
+        function onMove(e) {
+            var dX = e.clientX - startX;
+            var dY = e.clientY - startY;
+            var newW = Math.max(150, startW + dX);
+            var newH = Math.max(100, startH + dY);
+            container.style.width = newW + 'px';
+            container.style.height = newH + 'px';
+            badge.textContent = Math.round(newW) + ' \u00d7 ' + Math.round(newH);
+        }
+
+        function onUp() {
+            badge.classList.remove('gs-resize-badge--visible');
+            handle.removeEventListener('pointermove', onMove);
+            handle.removeEventListener('pointerup', onUp);
+            handle.removeEventListener('pointercancel', onUp);
         }
     };
 
@@ -1051,6 +1191,9 @@
         this._userPaused = false;
         this._updateControlBtn();
         this._updateTooltip();
+        if (this._fullscreenHost) {
+            this._fullscreenHost.classList.remove('gs-fullscreen-host--visible');
+        }
         this._announce('Playing');
         this._runStep();
     };
@@ -1064,6 +1207,9 @@
         }
         this._updateControlBtn(true);
         this._updateTooltip();
+        if (this._fullscreenHost) {
+            this._fullscreenHost.classList.add('gs-fullscreen-host--visible');
+        }
         this._announce('Paused at step ' + (this._stepIndex + 1) + ' of ' + this._steps.length);
     };
 
