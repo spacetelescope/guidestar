@@ -22,6 +22,5 @@ This package handles:
    :maxdepth: 2
 
    quickstart
-   wireframe/index
    demos/index
    workflows/index

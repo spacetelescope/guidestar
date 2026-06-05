@@ -1,5 +1,5 @@
-Configuration Reference
-=======================
+Demo Options
+============
 
 Config object
 -------------
