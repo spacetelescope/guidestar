@@ -66,6 +66,8 @@ class GuidestarDirective(SphinxDirective):
         'cursor-speed': str,
         'reduce-motion': str,
         'viewport': str,
+        'fullscreen': str,
+        'resizable': str,
     }
 
     def run(self):
@@ -164,6 +166,12 @@ class GuidestarDirective(SphinxDirective):
                 config['viewport'] = int(viewport)
             except ValueError:
                 pass
+
+        # Fullscreen and resizable toggles
+        for opt, key in [('fullscreen', 'fullscreen'), ('resizable', 'resizable')]:
+            val = self.options.get(opt)
+            if val is not None:
+                config[key] = val.strip().lower() != 'false'
 
         config_json = json.dumps(config)
         config_escaped = html_module.escape(config_json)

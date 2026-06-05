@@ -29,6 +29,110 @@
     transform-origin: top left;
 }
 
+/* ── Fullscreen button ───────────────────────────────────────────── */
+
+/*
+ * .gs-fullscreen-host wraps the fullscreen toggle button in the
+ * top-right corner of the container.  It is a plain DOM element
+ * (not Shadow DOM) so it inherits the same --gs-control-* custom
+ * properties used by the play/pause controls.
+ *
+ * Visibility: hidden by default; revealed on container hover or when
+ * the demo is paused (JS adds .gs-fullscreen-host--visible).
+ *
+ * Themeable via the same --gs-control-* custom properties as the
+ * bottom-right controls.  Use --gs-control-top to adjust the offset
+ * (default: 12px).
+ */
+
+.gs-fullscreen-host {
+    position: absolute;
+    top: var(--gs-control-top, 12px);
+    right: var(--gs-control-right, 12px);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+[data-guidestar]:hover .gs-fullscreen-host,
+.gs-fullscreen-host--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.gs-fullscreen-btn {
+    width: var(--gs-control-size, 44px);
+    height: var(--gs-control-size, 44px);
+    border-radius: var(--gs-control-radius, 8px);
+    border: var(--gs-control-border, none);
+    padding: 0;
+    background: var(--gs-control-bg, rgba(0, 0, 0, 0.55));
+    color: var(--gs-control-color, #fff);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    position: relative;
+}
+
+.gs-fullscreen-btn:hover {
+    background: var(--gs-control-bg-hover, rgba(0, 0, 0, 0.75));
+    transform: scale(1.05);
+}
+
+.gs-fullscreen-btn svg {
+    width: var(--gs-control-icon-size, 22px);
+    height: var(--gs-control-icon-size, 22px);
+    fill: currentColor;
+}
+
+.gs-fullscreen-btn:focus-visible {
+    outline: 2px solid var(--gs-control-color, #fff);
+    outline-offset: 2px;
+}
+
+/* Tooltip (appears to the left of the button) */
+.gs-fullscreen-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 8px;
+    background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--gs-control-tooltip-color, #fff);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.gs-fullscreen-btn:hover::after {
+    opacity: 1;
+}
+
+/* When the container itself is fullscreen, fill the screen */
+[data-guidestar]:fullscreen,
+[data-guidestar]:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gs-fullscreen-btn {
+        transition: none;
+    }
+    .gs-fullscreen-btn:hover {
+        transform: none;
+    }
+}
+
 /* ── Highlight animation applied to targeted elements ────────────── */
 
 @keyframes gs-highlight-pulse {
