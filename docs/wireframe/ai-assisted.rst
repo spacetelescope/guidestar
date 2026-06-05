@@ -131,11 +131,16 @@ scales it correctly at any container size.
         a. Try ``page.evaluate()`` to read any inline SVG source directly
            from the DOM (``el.outerHTML`` for ``<svg>`` elements, or
            ``el.src`` / ``el.currentSrc`` for ``<img>``).
-        b. If the icon is an image URL, fetch its bytes via Playwright and
-           convert to a ``data:`` URI (base64-encoded).  Only do this if the
-           resulting data URI would be under ~20 KB; otherwise replace the
-           icon with a simplified SVG stand-in (a circle, square, or
-           appropriate unicode character) that preserves the shape and colour.
+        b. **Prefer SVG over raster formats.**  If the source image is a
+           PNG, GIF, or JPEG, do **not** inline it as a base64 ``data:``
+           URI — instead redraw it as a minimal inline SVG that reproduces
+           the shape, colours, and general composition.  Raster images
+           (especially GIFs) may be animated; a static wireframe only ever
+           shows one frame, which is often incomplete.  Use the Playwright
+           screenshot of the rendered element as your visual reference.
+           Only fall back to a base64 ``data:`` URI if the image cannot be
+           reasonably approximated as SVG (e.g. a photographic background).
+           In that case apply the ~20 KB size limit from the previous rule.
         c. For icon-font glyphs (Material Icons, Font Awesome, etc.), look up
            the rendered text content or ``aria-label`` and substitute an
            equivalent unicode character or a minimal inline SVG path.
