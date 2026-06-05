@@ -18,7 +18,8 @@
   /* Approximated from the Hubble-background.jpg (~65 KB) — over the
      20 KB inline threshold, reproduced as a CSS radial-gradient. */
   .app {
-    min-height: 900px;
+    min-height: 0;
+    height: 100%;  /* fills _contentRoot in embedded mode so flex chain constrains form-area */
     background-color: #02171c;
     background-image:
       radial-gradient(ellipse 120% 80% at 75% 35%, rgba(10,30,50,0.85) 0%, transparent 60%),
@@ -140,7 +141,7 @@
   .btn-nav:hover { background: rgba(255,255,255,0.08); }
 
   /* ── Search view ─────────────────────────────────────────────── */
-  .search-view { display: flex; flex-direction: column; overflow: hidden; }
+  .search-view { display: flex; flex-direction: column; overflow: hidden; flex: 1; min-height: 0; }
   .app.results-open .search-view { display: none; }
 
   /* ── Welcome banner ──────────────────────────────────────────── */
@@ -335,7 +336,7 @@
   }
 
   /* ── Extra filters row ───────────────────────────────────────── */
-  .extra-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .extra-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
   .range-wrap { display: flex; border: 1px solid #858585; background: rgba(0,0,0,0.3); }
   .range-part { flex: 1; display: flex; align-items: center; padding: 10px 12px; gap: 6px; }
@@ -359,6 +360,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex-shrink: 0;  /* stays pinned at bottom; only form-area scrolls */
   }
 
   .action-buttons {
@@ -783,6 +785,58 @@
         </div>
       </div>
 
+      <!-- Observation dates + proposal type -->
+      <div class="extra-filters">
+        <div class="field-block">
+          <div class="field-label">Observation start date, e.g. 2005-01-01</div>
+          <div class="input-field"><span class="input-field-label">Obs Start=</span><input type="text" id="input-obs-start" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Observation end date, e.g. 2015-12-31</div>
+          <div class="input-field"><span class="input-field-label">Obs End=</span><input type="text" id="input-obs-end" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Proposal type</div>
+          <div class="input-field"><span class="input-field-label">Proposal Type=</span><select id="select-proposal-type"><option selected>All</option><option>GO</option><option>CAL</option><option>SNAP</option><option>AR</option></select></div>
+        </div>
+      </div>
+
+      <!-- Coordinate ranges -->
+      <div class="extra-filters">
+        <div class="field-block">
+          <div class="field-label">Right Ascension min (deg, 0–360)</div>
+          <div class="input-field"><span class="input-field-label">RA Min=</span><input type="text" id="input-ra-min" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Right Ascension max (deg, 0–360)</div>
+          <div class="input-field"><span class="input-field-label">RA Max=</span><input type="text" id="input-ra-max" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Declination min (deg, −90–90)</div>
+          <div class="input-field"><span class="input-field-label">Dec Min=</span><input type="text" id="input-dec-min" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Declination max (deg, −90–90)</div>
+          <div class="input-field"><span class="input-field-label">Dec Max=</span><input type="text" id="input-dec-max" /></div>
+        </div>
+      </div>
+
+      <!-- Science keywords + wavelength + calibration level -->
+      <div class="extra-filters">
+        <div class="field-block">
+          <div class="field-label">Science keywords</div>
+          <div class="input-field"><span class="input-field-label">Keywords=</span><input type="text" id="input-science-keywords" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Wavelength range (e.g. UV, optical, IR)</div>
+          <div class="input-field"><span class="input-field-label">Wavelength=</span><input type="text" id="input-wavelength" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Calibration level</div>
+          <div class="input-field"><span class="input-field-label">Cal Level=</span><select id="select-cal-level"><option selected>All</option><option>0 (Raw)</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        </div>
+      </div>
+
     </div><!-- /form-area -->
 
     <div class="action-bar">
@@ -868,6 +922,24 @@
           <tr id="row-10"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">Z14Z0304T</a></td><td></td><td>0</td><td>0</td><td>0</td><td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td></tr>
           <tr id="row-11"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">Z17X0202T</a></td><td></td><td>0</td><td>0</td><td>0</td><td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td></tr>
           <tr id="row-12"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">Z18W0102M</a></td><td></td><td>0</td><td>0</td><td>0</td><td>HRS</td><td>2.0</td><td>MIRROR-A2</td><td></td></tr>
+          <tr id="row-13"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IB7J01010</a></td><td>M31</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>UVIS</td><td>F814W</td><td>1200</td></tr>
+          <tr id="row-14"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JC8M02020</a></td><td>M31</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>WFC</td><td>F606W</td><td>2400</td></tr>
+          <tr id="row-15"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC8903010</a></td><td>M31-NUC</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>IR</td><td>F160W</td><td>1800</td></tr>
+          <tr id="row-16"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">LB4R04010</a></td><td>M31</td><td>0</td><td>0</td><td>0</td><td>COS</td><td>PSA</td><td>G130M</td><td>3000</td></tr>
+          <tr id="row-17"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JD1X05020</a></td><td>M31-DISK</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>WFC</td><td>F475W</td><td>900</td></tr>
+          <tr id="row-18"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">OB3M06010</a></td><td>M31-NUC</td><td>0</td><td>0</td><td>0</td><td>STIS</td><td>CCD</td><td>G430L</td><td>600</td></tr>
+          <tr id="row-19"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC4Z07010</a></td><td>M31-HALO</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>IR</td><td>F105W</td><td>2100</td></tr>
+          <tr id="row-20"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JD9K08020</a></td><td>M31</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>WFC</td><td>F814W</td><td>1500</td></tr>
+          <tr id="row-21"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC3Y09010</a></td><td>M31-BULGE</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>IR</td><td>F125W</td><td>1200</td></tr>
+          <tr id="row-22"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">LC7A10010</a></td><td>M31</td><td>0</td><td>0</td><td>0</td><td>COS</td><td>PSA</td><td>G160M</td><td>2700</td></tr>
+          <tr id="row-23"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JB2P11020</a></td><td>M31-RING</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>HRC</td><td>F435W</td><td>1800</td></tr>
+          <tr id="row-24"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC8V12010</a></td><td>M31</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>UVIS</td><td>F140W</td><td>900</td></tr>
+          <tr id="row-25"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">OB1Q13010</a></td><td>M31-CORE</td><td>0</td><td>0</td><td>0</td><td>STIS</td><td>CCD</td><td>G750L</td><td>1200</td></tr>
+          <tr id="row-26"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC5W14010</a></td><td>M31</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>UVIS</td><td>F606W</td><td>1500</td></tr>
+          <tr id="row-27"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JC3L15020</a></td><td>M31-NW</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>WFC</td><td>F555W</td><td>2100</td></tr>
+          <tr id="row-28"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">IC9B16010</a></td><td>M31-SE</td><td>1</td><td>0</td><td>0</td><td>WFC3</td><td>IR</td><td>F110W</td><td>1800</td></tr>
+          <tr id="row-29"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">OC3M17010</a></td><td>M31-AGN</td><td>0</td><td>0</td><td>0</td><td>STIS</td><td>FUV-MAMA</td><td>E140M</td><td>4500</td></tr>
+          <tr id="row-30"><td><input type="checkbox"></td><td><a class="dataset-link" href="#">JB5K18020</a></td><td>M31-DISK</td><td>1</td><td>0</td><td>0</td><td>ACS</td><td>SBC</td><td>F150LP</td><td>1200</td></tr>
         </tbody>
       </table>
     </div>

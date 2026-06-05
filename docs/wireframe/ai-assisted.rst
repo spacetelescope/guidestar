@@ -28,7 +28,7 @@ JavaScript.  The built demo page is at
 `_site/mast-hst.html <../../_site/mast-hst.html>`_.
 
 .. guidestar-demo:: _static/mast-hst.html
-   :steps: #input-objects@1800:type-text=M31|Enter a target name, #toggle-dtype-all@800:remove-class=active, #toggle-dtype-spectrum@800:add-class=active|Filter to spectra only, #mast-app@200:add-class=banner-closed, #input-dataset-id@1200:scroll-to|Scroll to additional filters, #input-program-id@1200:type-text=14657|Enter a program ID, #input-target-class@1200:type-text=GALAXY|Auto-scroll to Target Class field, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@2000, #row-3@1200:add-class=highlighted|Inspect a dataset, pause@1500, #row-3@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
+   :steps: #input-objects@1800:type-text=M31|Enter a target name, #btn-resolve@1200:click|Resolve the coordinates, #toggle-dtype-all@1000:remove-class=active|Deselect All data types, #toggle-dtype-spectrum@1000:add-class=active|Select Spectrum only, #mast-app@400:add-class=banner-closed, #input-program-id@1200:type-text=14657|Enter a program ID, #input-target-class@1200:type-text=GALAXY|Set target classification, #input-obs-start@1000:type-text=2020-01-01|Enter observation start date, #input-science-keywords@1400:scroll-to|Scroll to science keyword filter, #input-science-keywords@1200:type-text=spiral galaxy|Enter science keywords, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@1500, #row-28@1400:add-class=highlighted|Scroll down to inspect a result, pause@1200, #row-28@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
    :height: 540px
    :viewport: 1440
    :repeat: true
@@ -168,6 +168,45 @@ scales it correctly at any container size.
       Use the screenshots, the computed-style palette, and the accessibility
       tree snapshot as references, then write clean minimal HTML from scratch
       that reproduces the layout visible in the screenshots.
+
+      Pay special attention to **scrollable content regions** (forms,
+      lists, or result tables that scroll independently while a header
+      or action bar stays fixed).  These are easy to model incorrectly
+      because a block element whose content is shorter than the viewport
+      will look correct at full height but will silently refuse to scroll
+      when embedded in a constrained container.  Use the following flex
+      containment pattern for any column that must scroll:
+
+      .. code-block:: css
+
+         /* Root element: fill the container in embedded mode */
+         .app { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+
+         /* Every flex ancestor in the scroll chain must opt out of
+            min-height:auto (the default), otherwise overflow is suppressed */
+         .scrollable-region { flex: 1; min-height: 0; overflow-y: auto; }
+
+         /* Sticky footers inside the column must not shrink */
+         .action-bar { flex-shrink: 0; }
+
+      Key rules:
+
+      - Use ``height: 100%`` (not ``min-height``) on the root element so
+        that a guidestar embedded container limits the height.
+        ``min-height`` overrides ``height`` and prevents the flex chain
+        from constraining the scrollable child.
+      - Add ``min-height: 0`` to every flex item in the chain between the
+        root and the scrollable leaf.  Without it, flex's default
+        ``min-height: auto`` allows the child to grow past its allocated
+        space and the scrollbar never appears.
+      - Give the scrollable leaf ``overflow-y: auto`` (or ``scroll``).
+      - Give any non-scrolling sibling (action bar, footer) ``flex-shrink: 0``
+        so it is never squeezed out of view.
+
+      After writing the CSS, open the file in a browser window sized to the
+      design viewport and **manually resize the window to a smaller height**.
+      If an action bar disappears or content leaks below the bottom edge,
+      the flex chain is still wrong.
 
       Pay special attention to **sticky/fixed bars** (headers, footers,
       toolbars that remain on screen while the main content scrolls).
