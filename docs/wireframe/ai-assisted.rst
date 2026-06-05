@@ -15,25 +15,6 @@ in particular: a single ``<style>`` block, no ``<script>`` tags, IDs on
 every interactive element, and no external resource references.
 
 
-Worked example — MAST HST Search
-----------------------------------
-
-The wireframe at
-`examples/wireframes/mast-hst.html <../../examples/wireframes/mast-hst.html>`_
-was produced by applying the "From a live web URL" prompt below to
-`https://mast.stsci.edu/search/ui/#/hst/ <https://mast.stsci.edu/search/ui/#/hst/>`_.
-The resulting file captures both the search-form state and the results-table
-state as pure-CSS class variants (``#mast-app.results-open``) with no
-JavaScript.  The built demo page is at
-`_site/mast-hst.html <../../_site/mast-hst.html>`_.
-
-.. guidestar-demo:: _static/mast-hst.html
-   :steps: #input-objects@1800:type-text=M31|Enter a target name, #btn-resolve@1200:click|Resolve the coordinates, #toggle-dtype-all@1000:remove-class=active|Deselect All data types, #toggle-dtype-spectrum@1000:add-class=active|Select Spectrum only, #mast-app@400:add-class=banner-closed, #input-program-id@1200:type-text=14657|Enter a program ID, #input-pi@1200:type-text=Postman|Enter PI surname, #input-exposure@1000:type-text=1200|Enter exposure time in seconds, #input-obs-start-from@1400:scroll-to|Scroll to output column selector, #btn-select-recommended@1200:click|Select recommended columns, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@1500, #row-28@1400:add-class=highlighted|Scroll down to inspect a result, pause@1200, #row-28@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
-   :height: 540px
-   :viewport: 1440
-   :repeat: true
-
-
 From a Vue / JavaScript source repository
 ------------------------------------------
 
@@ -283,3 +264,20 @@ scales it correctly at any container size.
    Verify the output by opening wireframe.html in a browser and comparing it
    visually against the Playwright screenshots for each state.  The two
    should look substantially the same at the same viewport size.
+
+
+Worked example — MAST HST Search
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The wireframe at
+`examples/wireframes/mast-hst.html <../../examples/wireframes/mast-hst.html>`_
+was produced by applying the "From a live web URL" prompt to
+`https://mast.stsci.edu/search/ui/#/hst/ <https://mast.stsci.edu/search/ui/#/hst/>`_.
+The resulting file captures both the search-form state and the results-table
+state as pure-CSS class variants (``#mast-app.results-open``).
+
+.. guidestar-demo:: _static/mast-hst.html
+   :steps: #input-objects@1800:type-text=M31|Enter a target name, #btn-resolve@1200:click|Resolve the coordinates, #toggle-dtype-all@1000:remove-class=active|Deselect All data types, #toggle-dtype-spectrum@1000:add-class=active|Select Spectrum only, #mast-app@400:add-class=banner-closed, #input-program-id@1200:type-text=14657|Enter a program ID, #input-pi@1200:type-text=Postman|Enter PI surname, #input-exposure@1000:type-text=1200|Enter exposure time in seconds, #input-obs-start-from@1400:scroll-to|Scroll to output column selector, #btn-select-recommended@1200:click|Select recommended columns, #btn-search@1200:click|Click SEARCH, #mast-app@600:add-class=results-open|Results table appears, pause@1500, #row-28@1400:add-class=highlighted|Scroll down to inspect a result, pause@1200, #row-28@400:remove-class=highlighted, #btn-edit-search@1200:click|Return to search form, #mast-app@400:remove-class=results-open, pause@1500
+   :height: 540px
+   :viewport: 1440
+   :repeat: true
