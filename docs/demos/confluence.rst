@@ -14,8 +14,8 @@ permit JavaScript in iframes, such as when using the Bobswift HTML macro).
    work around this limitation.
 
 
-GitHub Pages + iFrame
----------------------
+Embed Interactive Demo from GitHub Pages
+----------------------------------------
 
 For teams that want live interactive demos in Confluence, the recommended
 approach is to host the self-contained demo HTML on **GitHub Pages** and then
@@ -27,20 +27,32 @@ Confluence macro that renders iframes without the ``sandbox`` restriction).
 Setting up GitHub Pages
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The included GitHub Actions workflow (see :doc:`../workflows/wireframe-review`)
-automatically builds self-contained HTML pages for every demo config in
-``examples/demos/`` and deploys them to GitHub Pages on push to ``main``.
+The :doc:`../workflows/deploy-demos` reusable workflow builds self-contained
+HTML pages from your demo configs and deploys them to GitHub Pages.  See that
+page for the full setup guide, but in brief — add this to your repo:
 
-Once enabled, each demo is available at a stable URL:
+.. code-block:: yaml
+   :caption: ``.github/workflows/deploy-demos.yml``
+
+   jobs:
+     deploy:
+       permissions:
+         contents: read
+         pages: write
+         id-token: write
+       uses: spacetelescope/guidestar/.github/workflows/deploy-demos.yml@main
+       with:
+         demos-dir: guidestar-demos
+
+Once deployed, each demo is available at a stable URL:
 
 .. code-block:: text
 
    https://<org>.github.io/<repo>/kitchen-sink-full.html
    https://<org>.github.io/<repo>/mast-hst.html
 
-To enable GitHub Pages, go to your repository **Settings → Pages** and set
-the source to the ``gh-pages`` branch (or whichever branch the workflow
-deploys to).
+Enable GitHub Pages in your repository **Settings → Pages** and set the
+source to **GitHub Actions**.
 
 
 Embedding in Confluence with Bobswift
@@ -70,8 +82,8 @@ The demo loads with full play/pause/restart controls and auto-starts when
 scrolled into view.
 
 
-GIF
----
+Embed GIF Hosted by GitHub Pages
+--------------------------------
 
 Animated GIFs are the simplest embedding option and work in any Confluence
 environment without any special macros or admin configuration.
@@ -82,9 +94,17 @@ For instructions on how to generate the GIF itself, see :doc:`recording`.
 Setting up GitHub Pages for GIF hosting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The same GitHub Actions workflow that builds the interactive HTML pages also
-records GIFs and deploys them to GitHub Pages.  Once deployed, each GIF is
-available at:
+Pass ``record-gifs: true`` to the :doc:`../workflows/deploy-demos` workflow
+and it will record GIFs alongside the HTML pages:
+
+.. code-block:: yaml
+
+       uses: spacetelescope/guidestar/.github/workflows/deploy-demos.yml@main
+       with:
+         demos-dir: guidestar-demos
+         record-gifs: true
+
+Once deployed, each GIF is available at:
 
 .. code-block:: text
 

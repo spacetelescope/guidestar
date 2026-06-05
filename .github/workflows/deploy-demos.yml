@@ -1,0 +1,150 @@
+name: Deploy Guidestar Demos to GitHub Pages
+
+# Reusable workflow — call this from any repository that wants to build
+# and host guidestar wireframe demos on GitHub Pages.
+#
+# Usage in your repo (.github/workflows/deploy-demos.yml):
+#
+#   name: Deploy Demos
+#   on:
+#     push:
+#       branches: [main]
+#       paths:
+#         - 'guidestar-demos/**'
+#     workflow_dispatch:
+#
+#   jobs:
+#     deploy:
+#       permissions:
+#         contents: read
+#         pages: write
+#         id-token: write
+#       uses: spacetelescope/guidestar/.github/workflows/deploy-demos.yml@main
+#       with:
+#         demos-dir: guidestar-demos
+#
+# Prerequisites:
+#   - GitHub Pages must be enabled in repo Settings → Pages with source
+#     set to "GitHub Actions".
+#   - Demos are always deployed to the Pages root.  Subfolder deployment
+#     is not currently supported.
+
+on:
+  workflow_call:
+    inputs:
+      demos-dir:
+        description: >
+          Directory containing demo JSON config files and (by default) a
+          wireframes/ subdirectory with wireframe HTML files.
+        type: string
+        default: guidestar-demos
+
+      wireframes-dir:
+        description: >
+          Directory containing wireframe HTML files.
+          Defaults to <demos-dir>/wireframes when left empty.
+        type: string
+        default: ''
+
+      record-gifs:
+        description: >
+          Also record animated GIF versions of each demo.
+          Requires additional install time for Playwright + Chromium.
+        type: boolean
+        default: false
+
+      fps:
+        description: GIF frame rate (frames per second).
+        type: number
+        default: 10
+
+      width:
+        description: Viewport width in pixels used when recording GIFs.
+        type: number
+        default: 800
+
+      index-title:
+        description: Title shown in the auto-generated index.html.
+        type: string
+        default: Wireframe Demos
+
+      guidestar-version:
+        description: >
+          pip version specifier for sphinx-guidestar, e.g. "==0.2.0".
+          Leave empty to install the latest published release.
+        type: string
+        default: ''
+
+      python-version:
+        description: Python version to use.
+        type: string
+        default: '3.11'
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install sphinx-guidestar
+        run: |
+          VERSION="${{ inputs.guidestar-version }}"
+          if [ -n "$VERSION" ]; then
+            pip install "sphinx-guidestar[record]==${VERSION}"
+          else
+            pip install "sphinx-guidestar[record]"
+          fi
+
+      - name: Install Playwright browser
+        if: ${{ inputs.record-gifs }}
+        run: playwright install chromium --with-deps
+
+      - name: Resolve wireframes directory
+        id: dirs
+        run: |
+          WIREFRAMES="${{ inputs.wireframes-dir }}"
+          if [ -z "$WIREFRAMES" ]; then
+            WIREFRAMES="${{ inputs.demos-dir }}/wireframes"
+          fi
+          echo "wireframes_dir=$WIREFRAMES" >> "$GITHUB_OUTPUT"
+
+      - name: Build demo pages
+        run: |
+          guidestar-build \
+            --configs-dir "${{ inputs.demos-dir }}" \
+            --wireframes-dir "${{ steps.dirs.outputs.wireframes_dir }}" \
+            --out _site
+
+      - name: Record demo GIFs
+        if: ${{ inputs.record-gifs }}
+        run: |
+          guidestar-record \
+            --configs-dir "${{ inputs.demos-dir }}" \
+            --site _site \
+            --out _site \
+            --fps ${{ inputs.fps }} \
+            --width ${{ inputs.width }}
+
+      - name: Generate index page
+        run: guidestar-index --site _site --title "${{ inputs.index-title }}"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
