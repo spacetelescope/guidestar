@@ -118,6 +118,18 @@ When creating a ``Guidestar`` programmatically or via the
        default and fades in on hover.  Set to ``false`` to disable.
 
        In the Sphinx directive, use ``:resizable: false``.
+   * - ``poweredby``
+     - bool
+     - ``true``
+     - Show a small "demo powered by guidestar" badge in the bottom-left
+       corner of the container (to the left of the timeline).  The badge
+       displays the guidestar logo icon, links to
+       `guidestar.readthedocs.io <https://guidestar.readthedocs.io>`_,
+       and shows a "demo powered by guidestar" tooltip on hover.  Like the
+       timeline, it is hidden by default and fades in when the container
+       is hovered.  Set to ``false`` to hide the badge entirely.
+
+       In the Sphinx directive, use ``:poweredby: false``.
    * - ``onStepStart``
      - function
      - ``null``

@@ -191,6 +191,91 @@
     opacity: 1;
 }
 
+/* ── Branding badge ──────────────────────────────────────────────── */
+
+/*
+ * .gs-branding — small "demopowered by guidestar" link badge in the
+ * bottom-left corner, to the left of the timeline track.
+ *
+ * Visible on container hover, hidden otherwise (same rhythm as the
+ * timeline).  Hidden by default; set config.branding to false to
+ * suppress entirely.
+ *
+ * The tooltip text ("demo powered by guidestar") appears above the badge
+ * via a CSS ::after pseudo-element.
+ */
+
+.gs-branding {
+    position: absolute;
+    bottom: var(--gs-control-bottom, 12px);
+    left: var(--gs-control-left, 12px);
+    z-index: 10000;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    text-decoration: none;
+}
+
+[data-guidestar]:hover .gs-branding,
+.gs-branding--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.gs-branding svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+    border-radius: 4px;
+    transition: transform 0.15s ease;
+}
+
+.gs-branding:hover svg {
+    transform: scale(1.1);
+}
+
+/* Tooltip above the badge — left-aligned to the badge's left edge so it
+   extends rightward and does not overlap the timeline track */
+.gs-branding::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 8px;
+    background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
+    color: var(--gs-control-tooltip-color, #fff);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.gs-branding:hover::after {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gs-branding {
+        transition: none;
+    }
+    .gs-branding svg {
+        transition: none;
+    }
+    .gs-branding:hover svg {
+        transform: none;
+    }
+}
+
 /* ── Highlight animation applied to targeted elements ────────────── */
 
 @keyframes gs-highlight-pulse {

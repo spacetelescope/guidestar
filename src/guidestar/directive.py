@@ -68,6 +68,7 @@ class GuidestarDirective(SphinxDirective):
         'viewport': str,
         'fullscreen': str,
         'resizable': str,
+        'poweredby': str,
     }
 
     def run(self):
@@ -167,8 +168,9 @@ class GuidestarDirective(SphinxDirective):
             except ValueError:
                 pass
 
-        # Fullscreen and resizable toggles
-        for opt, key in [('fullscreen', 'fullscreen'), ('resizable', 'resizable')]:
+        # Fullscreen, resizable, and poweredby toggles
+        for opt, key in [('fullscreen', 'fullscreen'), ('resizable', 'resizable'),
+                         ('poweredby', 'poweredby')]:
             val = self.options.get(opt)
             if val is not None:
                 config[key] = val.strip().lower() != 'false'
