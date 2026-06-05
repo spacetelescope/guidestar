@@ -7,7 +7,7 @@ into any Sphinx-built documentation page.
 .. note::
 
    For a full list of configuration parameters, their types, defaults, and
-   descriptions, see the :doc:`configuration`.
+   descriptions, see the :doc:`../demos/configuration`.
 
 Basic syntax
 ------------
@@ -48,7 +48,7 @@ Directive options
        ``captionOptions``. The ``delay`` field is accepted but ignored.
        In static mode (no ``:steps:``), the cursor is placed at the last
        targeted init step and the last caption persists.
-       See :doc:`configuration` for details.
+       See :doc:`../demos/configuration` for details.
    * - ``:cursor:``
      - ``true``
      - Show an animated cursor that moves to each target element (``true`` /
@@ -81,7 +81,7 @@ Directive options
    * - ``:reduce-motion:``
      - ``auto``
      - Reduced-motion behaviour (``auto`` / ``true`` / ``false``). See
-       :doc:`accessibility`.
+       :doc:`../demos/accessibility`.
    * - ``:viewport:``
      - —
      - Fixed design width in CSS pixels (e.g. ``1440``).  When set, the
@@ -205,5 +205,5 @@ optionally ``captionOptions`` on each step object:
       :height: 400px
 
 Steps without a ``caption`` will hide any previously visible caption.
-See :doc:`configuration` for the full list of ``captionOptions`` fields
+See :doc:`../demos/configuration` for the full list of ``captionOptions`` fields
 and CSS custom properties for styling.

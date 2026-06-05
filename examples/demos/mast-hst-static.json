@@ -1,0 +1,23 @@
+{
+  "wireframe": "mast-hst.html",
+  "title": "MAST HST Search — Results",
+  "height": "540px",
+  "viewport": 1440,
+  "initSteps": [
+    "#mast-app@0:add-class=banner-closed",
+    "#input-objects@0:type-text=M31",
+    "#toggle-dtype-all@0:remove-class=active",
+    "#toggle-dtype-spectrum@0:add-class=active",
+    "#input-program-id@0:type-text=14657",
+    "#input-pi@0:type-text=Postman",
+    "#input-exposure@0:type-text=1200",
+    "#mast-app@0:add-class=results-open",
+    {
+      "target": "#row-28",
+      "action": "add-class",
+      "value": "highlighted",
+      "caption": "Click a result row to inspect observation details",
+      "captionOptions": { "position": "bottom" }
+    }
+  ]
+}

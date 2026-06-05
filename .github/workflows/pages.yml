@@ -31,19 +31,24 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install guidestar with recording dependencies
+        run: pip install -e ".[record]"
+
       - name: Build self-contained demo pages
-        run: python examples/build.py --out _site
-
-      - name: Add index page
-        run: cp examples/index.html _site/index.html
-
-      - name: Install recording dependencies
         run: |
-          pip install playwright Pillow
-          playwright install chromium --with-deps
+          guidestar-build \
+            --configs-dir examples/demos \
+            --wireframes-dir examples/wireframes \
+            --out _site
+
+      - name: Install Playwright browser
+        run: playwright install chromium --with-deps
 
       - name: Record demo GIFs
-        run: python examples/record.py --site _site --out _site
+        run: guidestar-record --configs-dir examples/demos --site _site --out _site
+
+      - name: Generate index page
+        run: guidestar-index --site _site
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -17,6 +17,15 @@ dependencies = [
 docs = [
     "pydata-sphinx-theme",
 ]
+record = [
+    "playwright>=1.40",
+    "Pillow>=10.0",
+]
+
+[project.scripts]
+guidestar-build = "guidestar.cli.build:main"
+guidestar-record = "guidestar.cli.record:main"
+guidestar-index = "guidestar.cli.index:main"
 
 [tool.hatch.version]
 source = "vcs"

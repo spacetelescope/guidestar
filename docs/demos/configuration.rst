@@ -1,5 +1,5 @@
-Configuration Reference
-=======================
+Demo Options
+============
 
 Config object
 -------------
@@ -137,6 +137,8 @@ Step format
 
 Steps can be provided as **JSON objects** or **shorthand strings**.
 
+
+.. _json-object-format:
 
 JSON object format
 ^^^^^^^^^^^^^^^^^^
