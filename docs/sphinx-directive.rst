@@ -35,6 +35,23 @@ Directive options
    * - ``:steps-json:``
      - —
      - Inline JSON array of step objects (alternative to ``:steps:``).
+   * - ``:init-steps-json:``
+     - —
+     - JSON array of steps executed silently before playback (or before a
+       static render). Each step supports ``target``, ``action`` /
+       ``actions``, ``value``, ``noHighlight``, ``caption``, and
+       ``captionOptions``. The ``delay`` field is accepted but ignored.
+       In static mode (no ``:steps:``), the cursor is placed at the last
+       targeted init step and the last caption persists.
+       See :doc:`configuration` for details.
+   * - ``:cursor:``
+     - ``true``
+     - Show an animated cursor that moves to each target element (``true`` /
+       ``false``). In static mode the cursor rests at the last init step's
+       target element when ``true``.
+   * - ``:cursor-speed:``
+     - ``300``
+     - Duration in milliseconds for the cursor movement animation.
    * - ``:repeat:``
      - ``true``
      - Loop the demo (``true`` / ``false``).

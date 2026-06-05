@@ -23,6 +23,20 @@ When creating a ``Guidestar`` programmatically or via the
      - array
      - ``[]``
      - Array of step objects or shorthand strings (see below).
+       When empty, the demo renders in **static mode** — no playback
+       controls, timeline, or autostart (see :ref:`static-render`).
+   * - ``initSteps``
+     - array
+     - ``[]``
+     - Steps executed synchronously before playback begins (or before the
+       static render is shown). Init steps run with no delay, no highlight
+       animation, and no cursor movement — they are intended to set up the
+       initial DOM state. Each object supports the non-time-based fields
+       from the step format: ``target``, ``action`` / ``actions``, ``value``,
+       ``noHighlight``, ``caption``, and ``captionOptions``. The ``delay``
+       field is accepted but ignored. In static mode the cursor (if enabled)
+       is placed at the last init step's target element, and the last caption
+       persists as a static overlay.
    * - ``repeat``
      - bool
      - ``true``
@@ -414,3 +428,90 @@ Example:
        --gs-caption-font-size: 16px;
        --gs-caption-padding: 12px 20px;
    }
+
+
+.. _static-render:
+
+Static render mode
+------------------
+
+When no ``steps`` are provided, the demo operates in **static render mode**.
+The playback controls, timeline, and restart overlay are not created, and
+autostart is skipped.  The wireframe is simply shown at whatever state
+``initSteps`` leaves it in.
+
+This is useful when you want to show a screenshot-like view of the wireframe
+at a specific state — for example, with a sidebar open, a field filled in,
+or a cursor resting over a particular element.
+
+
+Setting the visual state
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use ``initSteps`` to drive the wireframe into the desired state.  All normal
+actions (``add-class``, ``set-value``, ``click``, etc.) are supported;  time-
+based fields (``delay``) are ignored.
+
+.. code-block:: json
+
+   {
+     "initSteps": [
+       { "target": "#sidebar", "action": "add-class", "value": "open" },
+       { "target": "#search-input", "action": "set-value", "value": "jwst" }
+     ]
+   }
+
+
+Cursor placement
+^^^^^^^^^^^^^^^^
+
+When ``cursor`` is ``true`` (the default), the cursor is placed at the centre
+of the last init step that has a ``target``.  Set ``cursor`` to ``false`` to
+hide the cursor entirely.
+
+.. code-block:: json
+
+   {
+     "initSteps": [
+       { "target": "#sidebar", "action": "add-class", "value": "open" },
+       { "target": "#search-input", "action": "set-value", "value": "jwst",
+         "caption": "Search pre-filled with a query" }
+     ]
+   }
+
+The cursor rests on ``#search-input`` because it is the last targeted step.
+
+
+Persistent caption
+^^^^^^^^^^^^^^^^^^
+
+A ``caption`` on the last init step persists as a static overlay.  Use
+``captionOptions`` to control position as normal.
+
+
+Directive example
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: rst
+
+   .. guidestar-demo:: _static/app.html
+      :init-steps-json:
+         [
+           {"target": "#sidebar", "action": "add-class", "value": "open"},
+           {"target": "#run-btn",
+            "caption": "Ready to run",
+            "captionOptions": {"position": "bottom"}}
+         ]
+      :height: 420px
+
+This renders a static wireframe with the sidebar open, the cursor resting on
+``#run-btn``, and a caption at the bottom.
+
+To hide the cursor:
+
+.. code-block:: rst
+
+   .. guidestar-demo:: _static/app.html
+      :init-steps-json: [{"target": "#sidebar", "action": "add-class", "value": "open"}]
+      :cursor: false
+      :height: 420px
