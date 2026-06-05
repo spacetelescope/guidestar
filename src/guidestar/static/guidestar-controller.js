@@ -771,32 +771,33 @@
         var scrollerRect = scroller.getBoundingClientRect();
         var elRect = el.getBoundingClientRect();
         var elRelTop = elRect.top - scrollerRect.top + scroller.scrollTop;
-        var target = elRelTop - (scroller.clientHeight / 2) + (elRect.height / 2);
-        scroller.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+        var target = Math.max(0, Math.min(
+            elRelTop - (scroller.clientHeight / 2) + (elRect.height / 2),
+            scroller.scrollHeight - scroller.clientHeight
+        ));
+
+        // Use a manual RAF animation instead of scrollTo({ behavior:'smooth' })
+        // because CSS smooth-scroll is broken inside CSS transform: scale() contexts.
+        var startTop = scroller.scrollTop;
+        var startTime = null;
+        var DURATION = 400;
         this._showScrollIndicator(scroller);
 
-        // Wait for smooth scroll to finish (max 600 ms) then invoke callback
-        var startTop = scroller.scrollTop;
-        var self = this;
-        var waited = 0;
-        var POLL = 40;
-        var MAX_WAIT = 600;
-        function poll() {
-            waited += POLL;
-            if (waited >= MAX_WAIT) {
-                if (callback) callback();
-                return;
-            }
-            // Detect when scroll position has stabilised
-            var now = scroller.scrollTop;
-            if (Math.abs(now - target) < 2 || now === startTop) {
-                if (callback) callback();
-                return;
-            }
-            startTop = now;
-            setTimeout(poll, POLL);
+        function easeInOut(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         }
-        setTimeout(poll, POLL);
+
+        function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / DURATION, 1);
+            scroller.scrollTop = startTop + (target - startTop) * easeInOut(progress);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                if (callback) callback();
+            }
+        }
+        requestAnimationFrame(step);
     };
 
     Guidestar.prototype._loadHTML = function (src, callback) {

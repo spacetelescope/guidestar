@@ -354,6 +354,28 @@
     min-width: 0;
   }
 
+  /* Date range pairs (Obs Start Date / Release Date) */
+  .date-range-row { display: flex; align-items: center; gap: 8px; }
+  .date-range-row .input-field { flex: 1; }
+  .range-sep { color: #a0c8d8; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+
+  /* Advanced conditions row */
+  .condition-row { display: flex; align-items: stretch; gap: 8px; }
+  .condition-col-name { width: 280px; flex-shrink: 0; }
+  .condition-col-name select { background: transparent; border: none; color: #fff; font-size: 14px; font-family: inherit; outline: none; flex: 1; min-width: 0; cursor: pointer; }
+  .condition-value { flex: 1; }
+  .condition-remove { width: 36px; flex-shrink: 0; font-size: 16px; border: 1px solid rgba(255,255,255,0.18); border-radius: 0; color: rgba(255,255,255,0.6); }
+  .condition-remove:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* Output column chips */
+  .col-select-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .col-select { border: 1px solid #858585; background: rgba(0,0,0,0.3); }
+  .col-select-header { padding: 6px 12px; display: flex; align-items: center; }
+  .col-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px 10px; }
+  .col-chip { background: rgba(0,97,126,0.4); border: 1px solid #2a7f9c; color: #e0eef3; font-size: 13px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 2px; }
+  .col-chip .chip-x { color: rgba(255,255,255,0.45); cursor: pointer; font-size: 10px; }
+  .col-chip .chip-x:hover { color: #fff; }
+
   /* ── Action bar ──────────────────────────────────────────────── */
   .action-bar {
     padding: 12px 24px;
@@ -752,7 +774,7 @@
       </div>
 
       <!-- Extra filters -->
-      <div class="extra-filters">
+      <div class="extra-filters" style="grid-template-columns: 1fr 1fr 1fr;">
         <div class="field-block">
           <div class="field-label">Dataset ID, e.g. ICDM79040 &nbsp;<button class="btn-teal" id="btn-upload-dataset" style="display:inline-flex;"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg> UPLOAD LIST</button></div>
           <div class="input-field"><span class="input-field-label">Dataset ID=</span><input type="text" id="input-dataset-id" /></div>
@@ -770,70 +792,105 @@
       <div class="extra-filters">
         <div class="field-block">
           <div class="field-label">Exposure duration in seconds, e.g. 1200</div>
-          <div class="range-wrap">
-            <div class="range-part"><span class="r-label">Min=</span><input type="text" id="input-exp-min" /></div>
-            <div class="range-part"><span class="r-label">Max=</span><input type="text" id="input-exp-max" /></div>
+          <div class="input-field"><span class="input-field-label">Exposure Time=</span><input type="text" id="input-exposure" /></div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Names of Filters/Gratings, e.g. G130M or POL60UV;PR200L</div>
+          <div class="input-field"><span class="input-field-label">Filter / Grating=</span><input type="text" id="input-filter" /></div>
+        </div>
+      </div>
+
+      <!-- Date ranges -->
+      <div class="extra-filters">
+        <div class="field-block">
+          <div class="field-label">Find data with observations beginning between these dates</div>
+          <div class="date-range-row">
+            <div class="input-field"><span class="input-field-label">Obs Start Date=</span><input type="text" id="input-obs-start-from" placeholder="YYYY-MM-DD" /></div>
+            <span class="range-sep">to</span>
+            <div class="input-field"><span class="input-field-label">Obs Start Date=</span><input type="text" id="input-obs-start-to" placeholder="YYYY-MM-DD" /></div>
           </div>
         </div>
         <div class="field-block">
-          <div class="field-label">Names of Filters/Gratings, e.g. G130M or POL60</div>
-          <div class="input-field"><span class="input-field-label">Filters/Gratings=</span><input type="text" id="input-filters" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Target classification</div>
-          <div class="input-field"><span class="input-field-label">Target Class=</span><input type="text" id="input-target-class" /></div>
-        </div>
-      </div>
-
-      <!-- Observation dates + proposal type -->
-      <div class="extra-filters">
-        <div class="field-block">
-          <div class="field-label">Observation start date, e.g. 2005-01-01</div>
-          <div class="input-field"><span class="input-field-label">Obs Start=</span><input type="text" id="input-obs-start" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Observation end date, e.g. 2015-12-31</div>
-          <div class="input-field"><span class="input-field-label">Obs End=</span><input type="text" id="input-obs-end" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Proposal type</div>
-          <div class="input-field"><span class="input-field-label">Proposal Type=</span><select id="select-proposal-type"><option selected>All</option><option>GO</option><option>CAL</option><option>SNAP</option><option>AR</option></select></div>
+          <div class="field-label">Find observations released publicly on or between these dates</div>
+          <div class="date-range-row">
+            <div class="input-field"><span class="input-field-label">Release Date=</span><input type="text" id="input-release-from" placeholder="YYYY-MM-DD" /></div>
+            <span class="range-sep">to</span>
+            <div class="input-field"><span class="input-field-label">Release Date=</span><input type="text" id="input-release-to" placeholder="YYYY-MM-DD" /></div>
+          </div>
         </div>
       </div>
 
-      <!-- Coordinate ranges -->
-      <div class="extra-filters">
-        <div class="field-block">
-          <div class="field-label">Right Ascension min (deg, 0–360)</div>
-          <div class="input-field"><span class="input-field-label">RA Min=</span><input type="text" id="input-ra-min" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Right Ascension max (deg, 0–360)</div>
-          <div class="input-field"><span class="input-field-label">RA Max=</span><input type="text" id="input-ra-max" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Declination min (deg, −90–90)</div>
-          <div class="input-field"><span class="input-field-label">Dec Min=</span><input type="text" id="input-dec-min" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Declination max (deg, −90–90)</div>
-          <div class="input-field"><span class="input-field-label">Dec Max=</span><input type="text" id="input-dec-max" /></div>
+      <!-- Advanced conditions -->
+      <div class="field-block">
+        <div class="field-label">Add or remove additional conditions to filter results</div>
+        <div class="condition-row">
+          <div class="input-field condition-col-name">
+            <span class="input-field-label">Column Name=</span>
+            <select id="select-column-name">
+              <option value="" selected></option>
+              <option>Target Name</option>
+              <option>Instrument</option>
+              <option>Proposal ID</option>
+              <option>RA (J2000)</option>
+              <option>Dec (J2000)</option>
+              <option>Exp Time</option>
+              <option>Release Date</option>
+            </select>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0;opacity:0.6" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+          </div>
+          <div class="input-field condition-value">
+            <span class="input-field-label">Condition=</span>
+            <input type="text" id="input-condition" />
+          </div>
+          <button class="btn-icon condition-remove" id="btn-remove-condition" aria-label="Remove this condition">&#x2715;</button>
+          <button class="btn-teal" id="btn-add-condition">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            ADD ANOTHER CONDITION
+          </button>
         </div>
       </div>
 
-      <!-- Science keywords + wavelength + calibration level -->
-      <div class="extra-filters">
-        <div class="field-block">
-          <div class="field-label">Science keywords</div>
-          <div class="input-field"><span class="input-field-label">Keywords=</span><input type="text" id="input-science-keywords" /></div>
+      <!-- Output columns -->
+      <div class="field-block">
+        <div class="field-label col-select-top">
+          Choose fields to display in search results table.
+          <button class="btn-teal" id="btn-select-recommended" style="display:inline-flex;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            Select recommended
+          </button>
+          <button class="btn-icon" id="btn-col-select-all" style="border:1px solid rgba(255,255,255,0.2);border-radius:0;padding:6px 8px;" aria-label="Select all columns">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </button>
+          <button class="btn-icon" id="btn-col-deselect-all" style="border:1px solid rgba(255,255,255,0.2);border-radius:0;padding:6px 8px;" aria-label="Deselect all columns">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+          </button>
         </div>
-        <div class="field-block">
-          <div class="field-label">Wavelength range (e.g. UV, optical, IR)</div>
-          <div class="input-field"><span class="input-field-label">Wavelength=</span><input type="text" id="input-wavelength" /></div>
-        </div>
-        <div class="field-block">
-          <div class="field-label">Calibration level</div>
-          <div class="input-field"><span class="input-field-label">Cal Level=</span><select id="select-cal-level"><option selected>All</option><option>0 (Raw)</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <div class="col-select">
+          <div class="col-select-header"><span class="input-field-label" style="font-size:13px;">Output columns=</span></div>
+          <div class="col-chips" id="col-chips">
+            <span class="col-chip">Ang Sep (') <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Apertures <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Central Wavelength <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Dataset <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Dec (J2000) <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Exp Time <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Filters/Gratings <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">HAP <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">HASP <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">High-Level Science Products <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">HSLA <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Instrument <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">PI Last Name <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Preview Name <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Proposal ID <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">RA (J2000) <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Ref <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Release Date <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Scan Type <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Start Time <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Stop Time <span class="chip-x">&#x2715;</span></span>
+            <span class="col-chip">Target Name <span class="chip-x">&#x2715;</span></span>
+          </div>
         </div>
       </div>
 
