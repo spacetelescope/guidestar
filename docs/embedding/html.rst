@@ -65,6 +65,92 @@ JSON attribute to any element:
 The controller auto-discovers these elements on ``DOMContentLoaded``.
 
 
+Wireframe content sources
+--------------------------
+
+Guidestar supports four ways to provide the wireframe HTML, controlled by
+``htmlSrc`` and ``htmlSrcSelector``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 25 50
+
+   * - ``htmlSrc``
+     - ``htmlSrcSelector``
+     - Behaviour
+   * - provided
+     - omitted
+     - Fetches the URL and uses the full response body as the wireframe.
+   * - provided
+     - provided
+     - Fetches the URL, parses the response with ``DOMParser``, and extracts
+       the first element matching the selector as the wireframe.
+   * - omitted
+     - provided
+     - Clones the first element matching the selector from the **current page**
+       DOM — no network request needed.
+   * - omitted
+     - omitted
+     - Uses any HTML that already exists as children of the container element
+       (inline wireframe).  Logs an error if the container is empty.
+
+
+**Inline wireframe** (no fetch, no external file):
+
+.. code-block:: html
+
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
+
+   <div style="width:100%;height:420px"
+        data-guidestar
+        data-guidestar-config='{"steps":["#btn@1500:click|Click the button"],"repeat":true}'>
+     <!-- wireframe HTML pasted directly here -->
+     <button id="btn">Click me</button>
+   </div>
+
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
+
+
+**Clone from an element already on the page** (e.g. a hidden template div):
+
+.. code-block:: html
+
+   <!-- Wireframe lives elsewhere on the page -->
+   <div id="my-wireframe" style="display:none">
+     <button id="btn">Click me</button>
+   </div>
+
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
+
+   <div style="width:100%;height:420px"
+        data-guidestar
+        data-guidestar-config='{
+     "htmlSrcSelector": "#my-wireframe",
+     "steps": ["#btn@1500:click|Click the button"],
+     "repeat": true
+   }'></div>
+
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
+
+
+**Extract a specific element from a remote URL**:
+
+.. code-block:: html
+
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
+
+   <div style="width:100%;height:420px"
+        data-guidestar
+        data-guidestar-config='{
+     "htmlSrc": "https://example.com/page-with-wireframe.html",
+     "htmlSrcSelector": "#wireframe-container",
+     "steps": ["#btn@1500:click|Click the button"],
+     "repeat": true
+   }'></div>
+
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
+
+
 Programmatic usage
 ------------------
 

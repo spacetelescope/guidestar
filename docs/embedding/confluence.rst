@@ -19,19 +19,32 @@ hosted externally and the step definitions live directly in the macro body.
 Embed with Steps Defined in Confluence (Bobswift)
 --------------------------------------------------
 
-This approach lets you keep the step sequence editable directly in Confluence
-while hosting only the **wireframe HTML** externally.  Because the Bobswift
-HTML macro renders its content in the Confluence page DOM, the Guidestar
-controller can be loaded from GitHub Pages and
-instantiated in the macro body with steps written inline.
+Because the Bobswift HTML macro renders its content directly in the Confluence
+page DOM (not a sandboxed iframe), you can load the Guidestar controller from
+GitHub Pages and define your steps inline — without hosting a pre-built demo
+page.  Three sub-approaches are available depending on where your wireframe
+HTML lives:
 
-**What to host externally:** only the bare wireframe HTML file — no
-controller, no steps, no build step required.  The wireframe can be served
-from GitHub Pages, an S3 bucket, or any other static host that returns
-permissive CORS headers.
+**Wireframe hosted externally (GitHub Pages, S3, etc.)**
+   Use ``htmlSrc`` pointing to the wireframe URL.  The host must return
+   permissive CORS headers; GitHub Pages does this by default.
 
-**What lives in Confluence:** the controller script tag, the stylesheet link,
-and the step definitions.
+**Wireframe defined in the same macro**
+   Place the wireframe HTML as children of the ``[data-guidestar]`` container
+   and omit both ``htmlSrc`` and ``htmlSrcSelector``.  No network request is
+   made; no CORS configuration is needed.
+
+**Wireframe defined in an earlier macro on the same Confluence page**
+   Give the wireframe container an ``id`` (or any unique selector) in the
+   earlier macro, then use ``htmlSrcSelector`` in the demo macro.  The
+   controller clones that element from the live page DOM — again, no fetch.
+
+**Wireframe defined in a macro on a different Confluence page**
+   If the other page is same-origin, you can use ``htmlSrc`` **and**
+   ``htmlSrcSelector`` to point at the wireframe element on that page. 
+   The controller will fetch the remote URL and extract only the matching element.
+   This lets you point at another Confluence page and pull out a specific ``<div>`` as
+   the wireframe, provided the page is publicly accessible or same-origin.
 
 Embedding in Confluence with Bobswift
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -40,24 +53,16 @@ Embedding in Confluence with Bobswift
    <https://marketplace.atlassian.com/apps/1210-html-macro>`_ from the
    Atlassian Marketplace (requires Confluence admin access).
 
-2. On the Confluence page, insert the **HTML macro** and paste either the
-   declarative or programmatic snippet from :ref:`html-embedding` into the
-   macro body, replacing the wireframe URL and steps with your own.  Both
-   approaches work inside the Bobswift macro because it renders content
-   directly in the Confluence page DOM without a sandbox.
+2. On the Confluence page, insert the **HTML macro** and paste one of the
+   snippets from :ref:`html-embedding` into the macro body.  All four
+   wireframe source modes described there work identically inside Bobswift.
 
-   Replace ``htmlSrc`` with the URL of your hosted wireframe and update the
-   ``steps`` array to match your demo.
+   Set ``htmlSrc`` and/or ``htmlSrcSelector`` to match where your wireframe
+   lives, and update the ``steps`` array to match your demo.
 
 3. Adjust ``height`` to match your wireframe dimensions.
    See :ref:`json-object-format` for the full list of configuration options
    and :ref:`step-format` for the step string syntax.
-
-.. note::
-
-   The wireframe host must serve files with permissive CORS headers so the
-   controller's ``fetch()`` call for ``htmlSrc`` can load the wireframe.
-   GitHub Pages does this by default with no additional configuration.
 
 
 Embed Interactive Demo from GitHub Pages

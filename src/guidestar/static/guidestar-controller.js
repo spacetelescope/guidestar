@@ -496,6 +496,7 @@
         this.container = container;
         this.config = Object.assign({
             htmlSrc: null,
+            htmlSrcSelector: null,
             steps: [],
             repeat: true,
             autoStart: true,
@@ -683,18 +684,49 @@
             }, true); // capture phase
         }
 
-        // Load HTML then start
-        if (this.config.htmlSrc) {
-            this._loadHTML(this.config.htmlSrc, function () {
+        // Load / locate wireframe content, then start.
+        //
+        // Four cases depending on htmlSrc / htmlSrcSelector:
+        //   1. htmlSrc only             — fetch URL, use full response body
+        //   2. htmlSrc + htmlSrcSelector — fetch URL, extract matching element
+        //   3. htmlSrcSelector only     — clone matching element from current page
+        //   4. neither + no inline children — log error and show nothing
+        var hasSrc      = !!this.config.htmlSrc;
+        var hasSelector = !!this.config.htmlSrcSelector;
+
+        if (hasSrc) {
+            this._loadHTML(this.config.htmlSrc, this.config.htmlSrcSelector || null, function () {
                 self._onReady();
             });
+        } else if (hasSelector) {
+            // Clone from the current page DOM
+            var srcEl = document.querySelector(this.config.htmlSrcSelector);
+            if (!srcEl) {
+                console.error('[Guidestar] htmlSrcSelector "' + this.config.htmlSrcSelector + '" not found in page');
+                this._contentRoot.innerHTML =
+                    '<p style="color:red;padding:16px;">Guidestar: element "' +
+                    this.config.htmlSrcSelector + '" not found.</p>';
+            } else {
+                this._contentRoot.innerHTML = srcEl.outerHTML;
+                this._runScripts();
+                document.dispatchEvent(new CustomEvent('guidestar-loaded', {
+                    detail: { container: self.container, instance: self }
+                }));
+                self._runInitSteps(function () {
+                    self._initialHTML = self._contentRoot.innerHTML;
+                    self._onReady();
+                });
+            }
         } else {
-            // No htmlSrc — use existing container children as inline content.
-            // Move any children that were in the container before _init into
-            // _contentRoot so selectors, restart-reset, and controls all work.
+            // No htmlSrc or htmlSrcSelector — use existing container children as
+            // inline content.  Move any children that were in the container before
+            // _init into _contentRoot so selectors, restart-reset, and controls work.
             var existingNodes = [];
             while (container.firstChild && container.firstChild !== this._contentRoot) {
                 existingNodes.push(container.removeChild(container.firstChild));
+            }
+            if (existingNodes.length === 0) {
+                console.error('[Guidestar] No wireframe content found. Provide htmlSrc, htmlSrcSelector, or inline HTML inside the container.');
             }
             for (var i = 0; i < existingNodes.length; i++) {
                 this._contentRoot.appendChild(existingNodes[i]);
@@ -975,7 +1007,16 @@
         requestAnimationFrame(step);
     };
 
-    Guidestar.prototype._loadHTML = function (src, callback) {
+    /**
+     * Fetch src, optionally extract the first element matching selector from
+     * the response, inject into _contentRoot, run scripts, and call callback.
+     *
+     * @param {string}      src      URL to fetch
+     * @param {string|null} selector CSS selector to extract from fetched HTML,
+     *                               or null to use the full response body
+     * @param {Function}    callback Called after content is ready
+     */
+    Guidestar.prototype._loadHTML = function (src, selector, callback) {
         var self = this;
         fetch(src)
             .then(function (resp) {
@@ -983,7 +1024,16 @@
                 return resp.text();
             })
             .then(function (html) {
-                self._contentRoot.innerHTML = html;
+                if (selector) {
+                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                    var el = doc.querySelector(selector);
+                    if (!el) {
+                        throw new Error('htmlSrcSelector "' + selector + '" not found in ' + src);
+                    }
+                    self._contentRoot.innerHTML = el.outerHTML;
+                } else {
+                    self._contentRoot.innerHTML = html;
+                }
                 self._runScripts();
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)
                 document.dispatchEvent(new CustomEvent('guidestar-loaded', {
