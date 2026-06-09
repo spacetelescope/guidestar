@@ -20,6 +20,7 @@ Usage:
 import html
 import json
 import re
+import shutil
 import sys
 from importlib.resources import files
 from pathlib import Path
@@ -169,6 +170,20 @@ def main(argv=None):
         built += 1
 
     print(f"\nBuilt {built} demo page(s) in {out_dir}")
+
+    # Copy standalone assets so they can be loaded via htmlSrc / script tag
+    # from an external page (e.g. a Bobswift macro in Confluence).
+    for asset in ("guidestar-controller.js", "guidestar-controls.css"):
+        dest = out_dir / asset
+        shutil.copy2(static / asset, dest)
+        print(f"Copied {asset} → {dest}")
+
+    wireframes_out = out_dir / "wireframes"
+    wireframes_out.mkdir(exist_ok=True)
+    for wf in sorted(wireframes_dir.glob("*.html")):
+        dest = wireframes_out / wf.name
+        shutil.copy2(wf, dest)
+        print(f"Copied wireframe {wf.name} → {dest}")
 
 
 if __name__ == "__main__":
