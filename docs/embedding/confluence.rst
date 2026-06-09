@@ -1,10 +1,12 @@
 Confluence
 ==========
 
-Guidestar demos can be embedded in Confluence pages in two ways: as
-**animated GIFs** (works everywhere, no JavaScript required) or as
+Guidestar demos can be embedded in Confluence pages in three ways: as
+**animated GIFs** (works everywhere, no JavaScript required), as
 **interactive HTML pages** embedded via iframe (works on platforms that
-permit JavaScript in iframes, such as when using the Bobswift HTML macro).
+permit JavaScript in iframes, such as when using the Bobswift HTML macro),
+or as a **Bobswift-hosted interactive demo** where only the wireframe is
+hosted externally and the step definitions live directly in the macro body.
 
 .. note::
 
@@ -12,6 +14,50 @@ permit JavaScript in iframes, such as when using the Bobswift HTML macro).
    all JavaScript execution.  For this reason, interactive HTML embeds do not
    work via Confluence's native iframe macro.  The options described below
    work around this limitation.
+
+
+Embed with Steps Defined in Confluence (Bobswift)
+--------------------------------------------------
+
+This approach lets you keep the step sequence editable directly in Confluence
+while hosting only the **wireframe HTML** externally.  Because the Bobswift
+HTML macro renders its content in the Confluence page DOM, the Guidestar
+controller can be loaded from GitHub Pages and
+instantiated in the macro body with steps written inline.
+
+**What to host externally:** only the bare wireframe HTML file — no
+controller, no steps, no build step required.  The wireframe can be served
+from GitHub Pages, an S3 bucket, or any other static host that returns
+permissive CORS headers.
+
+**What lives in Confluence:** the controller script tag, the stylesheet link,
+and the step definitions.
+
+Embedding in Confluence with Bobswift
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install the `Bobswift HTML macro
+   <https://marketplace.atlassian.com/apps/1210-html-macro>`_ from the
+   Atlassian Marketplace (requires Confluence admin access).
+
+2. On the Confluence page, insert the **HTML macro** and paste either the
+   declarative or programmatic snippet from :ref:`html-embedding` into the
+   macro body, replacing the wireframe URL and steps with your own.  Both
+   approaches work inside the Bobswift macro because it renders content
+   directly in the Confluence page DOM without a sandbox.
+
+   Replace ``htmlSrc`` with the URL of your hosted wireframe and update the
+   ``steps`` array to match your demo.
+
+3. Adjust ``height`` to match your wireframe dimensions.
+   See :ref:`json-object-format` for the full list of configuration options
+   and :ref:`step-format` for the step string syntax.
+
+.. note::
+
+   The wireframe host must serve files with permissive CORS headers so the
+   controller's ``fetch()`` call for ``htmlSrc`` can load the wireframe.
+   GitHub Pages does this by default with no additional configuration.
 
 
 Embed Interactive Demo from GitHub Pages
