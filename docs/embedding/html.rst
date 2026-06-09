@@ -1,3 +1,5 @@
+.. _html-embedding:
+
 Standalone HTML
 ===============
 
@@ -18,6 +20,14 @@ Copy (or serve) these two files from the package's ``static/`` directory:
 * ``guidestar-controller.js``
 * ``guidestar-controls.css``
 
+They are also available directly from the Guidestar GitHub Pages site if you
+want to load them without self-hosting:
+
+.. code-block:: text
+
+   https://spacetelescope.github.io/guidestar/guidestar-controller.js
+   https://spacetelescope.github.io/guidestar/guidestar-controls.css
+
 .. code-block:: html
 
    <link rel="stylesheet" href="guidestar-controls.css">
@@ -32,15 +42,25 @@ JSON attribute to any element:
 
 .. code-block:: html
 
-   <div data-guidestar
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
+
+   <div style="width:100%;height:420px"
+        data-guidestar
         data-guidestar-config='{
-     "htmlSrc": "my-wireframe.html",
+     "htmlSrc": "https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html",
      "steps": [
-       {"target": "#btn", "action": "click", "delay": 1500},
-       {"target": "#panel", "action": "toggle-class", "value": "open", "delay": 1000}
+       "#btn-sidebar@1800:click|Open the sidebar",
+       "#sidebar@800:toggle-class=open",
+       "#input-search@1500:type-text=pipeline|Search for a pipeline",
+       "#btn-action@1500:click|^Run the batch action",
+       "pause@2000",
+       "#sidebar@1200:toggle-class=open|vClose the sidebar",
+       "pause@2000"
      ],
      "repeat": true
    }'></div>
+
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
 
 The controller auto-discovers these elements on ``DOMContentLoaded``.
 
@@ -50,14 +70,22 @@ Programmatic usage
 
 .. code-block:: html
 
-   <div id="my-demo"></div>
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
 
+   <div id="my-demo" style="width:100%;height:420px"></div>
+
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
    <script>
    var demo = new Guidestar(document.getElementById('my-demo'), {
-       htmlSrc: 'my-wireframe.html',
+       htmlSrc: 'https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html',
        steps: [
-           { target: '#btn', action: 'click', delay: 1500 },
-           { target: '#panel', action: 'toggle-class', value: 'open', delay: 1000 }
+           '#btn-sidebar@1800:click|Open the sidebar',
+           '#sidebar@800:toggle-class=open',
+           '#input-search@1500:type-text=pipeline|Search for a pipeline',
+           '#btn-action@1500:click|^Run the batch action',
+           'pause@2000',
+           '#sidebar@1200:toggle-class=open|vClose the sidebar',
+           'pause@2000'
        ],
        repeat: true,
        onStepStart: function(index, step) {
@@ -96,10 +124,10 @@ Full standalone example
    <head>
        <meta charset="UTF-8">
        <title>Wireframe Demo — Standalone</title>
-       <link rel="stylesheet" href="guidestar-controls.css">
+       <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
        <style>
            body { font-family: sans-serif; max-width: 800px; margin: 40px auto; }
-           #demo-container { border: 1px solid #ccc; border-radius: 8px; }
+           #demo-container { width: 100%; height: 420px; border: 1px solid #ccc; border-radius: 8px; }
        </style>
    </head>
    <body>
@@ -107,17 +135,19 @@ Full standalone example
        <div id="demo-container"
             data-guidestar
             data-guidestar-config='{
-              "htmlSrc": "my-app-wireframe.html",
+              "htmlSrc": "https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html",
               "steps": [
-                "#start-btn@2000:click",
-                "#sidebar@1000:add-class=open",
-                "#search@1500:type-text=example query",
-                "#search-btn@1500:click",
-                "#sidebar@1000:remove-class=open",
+                "#btn-sidebar@1800:click|Open the sidebar",
+                "#sidebar@800:toggle-class=open",
+                "#input-search@1500:type-text=pipeline|Search for a pipeline",
+                "#btn-action@1500:click|^Run the batch action",
+                "pause@2000",
+                "#sidebar@1200:toggle-class=open|vClose the sidebar",
                 "pause@2000"
-              ]
+              ],
+              "repeat": true
             }'>
        </div>
-       <script src="guidestar-controller.js"></script>
+       <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
    </body>
    </html>
