@@ -1,10 +1,12 @@
 Confluence
 ==========
 
-Guidestar demos can be embedded in Confluence pages in two ways: as
-**animated GIFs** (works everywhere, no JavaScript required) or as
+Guidestar demos can be embedded in Confluence pages in three ways: as
+**animated GIFs** (works everywhere, no JavaScript required), as
 **interactive HTML pages** embedded via iframe (works on platforms that
-permit JavaScript in iframes, such as when using the Bobswift HTML macro).
+permit JavaScript in iframes, such as when using the Bobswift HTML macro),
+or as a **Bobswift-hosted interactive demo** where only the wireframe is
+hosted externally and the step definitions live directly in the macro body.
 
 .. note::
 
@@ -14,18 +16,66 @@ permit JavaScript in iframes, such as when using the Bobswift HTML macro).
    work around this limitation.
 
 
-Embed Interactive Demo from GitHub Pages
-----------------------------------------
+Embedding in Confluence with Bobswift
+-------------------------------------
 
-For teams that want live interactive demos in Confluence, the recommended
-approach is to host the self-contained demo HTML on **GitHub Pages** and then
-embed those pages using the `Bobswift HTML macro
-<https://marketplace.atlassian.com/apps/1210-html-macro>`_ (or any other
-Confluence macro that renders iframes without the ``sandbox`` restriction).
+1. Install the `Bobswift HTML macro
+   <https://marketplace.atlassian.com/apps/1210-html-macro>`_ from the
+   Atlassian Marketplace (requires Confluence admin access).
+
+2. On the Confluence page, insert the **HTML macro** (leave all options as default) 
+   and paste one of the options described below into the macro body.
+
+3. Adjust ``height`` to match the ``height`` set in the demo
+   :ref:`config JSON <json-object-format>`
+   (add ~40 px for the page chrome).
+
+The demo loads with full play/pause/restart controls and auto-starts when
+scrolled into view.
+
+.. guidestar-demo:: _static/confluence-bobswift.html
+   :steps: #search-input@1000:click|Click "Search macros", #search-input@2200:type-text=bobswift|Type "bobswift", #app@500:add-class=searched, #bobswift-result@1500:click|^Click Html-bobswift, #app@400:add-class=inserting, #insert-btn@1800:click|Click Insert, #app@400:add-class=inserted, pause@700, #macro-content@5000:type-text=<pasted code from sections below>|^Paste and modify the embed code, pause@2000
+   :height: 580px
+   :viewport: 860
+   :repeat: true
 
 
-Setting up GitHub Pages
-^^^^^^^^^^^^^^^^^^^^^^^
+Embed with Demo Defined Inline
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Four sub-approaches are available depending on where your wireframe
+HTML lives:
+
+**Wireframe hosted externally (GitHub Pages, S3, etc.)**
+   Use ``htmlSrc`` pointing to the wireframe URL.  The host must return
+   permissive CORS headers; GitHub Pages does this by default.
+
+   See :ref:`wireframe-src-external` for a paste-ready example.
+
+**Wireframe defined in an earlier macro on the same Confluence page**
+   Give the wireframe container an ``id`` (or any unique selector) in the
+   earlier macro, then use ``htmlSrcSelector`` in the demo macro.  The
+   controller clones that element from the live page DOM — no fetch required.
+
+   See :ref:`wireframe-src-same-page` for a paste-ready example.
+
+**Wireframe defined in a macro on a different Confluence page**
+   If the other page is same-origin (or publicly accessible), use ``htmlSrc``
+   **and** ``htmlSrcSelector`` together.  The controller fetches the remote
+   URL, parses it, and extracts only the matching element as the wireframe.
+
+   See :ref:`wireframe-src-remote-extract` for a paste-ready example.
+
+**Wireframe defined in the same macro**
+   Place the wireframe HTML as children of the ``[data-guidestar]`` container
+   and omit both ``htmlSrc`` and ``htmlSrcSelector``.  No network request is
+   made; no CORS configuration is needed.
+
+   See :ref:`wireframe-src-inline` for a paste-ready example.
+
+
+Demo Hosted from GitHub Pages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :doc:`../gh_actions/deploy-demos` reusable workflow builds self-contained
 HTML pages from your demo configs and deploys them to GitHub Pages.  See that
@@ -54,16 +104,8 @@ Once deployed, each demo is available at a stable URL:
 Enable GitHub Pages in your repository **Settings → Pages** and set the
 source to **GitHub Actions**.
 
-
-Embedding in Confluence with Bobswift
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. Install the `Bobswift HTML macro
-   <https://marketplace.atlassian.com/apps/1210-html-macro>`_ from the
-   Atlassian Marketplace (requires Confluence admin access).
-
-2. On the Confluence page, insert the **HTML macro** (leave all options as default) 
-   and paste the following into the macro body (replacing the ``src`` URL with your GitHub Pages demo URL):
+When embedding from GitHub pages, the content in the Bobswift macro is an iframe embedding the
+hosted demo page:
 
    .. code-block:: html
 
@@ -75,19 +117,6 @@ Embedding in Confluence with Bobswift
         scrolling="no"
         allowfullscreen>
       </iframe>
-
-3. Adjust ``height`` to match the ``height`` set in the demo
-   :ref:`config JSON <json-object-format>`
-   (add ~40 px for the page chrome).
-
-The demo loads with full play/pause/restart controls and auto-starts when
-scrolled into view.
-
-.. guidestar-demo:: _static/confluence-bobswift.html
-   :steps: #search-input@1000:click|Click "Search macros", #search-input@2200:type-text=bobswift|Type "bobswift", #app@500:add-class=searched, #bobswift-result@1500:click|^Click Html-bobswift, #app@400:add-class=inserting, #insert-btn@1800:click|Click Insert, #app@400:add-class=inserted, pause@700, #macro-content@5000:type-text=<iframe src="https://org.github.io/repo/demo.html" width="100%" height="460" frameborder="0"></iframe>|^Paste the iframe embed code, pause@2000
-   :height: 580px
-   :viewport: 860
-   :repeat: true
 
 
 Embed GIF Hosted by GitHub Pages

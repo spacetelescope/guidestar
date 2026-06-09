@@ -96,25 +96,42 @@ Minimal Sphinx example
 Minimal standalone HTML example
 -------------------------------
 
-No Sphinx needed — just include the JS and CSS files directly:
+No Sphinx needed — just include the JS and CSS files directly.  The example
+below uses the controller and wireframe hosted on GitHub Pages so it works
+without any local files:
 
 .. code-block:: html
 
    <!DOCTYPE html>
    <html>
    <head>
-       <link rel="stylesheet" href="guidestar-controls.css">
+       <link rel="stylesheet"
+             href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
    </head>
    <body>
-       <div data-guidestar
+       <div style="width:100%;height:420px"
+            data-guidestar
             data-guidestar-config='{
-              "htmlSrc": "my-app.html",
+              "htmlSrc": "https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html",
               "steps": [
-                {"target": "#btn", "action": "click", "delay": 1500, "caption": "Click the button"},
-                {"target": "#panel", "action": "toggle-class", "value": "open", "delay": 1000, "caption": "Open the panel", "captionOptions": {"position": "bottom"}}
-              ]
+                "#btn-sidebar@1800:click|Open the sidebar",
+                "#sidebar@800:toggle-class=open",
+                "#input-search@1500:type-text=pipeline|Search for a pipeline",
+                "#btn-action@1500:click|^Run the batch action",
+                "pause@2000",
+                "#sidebar@1200:toggle-class=open|vClose the sidebar",
+                "pause@2000"
+              ],
+              "repeat": true
             }'>
        </div>
-       <script src="guidestar-controller.js"></script>
+       <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
    </body>
    </html>
+
+Result:
+
+.. guidestar-demo:: https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html
+   :steps: #btn-sidebar@1800:click|Open the sidebar, #sidebar@800:toggle-class=open, #input-search@1500:type-text=pipeline|Search for a pipeline, #btn-action@1500:click|^Run the batch action, pause@2000, #sidebar@1200:toggle-class=open|vClose the sidebar, pause@2000
+   :height: 420px
+   :repeat: true
