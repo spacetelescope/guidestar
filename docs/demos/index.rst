@@ -1,5 +1,3 @@
-:orphan:
-
 Wireframe Demos
 ===============
 

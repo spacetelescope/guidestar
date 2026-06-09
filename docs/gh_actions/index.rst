@@ -1,5 +1,3 @@
-:orphan:
-
 GitHub Actions
 ==============
 
