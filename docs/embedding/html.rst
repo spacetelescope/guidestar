@@ -95,59 +95,121 @@ Guidestar supports four ways to provide the wireframe HTML, controlled by
        (inline wireframe).  Logs an error if the container is empty.
 
 
-**Inline wireframe** (no fetch, no external file):
+.. _wireframe-src-external:
+
+External wireframe (``htmlSrc``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Fetch a wireframe file hosted on GitHub Pages, S3, or any URL with permissive
+CORS headers.  The full response body is used as the wireframe:
 
 .. code-block:: html
 
    <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-
    <div style="width:100%;height:420px"
         data-guidestar
-        data-guidestar-config='{"steps":["#btn@1500:click|Click the button"],"repeat":true}'>
-     <!-- wireframe HTML pasted directly here -->
-     <button id="btn">Click me</button>
-   </div>
-
+        data-guidestar-config='{
+     "htmlSrc": "https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html",
+     "steps": [
+       "#btn-sidebar@1800:click|Open the sidebar",
+       "#sidebar@800:toggle-class=open",
+       "#input-search@1500:type-text=pipeline|Search for a pipeline",
+       "#btn-action@1500:click|^Run the batch action",
+       "pause@2000",
+       "#sidebar@1200:toggle-class=open|vClose the sidebar",
+       "pause@2000"
+     ],
+     "repeat": true
+   }'></div>
    <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
 
 
-**Clone from an element already on the page** (e.g. a hidden template div):
+.. _wireframe-src-inline:
+
+Inline wireframe (children of container)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Place the wireframe HTML as children of the container and omit both
+``htmlSrc`` and ``htmlSrcSelector``.  No network request is made:
 
 .. code-block:: html
 
-   <!-- Wireframe lives elsewhere on the page -->
+   <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
+   <div style="width:100%;height:120px"
+        data-guidestar
+        data-guidestar-config='{
+     "steps": [
+       "#my-btn@1500:click|Click the button",
+       "#my-panel@1000:toggle-class=open|Toggle the panel",
+       "pause@2000"
+     ],
+     "repeat": true
+   }'>
+     <!-- inline wireframe HTML -->
+     <style>
+       #my-panel { display: none; padding: 8px; background: #eef; }
+       #my-panel.open { display: block; }
+     </style>
+     <button id="my-btn">Click me</button>
+     <div id="my-panel">Panel content</div>
+   </div>
+   <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
+
+
+.. _wireframe-src-same-page:
+
+Clone from current page (``htmlSrcSelector``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Give a wireframe element already in the DOM a stable ``id``, then reference
+it with ``htmlSrcSelector``.  The controller clones it — no network request
+needed:
+
+.. code-block:: html
+
+   <!-- Wireframe lives elsewhere on the page (e.g. an earlier macro) -->
    <div id="my-wireframe" style="display:none">
-     <button id="btn">Click me</button>
+     <!-- wireframe HTML here -->
    </div>
 
    <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-
    <div style="width:100%;height:420px"
         data-guidestar
         data-guidestar-config='{
      "htmlSrcSelector": "#my-wireframe",
-     "steps": ["#btn@1500:click|Click the button"],
+     "steps": [
+       "#btn-sidebar@1800:click|Open the sidebar",
+       "#sidebar@800:toggle-class=open",
+       "pause@2000"
+     ],
      "repeat": true
    }'></div>
-
    <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
 
 
-**Extract a specific element from a remote URL**:
+.. _wireframe-src-remote-extract:
+
+Extract from remote URL (``htmlSrc`` + ``htmlSrcSelector``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Fetch a remote page and extract only the element matching the selector.  The
+remote URL must be same-origin or publicly accessible:
 
 .. code-block:: html
 
    <link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-
    <div style="width:100%;height:420px"
         data-guidestar
         data-guidestar-config='{
      "htmlSrc": "https://example.com/page-with-wireframe.html",
      "htmlSrcSelector": "#wireframe-container",
-     "steps": ["#btn@1500:click|Click the button"],
+     "steps": [
+       "#btn-sidebar@1800:click|Open the sidebar",
+       "#sidebar@800:toggle-class=open",
+       "pause@2000"
+     ],
      "repeat": true
    }'></div>
-
    <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
 
 

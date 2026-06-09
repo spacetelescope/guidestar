@@ -50,116 +50,28 @@ HTML lives:
    Use ``htmlSrc`` pointing to the wireframe URL.  The host must return
    permissive CORS headers; GitHub Pages does this by default.
 
-   .. code-block:: html
-
-      <div id="gs-demo" style="width:100%;height:420px"></div>
-      <link rel="stylesheet"
-            href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-      <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
-      <script>
-        new Guidestar(document.getElementById('gs-demo'), {
-          htmlSrc: 'https://spacetelescope.github.io/guidestar/wireframes/kitchen-sink.html',
-          steps: [
-            '#btn-sidebar@1800:click|Open the sidebar',
-            '#sidebar@800:toggle-class=open',
-            '#input-search@1500:type-text=pipeline|Search for a pipeline',
-            '#btn-action@1500:click|^Run the batch action',
-            'pause@2000',
-            '#sidebar@1200:toggle-class=open|vClose the sidebar',
-            'pause@2000'
-          ],
-          height: 420,
-          repeat: true
-        });
-      </script>
+   See :ref:`wireframe-src-external` for a paste-ready example.
 
 **Wireframe defined in an earlier macro on the same Confluence page**
    Give the wireframe container an ``id`` (or any unique selector) in the
    earlier macro, then use ``htmlSrcSelector`` in the demo macro.  The
    controller clones that element from the live page DOM — no fetch required.
 
-   *Earlier macro on the page (wireframe only):*
-
-   .. code-block:: html
-
-      <div id="my-wireframe" style="display:none">
-        <!-- wireframe HTML here -->
-      </div>
-
-   *Demo macro (steps defined here, wireframe cloned from above):*
-
-   .. code-block:: html
-
-      <div id="gs-demo" style="width:100%;height:420px"></div>
-      <link rel="stylesheet"
-            href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-      <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
-      <script>
-        new Guidestar(document.getElementById('gs-demo'), {
-          htmlSrcSelector: '#my-wireframe',
-          steps: [
-            '#btn-sidebar@1800:click|Open the sidebar',
-            '#sidebar@800:toggle-class=open',
-            'pause@2000'
-          ],
-          height: 420,
-          repeat: true
-        });
-      </script>
+   See :ref:`wireframe-src-same-page` for a paste-ready example.
 
 **Wireframe defined in a macro on a different Confluence page**
    If the other page is same-origin (or publicly accessible), use ``htmlSrc``
    **and** ``htmlSrcSelector`` together.  The controller fetches the remote
    URL, parses it, and extracts only the matching element as the wireframe.
 
-   .. code-block:: html
-
-      <div id="gs-demo" style="width:100%;height:420px"></div>
-      <link rel="stylesheet"
-            href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-      <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
-      <script>
-        new Guidestar(document.getElementById('gs-demo'), {
-          htmlSrc: 'https://your-confluence.example.com/wiki/spaces/TEAM/pages/123456/Wireframe+Library',
-          htmlSrcSelector: '#my-wireframe',
-          steps: [
-            '#btn-sidebar@1800:click|Open the sidebar',
-            '#sidebar@800:toggle-class=open',
-            'pause@2000'
-          ],
-          height: 420,
-          repeat: true
-        });
-      </script>
+   See :ref:`wireframe-src-remote-extract` for a paste-ready example.
 
 **Wireframe defined in the same macro**
    Place the wireframe HTML as children of the ``[data-guidestar]`` container
    and omit both ``htmlSrc`` and ``htmlSrcSelector``.  No network request is
    made; no CORS configuration is needed.
 
-   .. code-block:: html
-
-      <link rel="stylesheet"
-            href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">
-      <div id="gs-demo" style="width:100%;height:120px"
-           data-guidestar
-           data-guidestar-config='{
-             "steps": [
-               "#my-btn@1500:click|Click the button",
-               "#my-panel@1000:toggle-class=open|Toggle the panel",
-               "pause@2000"
-             ],
-             "repeat": true
-           }'>
-        <!-- inline wireframe HTML -->
-        <style>
-          #my-panel { display: none; padding: 8px; background: #eef; }
-          #my-panel.open { display: block; }
-        </style>
-        <button id="my-btn">Click me</button>
-        <div id="my-panel">Panel content</div>
-      </div>
-      <script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"></script>
+   See :ref:`wireframe-src-inline` for a paste-ready example.
 
 
 Demo Defined and Hosted from GitHub Pages
