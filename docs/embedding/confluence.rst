@@ -34,7 +34,7 @@ The demo loads with full play/pause/restart controls and auto-starts when
 scrolled into view.
 
 .. guidestar-demo:: _static/confluence-bobswift.html
-   :steps: #search-input@1000:click|Click "Search macros", #search-input@2200:type-text=bobswift|Type "bobswift", #app@500:add-class=searched, #bobswift-result@1500:click|^Click Html-bobswift, #app@400:add-class=inserting, #insert-btn@1800:click|Click Insert, #app@400:add-class=inserted, pause@700, #macro-content@5000:type-text=<pasted code from sections below>|^Paste the iframe embed code, pause@2000
+   :steps: #search-input@1000:click|Click "Search macros", #search-input@2200:type-text=bobswift|Type "bobswift", #app@500:add-class=searched, #bobswift-result@1500:click|^Click Html-bobswift, #app@400:add-class=inserting, #insert-btn@1800:click|Click Insert, #app@400:add-class=inserted, pause@700, #macro-content@5000:type-text=<pasted code from sections below>|^Paste and modify the embed code, pause@2000
    :height: 580px
    :viewport: 860
    :repeat: true
@@ -74,8 +74,8 @@ HTML lives:
    See :ref:`wireframe-src-inline` for a paste-ready example.
 
 
-Demo Defined and Hosted from GitHub Pages
------------------------------------------
+Demo Hosted from GitHub Pages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :doc:`../gh_actions/deploy-demos` reusable workflow builds self-contained
 HTML pages from your demo configs and deploys them to GitHub Pages.  See that
