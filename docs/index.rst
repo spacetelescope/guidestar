@@ -19,8 +19,38 @@ This package handles:
 * Supporting multiple independent instances on the same page
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    quickstart
-   demos/index
-   gh_actions/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Creating Wireframes
+
+   wireframe/manual
+   wireframe/ai-assisted-vue
+   wireframe/ai-assisted-url
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Demo Configuration
+
+   demos/configuration
+   demos/styling
+   demos/accessibility
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Embedding
+
+   embedding/sphinx
+   embedding/html
+   embedding/recording
+   embedding/confluence
+
+.. toctree::
+   :maxdepth: 1
+   :caption: GitHub Actions
+
+   gh_actions/deploy-demos
+   gh_actions/wireframe-review
