@@ -13,6 +13,7 @@ Wireframe Demos
    :maxdepth: 1
    :caption: Demo Configuration
 
+   web-tool
    configuration
    styling
    accessibility

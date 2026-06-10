@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guidestar Demo Builder</title>
+<style>
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 15px; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f3f4f6;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+/* ── Layout ────────────────────────────────────────────────────────── */
+.app-header {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.app-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.app-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+}
+.card-header:hover { background: #f1f5f9; }
+.card-header h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+}
+.card-header .chevron {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  transition: transform 0.2s;
+}
+.card-header.collapsed .chevron { transform: rotate(-90deg); }
+.card-body { padding: 1rem; }
+.card-body.collapsed { display: none; }
+
+/* ── Source Input ──────────────────────────────────────────────────── */
+.source-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.source-row input[type="url"] {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+}
+.source-row input[type="url"]:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+.type-badge--wireframe { background: #d1fae5; color: #065f46; }
+.type-badge--html-demo { background: #dbeafe; color: #1e40af; }
+.type-badge--sphinx-demo { background: #ede9fe; color: #4c1d95; }
+
+.cors-notice {
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.825rem;
+  color: #713f12;
+  margin-top: 0.75rem;
+}
+.cors-notice strong { display: block; margin-bottom: 0.2rem; }
+
+.fallback-inputs { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.fallback-inputs textarea {
+  width: 100%;
+  height: 120px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  resize: vertical;
+  outline: none;
+}
+.fallback-inputs textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+.wireframe-sub-input { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.6rem; }
+.wireframe-sub-input label { font-size: 0.8rem; color: #64748b; white-space: nowrap; }
+.wireframe-sub-input input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  outline: none;
+}
+.wireframe-sub-input input:focus { border-color: #6366f1; }
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+  transition: background 0.15s, opacity 0.15s;
+}
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary { background: #6366f1; color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: #4f46e5; }
+.btn-secondary { background: #e2e8f0; color: #334155; }
+.btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+.btn-danger { background: #fee2e2; color: #991b1b; }
+.btn-danger:hover:not(:disabled) { background: #fecaca; }
+.btn-warning { background: #fef3c7; color: #92400e; }
+.btn-warning:hover:not(:disabled) { background: #fde68a; }
+.btn-success { background: #d1fae5; color: #065f46; }
+.btn-success:hover:not(:disabled) { background: #a7f3d0; }
+.btn-icon {
+  background: none;
+  padding: 0.3rem;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icon:hover:not(:disabled) { background: #f1f5f9; color: #1e293b; }
+.btn-sm { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
+
+/* ── Demo Options Grid ─────────────────────────────────────────────── */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.field input[type="text"],
+.field input[type="number"],
+.field select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  background: #fff;
+}
+.field input:focus,
+.field select:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+.field-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+.field-inline label { text-transform: none; letter-spacing: normal; font-size: 0.875rem; color: #334155; }
+input[type="checkbox"] { accent-color: #6366f1; width: 15px; height: 15px; }
+
+/* ── Recording Area ────────────────────────────────────────────────── */
+.recording-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.recording-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+.recording-status.recording { background: #fee2e2; color: #b91c1c; }
+.recording-status.pick-mode { background: #fef9c3; color: #92400e; }
+.recording-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.recording-status.recording .dot { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.iframe-wrap {
+  position: relative;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.iframe-wrap.recording { border-color: #ef4444; }
+.iframe-wrap.pick-mode { border-color: #f59e0b; }
+.iframe-wrap iframe {
+  display: block;
+  width: 100%;
+  border: none;
+  min-height: 480px;
+}
+.iframe-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 480px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.iframe-placeholder svg { opacity: 0.4; }
+
+/* ── Steps List ────────────────────────────────────────────────────── */
+.steps-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.steps-count {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-left: auto;
+}
+
+.step-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.step-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.step-card.invalid { border-color: #fca5a5; background: #fff5f5; }
+.step-card.dragging { opacity: 0.4; }
+.step-card.drag-over { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.step-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-card.invalid .step-number { background: #ef4444; }
+.step-summary {
+  flex: 1;
+  font-size: 0.8rem;
+  color: #475569;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.invalid-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.drag-handle {
+  cursor: grab;
+  color: #cbd5e1;
+  padding: 0.2rem;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.drag-handle:active { cursor: grabbing; }
+
+.step-body {
+  padding: 0.6rem 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.step-body .field-full { grid-column: 1 / -1; }
+.step-body .field label { font-size: 0.72rem; }
+.step-body select,
+.step-body input[type="text"],
+.step-body input[type="number"],
+.step-body textarea {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+}
+.step-body select:focus,
+.step-body input:focus,
+.step-body textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+.step-body textarea { resize: vertical; min-height: 44px; }
+.step-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+.step-footer .field-inline label { font-size: 0.78rem; }
+.step-actions { margin-left: auto; display: flex; gap: 0.3rem; }
+
+/* ── Preview ───────────────────────────────────────────────────────── */
+.preview-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+#preview-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 60px;
+  background: #fff;
+}
+#preview-container:empty { display: none; }
+#preview-container [data-guidestar] {
+  width: 100%;
+}
+
+/* ── Output ────────────────────────────────────────────────────────── */
+.tab-row {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 0.75rem;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: -1px;
+}
+.tab-btn.active { color: #6366f1; border-bottom-color: #6366f1; }
+.tab-btn:hover:not(.active) { color: #334155; }
+.output-area { position: relative; }
+.output-area textarea {
+  width: 100%;
+  height: 180px;
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+  font-size: 0.78rem;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  resize: vertical;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+}
+.copy-btn-wrap {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+}
+.copy-feedback { font-size: 0.75rem; color: #16a34a; font-weight: 600; }
+
+/* ── Action Popup Modal ────────────────────────────────────────────── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  width: min(520px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.modal-header h3 { margin: 0; font-size: 0.95rem; flex: 1; }
+.modal-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.modal-footer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+.modal .field label { font-size: 0.8rem; font-weight: 600; color: #475569; }
+.modal .field select,
+.modal .field input,
+.modal .field textarea {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+}
+.modal .field select:focus,
+.modal .field input:focus,
+.modal .field textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+.element-info {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  color: #475569;
+}
+.element-info strong { color: #1e293b; font-family: monospace; }
+
+/* ── No-steps placeholder ──────────────────────────────────────────── */
+.steps-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* ── Spinner ───────────────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Toast ─────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  z-index: 10000;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform 0.2s, opacity 0.2s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Guidestar Demo Builder</h1>
+  <p>Load a wireframe, HTML demo, or Sphinx directive — record or edit steps — generate copy-pasteable output.</p>
+</header>
+
+<main class="main">
+
+  <!-- ── Source Input ─────────────────────────────────────────────── -->
+  <section class="card" id="section-source">
+    <div class="card-header" onclick="toggleCard('source')">
+      <h2>1 — Source</h2>
+      <span id="source-type-badge"></span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body" id="source-body">
+      <div class="source-row">
+        <input type="url" id="source-url" placeholder="https://example.com/wireframe.html  or  paste a demo URL…" autocomplete="off">
+        <button class="btn-primary" id="btn-fetch" onclick="handleFetch()">Load</button>
+      </div>
+      <div id="cors-notice" class="cors-notice" style="display:none">
+        <strong>Cross-origin request blocked.</strong>
+        The browser cannot fetch this URL directly (CORS restriction). Paste the HTML source below, or upload the file instead.
+      </div>
+      <div id="fallback-inputs" class="fallback-inputs" style="display:none">
+        <textarea id="paste-html" placeholder="Paste wireframe HTML, demo HTML, or a Sphinx directive block here…" oninput="handlePaste()"></textarea>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <input type="file" id="file-upload" accept=".html,.htm,.rst,.txt" style="font-size:0.8rem;" onchange="handleFileUpload()">
+        </div>
+      </div>
+      <div id="wireframe-sub" class="wireframe-sub-input" style="display:none">
+        <label>Wireframe URL:</label>
+        <input type="url" id="wireframe-override-url" placeholder="https://… or leave blank to use the path from the demo">
+        <button class="btn-secondary btn-sm" onclick="loadWireframeFromOverride()">Load wireframe</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Demo Options ─────────────────────────────────────────────── -->
+  <section class="card" id="section-options">
+    <div class="card-header collapsed" onclick="toggleCard('options')">
+      <h2>2 — Demo Options</h2>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body collapsed" id="options-body">
+      <div class="options-grid">
+        <div class="field">
+          <label>Height</label>
+          <input type="text" id="opt-height" value="480px" placeholder="480px">
+        </div>
+        <div class="field">
+          <label>Viewport (px)</label>
+          <input type="number" id="opt-viewport" placeholder="e.g. 1440 (leave blank for responsive)">
+        </div>
+        <div class="field">
+          <label>Cursor speed (ms)</label>
+          <input type="number" id="opt-cursor-speed" value="300">
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-repeat" checked>
+          <label for="opt-repeat">Repeat</label>
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-auto-start" checked>
+          <label for="opt-auto-start">Auto-start</label>
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-cursor" checked>
+          <label for="opt-cursor">Cursor</label>
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-timeline" checked>
+          <label for="opt-timeline">Timeline</label>
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-pause-interaction" checked>
+          <label for="opt-pause-interaction">Pause on interaction</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Recording Area ───────────────────────────────────────────── -->
+  <section class="card" id="section-recording">
+    <div class="card-header" onclick="toggleCard('recording')">
+      <h2>3 — Wireframe Preview &amp; Recording</h2>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body" id="recording-body">
+      <div class="recording-toolbar">
+        <button class="btn-primary" id="btn-record-toggle" onclick="toggleRecordMode()" disabled>
+          Enable Record Mode
+        </button>
+        <span class="recording-status" id="recording-status">
+          <span class="dot"></span> Idle
+        </span>
+        <span style="margin-left:auto;font-size:0.8rem;color:#64748b">
+          Click any element in the wireframe below to record a step.
+        </span>
+      </div>
+      <div class="iframe-wrap" id="iframe-wrap">
+        <div class="iframe-placeholder" id="iframe-placeholder">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="#94a3b8" stroke-width="1.5"/><path d="M8 21h8M12 17v4" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Load a source above to preview the wireframe here</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Steps List ───────────────────────────────────────────────── -->
+  <section class="card" id="section-steps">
+    <div class="card-header" onclick="toggleCard('steps')">
+      <h2>4 — Steps</h2>
+      <span id="steps-count" class="steps-count">0 steps</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body" id="steps-body">
+      <div class="steps-toolbar">
+        <button class="btn-secondary btn-sm" onclick="addManualStep()">+ Add step manually</button>
+        <button class="btn-danger btn-sm" onclick="clearAllSteps()" id="btn-clear-steps" disabled>Clear all</button>
+      </div>
+      <div id="step-list" class="step-list">
+        <div class="steps-empty">No steps yet. Enable Record Mode and click elements in the wireframe, or load an existing demo.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Preview ──────────────────────────────────────────────────── -->
+  <section class="card" id="section-preview">
+    <div class="card-header collapsed" onclick="toggleCard('preview')">
+      <h2>5 — Preview Demo</h2>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body collapsed" id="preview-body">
+      <div class="preview-toolbar">
+        <button class="btn-primary" onclick="renderPreview()" id="btn-preview" disabled>Render Preview</button>
+        <button class="btn-secondary" onclick="clearPreview()">Clear</button>
+        <span style="font-size:0.8rem;color:#64748b;margin-left:auto">Uses the guidestar player from this same site.</span>
+      </div>
+      <div id="preview-container"></div>
+    </div>
+  </section>
+
+  <!-- ── Output ───────────────────────────────────────────────────── -->
+  <section class="card" id="section-output">
+    <div class="card-header collapsed" onclick="toggleCard('output')">
+      <h2>6 — Output</h2>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body collapsed" id="output-body">
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-html" onclick="switchTab('html')">HTML</button>
+        <button class="tab-btn" id="tab-sphinx" onclick="switchTab('sphinx')">Sphinx Directive</button>
+      </div>
+      <div class="output-area">
+        <textarea id="output-textarea" readonly></textarea>
+        <div class="copy-btn-wrap">
+          <button class="btn-secondary btn-sm" onclick="copyOutput()">Copy</button>
+          <span id="copy-feedback" class="copy-feedback" style="display:none">Copied!</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── Action Popup Modal ──────────────────────────────────────────── -->
+<div class="modal-backdrop" id="action-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title">Add Step</h3>
+      <button class="btn-icon" onclick="closeModal()" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="element-info" id="modal-element-info"></div>
+      <div class="field">
+        <label>Selector</label>
+        <select id="modal-selector" onchange="onModalSelectorChange()"></select>
+        <input type="text" id="modal-selector-custom" placeholder="Custom CSS selector…" style="margin-top:0.4rem;display:none;">
+      </div>
+      <div class="field">
+        <label>Action</label>
+        <select id="modal-action" onchange="onModalActionChange()">
+          <option value="click">click</option>
+          <option value="highlight">highlight</option>
+          <option value="add-class">add-class</option>
+          <option value="remove-class">remove-class</option>
+          <option value="toggle-class">toggle-class</option>
+          <option value="set-attribute">set-attribute</option>
+          <option value="remove-attribute">remove-attribute</option>
+          <option value="set-value">set-value</option>
+          <option value="set-text">set-text</option>
+          <option value="set-html">set-html</option>
+          <option value="type-text">type-text</option>
+          <option value="scroll-into-view">scroll-into-view</option>
+          <option value="scroll-to">scroll-to</option>
+          <option value="dispatch-event">dispatch-event</option>
+          <option value="pause">pause</option>
+        </select>
+      </div>
+      <div class="field" id="modal-value-field">
+        <label id="modal-value-label">Value</label>
+        <input type="text" id="modal-value" placeholder="">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div class="field">
+          <label>Delay (ms)</label>
+          <input type="number" id="modal-delay" value="2000" min="0" step="100">
+        </div>
+        <div class="field">
+          <label>Caption position</label>
+          <select id="modal-caption-pos">
+            <option value="auto">auto</option>
+            <option value="top">top</option>
+            <option value="bottom">bottom</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Caption text</label>
+        <textarea id="modal-caption" rows="2" placeholder="Optional description shown during this step…"></textarea>
+      </div>
+      <div class="field field-inline">
+        <input type="checkbox" id="modal-no-highlight">
+        <label for="modal-no-highlight">Suppress highlight animation</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmModal()">Add Step</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   GUIDESTAR DEMO BUILDER — main script
+   ================================================================ */
+
+// ── State ──────────────────────────────────────────────────────────
+var state = {
+  wireframeHtml: null,       // raw HTML string of the wireframe
+  wireframeSrc: null,        // base URL for <base href>
+  demoParsed: null,          // {type, htmlSrc, ...} from auto-detect
+  steps: [],                 // array of step objects
+  recordMode: false,
+  pickModeStepIndex: null,   // index of step being fixed, or null
+  currentTab: 'html',
+  iframeReady: false,
+};
+
+// ── Iframe ref helper ──────────────────────────────────────────────
+function getIframe() { return document.getElementById('demo-iframe'); }
+
+// ── Card toggle ────────────────────────────────────────────────────
+function toggleCard(name) {
+  var header = document.querySelector('#section-' + name + ' .card-header');
+  var body   = document.getElementById(name + '-body');
+  header.classList.toggle('collapsed');
+  body.classList.toggle('collapsed');
+}
+
+// ── Toast ──────────────────────────────────────────────────────────
+function showToast(msg, duration) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, duration || 2500);
+}
+
+// ── Source type badge ──────────────────────────────────────────────
+function setTypeBadge(type) {
+  var el = document.getElementById('source-type-badge');
+  if (!type) { el.textContent = ''; el.className = 'type-badge'; return; }
+  var labels = {
+    'wireframe':   ['Wireframe',     'type-badge--wireframe'],
+    'html-demo':   ['Demo (HTML)',   'type-badge--html-demo'],
+    'sphinx-demo': ['Demo (Sphinx)', 'type-badge--sphinx-demo'],
+  };
+  el.textContent = labels[type][0];
+  el.className = 'type-badge ' + labels[type][1];
+}
+
+// ── Auto-detect content type ───────────────────────────────────────
+function detectType(text) {
+  // Matches both data-guidestar-config='...' and data-guidestar-config="..."
+  // as well as HTML-entity encoded versions (&quot;)
+  if (/data-guidestar-config[\s=]/.test(text)) return 'html-demo';
+  if (/\.\.\s+guidestar-demo\s*::/.test(text)) return 'sphinx-demo';
+  return 'wireframe';
+}
+
+// ── Fetch handler ──────────────────────────────────────────────────
+async function handleFetch() {
+  var url = document.getElementById('source-url').value.trim();
+  if (!url) return;
+  document.getElementById('cors-notice').style.display = 'none';
+  document.getElementById('fallback-inputs').style.display = 'none';
+  document.getElementById('btn-fetch').disabled = true;
+  document.getElementById('btn-fetch').innerHTML = '<span class="spinner"></span>';
+
+  try {
+    var resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var text = await resp.text();
+    document.getElementById('btn-fetch').disabled = false;
+    document.getElementById('btn-fetch').textContent = 'Load';
+    processSourceText(text, url);
+  } catch (err) {
+    document.getElementById('btn-fetch').disabled = false;
+    document.getElementById('btn-fetch').textContent = 'Load';
+    // CORS or network failure — show fallback
+    document.getElementById('cors-notice').style.display = 'block';
+    document.getElementById('fallback-inputs').style.display = 'block';
+  }
+}
+
+// ── Paste / file upload handlers ───────────────────────────────────
+function handlePaste() {
+  var text = document.getElementById('paste-html').value.trim();
+  if (text) processSourceText(text, null);
+}
+
+function handleFileUpload() {
+  var file = document.getElementById('file-upload').files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) { processSourceText(e.target.result, null); };
+  reader.readAsText(file);
+}
+
+// ── Central processor ─────────────────────────────────────────────
+function processSourceText(text, baseUrl) {
+  var type = detectType(text);
+  setTypeBadge(type);
+  state.demoParsed = { type: type };
+
+  if (type === 'html-demo') {
+    parseHtmlDemo(text, baseUrl);
+  } else if (type === 'sphinx-demo') {
+    parseSphinxDemo(text, baseUrl);
+  } else {
+    // Plain wireframe
+    loadWireframeHtml(text, baseUrl);
+  }
+}
+
+// ── HTML Demo parser ───────────────────────────────────────────────
+async function parseHtmlDemo(text, baseUrl) {
+  // Use DOMParser so HTML entities (&quot; etc.) are decoded automatically
+  var doc;
+  try {
+    doc = new DOMParser().parseFromString(text, 'text/html');
+  } catch(e) { showToast('Could not parse demo HTML.'); return; }
+
+  var el = doc.querySelector('[data-guidestar-config]');
+  if (!el) { showToast('Could not find data-guidestar-config in source.'); return; }
+
+  var config;
+  try { config = JSON.parse(el.getAttribute('data-guidestar-config')); }
+  catch(e) { showToast('Could not parse demo config JSON: ' + e.message); return; }
+
+  populateOptions(config);
+  if (config.steps) importSteps(config.steps);
+
+  // Determine wireframe URL or inline content
+  var htmlSrc = config.htmlSrc;
+  if (htmlSrc && baseUrl) {
+    try {
+      var resolved = new URL(htmlSrc, baseUrl).href;
+      await loadWireframeUrl(resolved);
+      return;
+    } catch(e) {}
+  }
+  if (htmlSrc) {
+    // Can't resolve — surface sub-input
+    document.getElementById('wireframe-sub').style.display = 'flex';
+    document.getElementById('wireframe-override-url').value = htmlSrc;
+    showToast('Load the wireframe manually (URL above).', 3500);
+    return;
+  }
+  // No htmlSrc — wireframe is inlined in the container element; extract its innerHTML
+  var container = doc.querySelector('[data-guidestar]');
+  if (container && container.innerHTML.trim()) {
+    // Also pick up height from container style or config
+    var heightVal = container.style.height || config.height || '480px';
+    if (heightVal) document.getElementById('opt-height').value = heightVal;
+    // Wrap the wireframe HTML in a minimal document so it renders correctly
+    var headHtml = '';
+    var headEl = doc.querySelector('head');
+    if (headEl) {
+      // Copy only non-guidestar stylesheets
+      Array.from(headEl.querySelectorAll('style')).forEach(function(s) {
+        if (!s.textContent.includes('guidestar-controls') && !s.textContent.includes('data-guidestar')) {
+          headHtml += s.outerHTML;
+        }
+      });
+    }
+    var wireframeHtml = '<!DOCTYPE html><html><head>' + headHtml + '</head><body style="margin:0">' + container.innerHTML + '</body></html>';
+    loadWireframeHtml(wireframeHtml, baseUrl);
+  } else {
+    showToast('Could not extract wireframe content from this demo.', 3500);
+  }
+}
+
+// ── Sphinx Demo parser ─────────────────────────────────────────────
+function parseSphinxDemo(text, baseUrl) {
+  var wireframePath = null;
+  var m = text.match(/\.\.\s+guidestar-demo\s*::\s*(\S+)/);
+  if (m) wireframePath = m[1].trim();
+
+  // Parse options
+  var config = {};
+  var optMap = {
+    'height': function(v) { config.height = v; },
+    'viewport': function(v) { config.viewport = parseInt(v, 10) || null; },
+    'repeat': function(v) { config.repeat = v.trim() !== 'false'; },
+    'auto-start': function(v) { config.autoStart = v.trim() !== 'false'; },
+    'cursor': function(v) { config.cursor = v.trim() !== 'false'; },
+    'cursor-speed': function(v) { config.cursorSpeed = parseInt(v, 10); },
+    'timeline': function(v) { config.timeline = v.trim() !== 'false'; },
+    'pause-on-interaction': function(v) { config.pauseOnInteraction = v.trim() !== 'false'; },
+  };
+  text.replace(/:([a-z-]+):\s*([^\n]+)/g, function(_, key, val) {
+    if (optMap[key]) optMap[key](val);
+  });
+
+  // Parse steps
+  var stepsJson = null;
+  var mJson = text.match(/:steps-json:\s*([\s\S]+?)(?=\n\s*:[a-z]|\n\s*\n|$)/);
+  if (mJson) {
+    try { stepsJson = JSON.parse(mJson[1].trim()); } catch(e) {}
+  }
+  if (!stepsJson) {
+    var mSteps = text.match(/:steps:\s*([^\n]+)/);
+    if (mSteps) stepsJson = parseShorthandSteps(mSteps[1].trim());
+  }
+
+  populateOptions(config);
+  if (stepsJson) importSteps(stepsJson);
+
+  if (wireframePath) {
+    var resolved = null;
+    if (baseUrl) {
+      try { resolved = new URL(wireframePath, baseUrl).href; } catch(e) {}
+    }
+    document.getElementById('wireframe-sub').style.display = 'flex';
+    document.getElementById('wireframe-override-url').value = resolved || wireframePath;
+    if (resolved) loadWireframeUrl(resolved);
+    else showToast('Enter the wireframe URL above to load it.', 3500);
+  }
+}
+
+// ── Shorthand step parser (mirrors controller logic) ───────────────
+function parseShorthandSteps(stepsStr) {
+  // Split on comma but not within brackets
+  var raw = stepsStr.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  return raw.map(parseShorthandStep);
+}
+
+function parseShorthandStep(s) {
+  s = s.trim();
+  // Format: target@delay!~:action=value|caption^v
+  var caption = '', captionPos = 'auto';
+  var ci = s.lastIndexOf('|');
+  if (ci !== -1) {
+    var cap = s.slice(ci + 1);
+    if (cap.endsWith('^')) { captionPos = 'top'; cap = cap.slice(0, -1); }
+    else if (cap.endsWith('v')) { captionPos = 'bottom'; cap = cap.slice(0, -1); }
+    caption = cap;
+    s = s.slice(0, ci);
+  }
+  var action = 'click', value = '', delay = 2000, noHighlight = false, noScroll = false;
+  var ai = s.indexOf(':');
+  if (ai !== -1) {
+    var actionPart = s.slice(ai + 1);
+    s = s.slice(0, ai);
+    var vi = actionPart.indexOf('=');
+    if (vi !== -1) { value = actionPart.slice(vi + 1); action = actionPart.slice(0, vi); }
+    else action = actionPart;
+  }
+  var target = s;
+  var di = s.indexOf('@');
+  if (di !== -1) {
+    var delayStr = s.slice(di + 1);
+    target = s.slice(0, di);
+    if (delayStr.includes('!')) { noHighlight = true; delayStr = delayStr.replace('!', ''); }
+    if (delayStr.includes('~')) { noScroll = true; delayStr = delayStr.replace('~', ''); }
+    delay = parseInt(delayStr, 10) || 2000;
+  }
+  // "pause" is a special magic target — normalise to action:pause
+  if (target === 'pause') { action = 'pause'; target = ''; }
+  return {
+    selectors: target ? [target] : [],
+    selectedSelector: target || '',
+    action: action,
+    value: value,
+    delay: delay,
+    caption: caption,
+    captionPosition: captionPos,
+    noHighlight: noHighlight,
+    noScroll: noScroll,
+    isInvalid: false,
+  };
+}
+
+// ── Populate options panel ─────────────────────────────────────────
+function populateOptions(config) {
+  if (config.height) document.getElementById('opt-height').value = config.height;
+  if (config.viewport) document.getElementById('opt-viewport').value = config.viewport;
+  if (config.cursorSpeed !== undefined) document.getElementById('opt-cursor-speed').value = config.cursorSpeed;
+  if (config.repeat !== undefined) document.getElementById('opt-repeat').checked = config.repeat;
+  if (config.autoStart !== undefined) document.getElementById('opt-auto-start').checked = config.autoStart;
+  if (config.cursor !== undefined) document.getElementById('opt-cursor').checked = config.cursor;
+  if (config.timeline !== undefined) document.getElementById('opt-timeline').checked = config.timeline;
+  if (config.pauseOnInteraction !== undefined) document.getElementById('opt-pause-interaction').checked = config.pauseOnInteraction;
+  // Open options panel
+  var header = document.querySelector('#section-options .card-header');
+  var body = document.getElementById('options-body');
+  header.classList.remove('collapsed');
+  body.classList.remove('collapsed');
+}
+
+// ── Import steps from parsed demo ──────────────────────────────────
+function importSteps(rawSteps) {
+  state.steps = rawSteps.map(function(s) {
+    if (typeof s === 'string') return parseShorthandStep(s);
+    // Object format
+    if (s.actions) {
+      // Multi-action steps: flatten to first action for now
+      return {
+        selectors: s.actions[0] ? [s.actions[0].target || ''] : [''],
+        selectedSelector: s.actions[0] ? (s.actions[0].target || '') : '',
+        action: s.actions[0] ? (s.actions[0].action || 'click') : 'click',
+        value: s.actions[0] ? (s.actions[0].value || '') : '',
+        delay: s.delay || 2000,
+        caption: s.caption || '',
+        captionPosition: (s.captionOptions && s.captionOptions.position) || 'auto',
+        noHighlight: s.noHighlight || false,
+        noScroll: s.noScroll || false,
+        isInvalid: false,
+        _multiAction: s,
+      };
+    }
+    var target = s.target || '';
+    return {
+      selectors: target ? [target] : [''],
+      selectedSelector: target,
+      action: s.action || 'click',
+      value: s.value || '',
+      delay: s.delay !== undefined ? s.delay : 2000,
+      caption: s.caption || '',
+      captionPosition: (s.captionOptions && s.captionOptions.position) || 'auto',
+      noHighlight: s.noHighlight || false,
+      noScroll: s.noScroll || false,
+      isInvalid: false,
+    };
+  });
+  renderStepList();
+  updateOutputPanel();
+  updateClearBtn();
+  // Validate once iframe is ready (scheduled after wireframe loads)
+}
+
+// ── Load wireframe URL ─────────────────────────────────────────────
+async function loadWireframeUrl(url) {
+  try {
+    var resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var html = await resp.text();
+    loadWireframeHtml(html, url);
+  } catch(e) {
+    document.getElementById('cors-notice').style.display = 'block';
+    document.getElementById('fallback-inputs').style.display = 'block';
+    showToast('Could not fetch wireframe: ' + e.message, 3000);
+  }
+}
+
+function loadWireframeFromOverride() {
+  var url = document.getElementById('wireframe-override-url').value.trim();
+  if (url) loadWireframeUrl(url);
+}
+
+// ── Load wireframe HTML into iframe ───────────────────────────────
+function loadWireframeHtml(html, baseUrl) {
+  state.wireframeHtml = html;
+  state.wireframeSrc = baseUrl;
+  state.iframeReady = false;
+
+  // Remove existing iframe
+  var existing = getIframe();
+  if (existing) existing.remove();
+  document.getElementById('iframe-placeholder').style.display = 'none';
+
+  // Build srcdoc: inject base + recording script
+  var injectedHtml = injectRecordingScript(html, baseUrl);
+
+  var iframe = document.createElement('iframe');
+  iframe.id = 'demo-iframe';
+  iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
+  iframe.style.cssText = 'display:block;width:100%;border:none;min-height:480px;';
+  iframe.srcdoc = injectedHtml;
+  document.getElementById('iframe-wrap').appendChild(iframe);
+
+  iframe.addEventListener('load', function() {
+    state.iframeReady = true;
+    document.getElementById('btn-record-toggle').disabled = false;
+    document.getElementById('btn-preview').disabled = false;
+    // Validate imported steps
+    if (state.steps.length > 0) {
+      setTimeout(validateImportedSteps, 300);
+    }
+    // Update iframe height to match content
+    try {
+      var h = iframe.contentDocument.body.scrollHeight;
+      if (h > 200) iframe.style.height = h + 'px';
+    } catch(e) {}
+  });
+}
+
+// ── Inject recording script into wireframe HTML ────────────────────
+function injectRecordingScript(html, baseUrl) {
+  var baseTag = baseUrl ? '<base href="' + escapeHtml(baseUrl) + '">' : '';
+  var script = '<script id="__gs_recorder">(function(){\n' +
+    'var recording=false,pickMode=false,pickStepIndex=null;\n' +
+    'window.addEventListener("message",function(e){\n' +
+    '  var d=e.data||{};\n' +
+    '  if(d.type==="enable-recording"){recording=true;pickMode=false;document.body.style.cursor="crosshair";}\n' +
+    '  if(d.type==="disable-recording"){recording=false;pickMode=false;document.body.style.cursor="";}\n' +
+    '  if(d.type==="enable-pick-mode"){pickMode=true;recording=false;pickStepIndex=d.stepIndex;document.body.style.cursor="crosshair";}\n' +
+    '  if(d.type==="validate-selectors"){\n' +
+    '    var results=(d.selectors||[]).map(function(sel){\n' +
+    '      var found=false;\n' +
+    '      try{found=!!document.querySelector(sel);}catch(e){}\n' +
+    '      return{selector:sel,found:found};\n' +
+    '    });\n' +
+    '    window.parent.postMessage({type:"selector-results",results:results},"*");\n' +
+    '  }\n' +
+    '});\n' +
+    'document.addEventListener("click",function(e){\n' +
+    '  if(!recording&&!pickMode)return;\n' +
+    '  e.preventDefault();e.stopPropagation();\n' +
+    '  var el=e.target;\n' +
+    '  var selectors=generateSelectors(el);\n' +
+    '  var text=(el.textContent||"").trim().slice(0,60);\n' +
+    '  var rect=el.getBoundingClientRect();\n' +
+    '  var msgType=pickMode?"element-pick":"element-click";\n' +
+    '  window.parent.postMessage({\n' +
+    '    type:msgType,\n' +
+    '    stepIndex:pickStepIndex,\n' +
+    '    selectors:selectors,\n' +
+    '    tagName:el.tagName.toLowerCase(),\n' +
+    '    text:text,\n' +
+    '    rect:{top:rect.top,left:rect.left,width:rect.width,height:rect.height}\n' +
+    '  },"*");\n' +
+    '  if(pickMode){pickMode=false;document.body.style.cursor="";}\n' +
+    '},true);\n' +
+    'function generateSelectors(el){\n' +
+    '  var candidates=[];\n' +
+    '  // 1. ID\n' +
+    '  if(el.id) candidates.push("#"+CSS.escape(el.id));\n' +
+    '  // 2. Unique data/aria attrs\n' +
+    '  var attrs=["data-testid","data-cy","data-id","name","aria-label"];\n' +
+    '  for(var i=0;i<attrs.length;i++){\n' +
+    '    var val=el.getAttribute(attrs[i]);\n' +
+    '    if(val){\n' +
+    '      var sel="["+attrs[i]+"=\\""+val.replace(/"/g,"\\\\\\"")+"]";\n' +
+    '      if(document.querySelectorAll(sel).length===1) candidates.push(sel);\n' +
+    '    }\n' +
+    '  }\n' +
+    '  // 3. Class combo\n' +
+    '  if(el.classList.length>0){\n' +
+    '    var cls="."+Array.from(el.classList).map(function(c){return CSS.escape(c);}).join(".");\n' +
+    '    if(document.querySelectorAll(cls).length===1) candidates.push(cls);\n' +
+    '  }\n' +
+    '  // 4. Tag + class\n' +
+    '  if(el.classList.length>0){\n' +
+    '    var tagcls=el.tagName.toLowerCase()+"."+Array.from(el.classList).map(function(c){return CSS.escape(c);}).join(".");\n' +
+    '    if(document.querySelectorAll(tagcls).length===1) candidates.push(tagcls);\n' +
+    '  }\n' +
+    '  // 5. Ancestor path (up to 3 levels)\n' +
+    '  candidates.push(buildAncestorPath(el,3));\n' +
+    '  // 6. Full nth-child path\n' +
+    '  candidates.push(buildNthPath(el));\n' +
+    '  // Deduplicate\n' +
+    '  var seen={};\n' +
+    '  return candidates.filter(function(s){if(!s||seen[s])return false;seen[s]=true;return true;}).slice(0,6);\n' +
+    '}\n' +
+    'function buildAncestorPath(el,maxDepth){\n' +
+    '  var parts=[];\n' +
+    '  var cur=el;\n' +
+    '  for(var d=0;d<maxDepth&&cur&&cur!==document.body;d++){\n' +
+    '    var part=cur.tagName.toLowerCase();\n' +
+    '    if(cur.id){part="#"+CSS.escape(cur.id);parts.unshift(part);break;}\n' +
+    '    if(cur.classList.length) part+="."+Array.from(cur.classList).map(function(c){return CSS.escape(c);}).join(".");\n' +
+    '    parts.unshift(part);\n' +
+    '    cur=cur.parentElement;\n' +
+    '  }\n' +
+    '  var sel=parts.join(" > ");\n' +
+    '  try{if(document.querySelectorAll(sel).length===1)return sel;}catch(e){}\n' +
+    '  return null;\n' +
+    '}\n' +
+    'function buildNthPath(el){\n' +
+    '  var parts=[];\n' +
+    '  var cur=el;\n' +
+    '  while(cur&&cur!==document.documentElement){\n' +
+    '    var parent=cur.parentElement;\n' +
+    '    if(!parent)break;\n' +
+    '    var siblings=Array.from(parent.children);\n' +
+    '    var idx=siblings.indexOf(cur)+1;\n' +
+    '    parts.unshift(cur.tagName.toLowerCase()+":nth-child("+idx+")");\n' +
+    '    if(cur.id){parts=[parts[0]];break;}\n' +
+    '    cur=parent;\n' +
+    '  }\n' +
+    '  return parts.join(" > ");\n' +
+    '}\n' +
+    '})();\n' +
+    '<\/script>';
+
+  // Inject after <head> opening or prepend
+  if (/<head[\s>]/i.test(html)) {
+    return html.replace(/(<head[^>]*>)/i, '$1' + baseTag + script);
+  }
+  if (/<html[\s>]/i.test(html)) {
+    return html.replace(/(<html[^>]*>)/i, '$1<head>' + baseTag + script + '</head>');
+  }
+  return baseTag + script + html;
+}
+
+// ── postMessage listener ───────────────────────────────────────────
+window.addEventListener('message', function(e) {
+  var d = e.data || {};
+  if (d.type === 'element-click') {
+    openModal(d);
+  } else if (d.type === 'element-pick') {
+    handlePickReplacement(d);
+  } else if (d.type === 'selector-results') {
+    applyValidationResults(d.results);
+  }
+});
+
+// ── Record mode toggle ─────────────────────────────────────────────
+function toggleRecordMode() {
+  var iframe = getIframe();
+  if (!iframe) return;
+  state.recordMode = !state.recordMode;
+  state.pickModeStepIndex = null;
+  var btn = document.getElementById('btn-record-toggle');
+  var status = document.getElementById('recording-status');
+  var wrap = document.getElementById('iframe-wrap');
+
+  if (state.recordMode) {
+    iframe.contentWindow.postMessage({ type: 'enable-recording' }, '*');
+    btn.textContent = 'Stop Recording';
+    btn.className = 'btn-danger';
+    status.className = 'recording-status recording';
+    status.innerHTML = '<span class="dot"></span> Recording';
+    wrap.classList.add('recording');
+    wrap.classList.remove('pick-mode');
+  } else {
+    iframe.contentWindow.postMessage({ type: 'disable-recording' }, '*');
+    btn.textContent = 'Enable Record Mode';
+    btn.className = 'btn-primary';
+    status.className = 'recording-status';
+    status.innerHTML = '<span class="dot"></span> Idle';
+    wrap.classList.remove('recording');
+    wrap.classList.remove('pick-mode');
+  }
+}
+
+// ── Modal open / close ─────────────────────────────────────────────
+var _pendingClickData = null;
+
+function openModal(clickData) {
+  _pendingClickData = clickData;
+  var selectors = clickData.selectors || [];
+  var tagName = clickData.tagName || 'element';
+  var text = clickData.text || '';
+
+  // Element info
+  document.getElementById('modal-element-info').innerHTML =
+    '<strong>&lt;' + escapeHtml(tagName) + '&gt;</strong>' +
+    (text ? ' — "' + escapeHtml(text.slice(0, 80)) + '"' : '');
+
+  // Selector dropdown
+  var sel = document.getElementById('modal-selector');
+  sel.innerHTML = selectors.map(function(s) {
+    return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>';
+  }).join('') + '<option value="__custom__">custom…</option>';
+  document.getElementById('modal-selector-custom').style.display = 'none';
+
+  // Reset fields
+  document.getElementById('modal-action').value = 'click';
+  document.getElementById('modal-value').value = '';
+  document.getElementById('modal-delay').value = '2000';
+  document.getElementById('modal-caption').value = '';
+  document.getElementById('modal-no-highlight').checked = false;
+  document.getElementById('modal-caption-pos').value = 'auto';
+  onModalActionChange();
+
+  document.getElementById('action-modal').classList.add('open');
+  document.getElementById('modal-action').focus();
+}
+
+function closeModal() {
+  document.getElementById('action-modal').classList.remove('open');
+  _pendingClickData = null;
+}
+
+function onModalSelectorChange() {
+  var val = document.getElementById('modal-selector').value;
+  document.getElementById('modal-selector-custom').style.display =
+    val === '__custom__' ? 'block' : 'none';
+}
+
+var VALUE_BEARING_ACTIONS = new Set([
+  'add-class','remove-class','toggle-class','set-attribute','remove-attribute',
+  'set-value','set-text','set-html','type-text','dispatch-event'
+]);
+var VALUE_LABELS = {
+  'add-class': 'Class name(s)',
+  'remove-class': 'Class name(s)',
+  'toggle-class': 'Class name(s)',
+  'set-attribute': 'attr:value',
+  'remove-attribute': 'Attribute name',
+  'set-value': 'Value',
+  'set-text': 'Text content',
+  'set-html': 'HTML string',
+  'type-text': 'Text to type',
+  'dispatch-event': 'Event name (or name:JSON)',
+};
+
+function onModalActionChange() {
+  var action = document.getElementById('modal-action').value;
+  var vf = document.getElementById('modal-value-field');
+  vf.style.display = VALUE_BEARING_ACTIONS.has(action) ? 'block' : 'none';
+  document.getElementById('modal-value-label').textContent = VALUE_LABELS[action] || 'Value';
+}
+
+function confirmModal() {
+  var selRaw = document.getElementById('modal-selector').value;
+  var selector = selRaw === '__custom__'
+    ? document.getElementById('modal-selector-custom').value.trim()
+    : selRaw;
+  var action = document.getElementById('modal-action').value;
+  var value = document.getElementById('modal-value').value.trim();
+  var delay = parseInt(document.getElementById('modal-delay').value, 10) || 2000;
+  var caption = document.getElementById('modal-caption').value.trim();
+  var noHighlight = document.getElementById('modal-no-highlight').checked;
+  var captionPos = document.getElementById('modal-caption-pos').value;
+
+  var step = {
+    selectors: _pendingClickData ? _pendingClickData.selectors : (selector ? [selector] : []),
+    selectedSelector: selector,
+    action: action,
+    value: value,
+    delay: delay,
+    caption: caption,
+    captionPosition: captionPos,
+    noHighlight: noHighlight,
+    noScroll: false,
+    isInvalid: false,
+  };
+  state.steps.push(step);
+  renderStepList();
+  updateOutputPanel();
+  updateClearBtn();
+  closeModal();
+  // Expand steps section if collapsed
+  var body = document.getElementById('steps-body');
+  if (body.classList.contains('collapsed')) toggleCard('steps');
+}
+
+// ── Pick replacement handler ───────────────────────────────────────
+function startPickMode(stepIndex) {
+  var iframe = getIframe();
+  if (!iframe) return;
+  // Turn off normal record mode
+  if (state.recordMode) toggleRecordMode();
+  state.pickModeStepIndex = stepIndex;
+  iframe.contentWindow.postMessage({ type: 'enable-pick-mode', stepIndex: stepIndex }, '*');
+
+  var status = document.getElementById('recording-status');
+  status.className = 'recording-status pick-mode';
+  status.innerHTML = '<span class="dot"></span> Click to pick replacement element';
+  document.getElementById('iframe-wrap').classList.add('pick-mode');
+  document.getElementById('iframe-wrap').classList.remove('recording');
+  // Scroll to iframe
+  document.getElementById('iframe-wrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function handlePickReplacement(d) {
+  var idx = d.stepIndex;
+  if (idx === null || idx === undefined || !state.steps[idx]) return;
+  var step = state.steps[idx];
+  step.selectors = d.selectors || [];
+  step.selectedSelector = d.selectors[0] || '';
+  step.isInvalid = false;
+
+  // Reset pick mode UI
+  var status = document.getElementById('recording-status');
+  status.className = 'recording-status';
+  status.innerHTML = '<span class="dot"></span> Idle';
+  document.getElementById('iframe-wrap').classList.remove('pick-mode');
+  state.pickModeStepIndex = null;
+
+  renderStepList();
+  updateOutputPanel();
+  showToast('Step ' + (idx + 1) + ' target updated.');
+}
+
+// ── Validate imported step selectors ──────────────────────────────
+function validateImportedSteps() {
+  var iframe = getIframe();
+  if (!iframe || !state.iframeReady) return;
+  var selectors = state.steps.map(function(s) { return s.selectedSelector || ''; });
+  iframe.contentWindow.postMessage({ type: 'validate-selectors', selectors: selectors }, '*');
+}
+
+function applyValidationResults(results) {
+  results.forEach(function(r, i) {
+    if (state.steps[i] !== undefined) {
+      // Only mark invalid if there's actually a non-empty selector
+      if (state.steps[i].selectedSelector && !r.found) {
+        state.steps[i].isInvalid = true;
+      } else {
+        state.steps[i].isInvalid = false;
+      }
+    }
+  });
+  renderStepList();
+}
+
+// ── Step list rendering ────────────────────────────────────────────
+function renderStepList() {
+  var container = document.getElementById('step-list');
+  var countEl = document.getElementById('steps-count');
+  countEl.textContent = state.steps.length + ' step' + (state.steps.length !== 1 ? 's' : '');
+
+  if (state.steps.length === 0) {
+    container.innerHTML = '<div class="steps-empty">No steps yet. Enable Record Mode and click elements in the wireframe, or load an existing demo.</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  state.steps.forEach(function(step, i) {
+    container.appendChild(buildStepCard(step, i));
+  });
+}
+
+function buildStepCard(step, i) {
+  var card = document.createElement('div');
+  card.className = 'step-card' + (step.isInvalid ? ' invalid' : '');
+  card.draggable = true;
+  card.dataset.index = i;
+
+  // Header
+  var header = document.createElement('div');
+  header.className = 'step-header';
+  header.innerHTML =
+    '<span class="drag-handle" title="Drag to reorder">⠿</span>' +
+    '<span class="step-number">' + (i + 1) + '</span>' +
+    '<span class="step-summary">' +
+      (step.action === 'pause'
+        ? 'pause (' + (step.delay || 0) + 'ms)'
+        : escapeHtml(step.selectedSelector || '(no target)') + ' → ' + escapeHtml(step.action)) +
+    '</span>' +
+    (step.isInvalid ? '<span class="invalid-badge">⚠ Invalid selector</span>' : '');
+  card.appendChild(header);
+
+  // Body
+  var body = document.createElement('div');
+  body.className = 'step-body';
+  body.innerHTML = buildStepBodyHtml(step, i);
+  card.appendChild(body);
+
+  // Footer
+  var footer = document.createElement('div');
+  footer.className = 'step-footer';
+
+  var noHlCheck = document.createElement('label');
+  noHlCheck.className = 'field-inline';
+  noHlCheck.style.display = 'flex';
+  noHlCheck.style.alignItems = 'center';
+  noHlCheck.style.gap = '0.3rem';
+  noHlCheck.innerHTML = '<input type="checkbox" ' + (step.noHighlight ? 'checked' : '') + ' onchange="updateStepField(' + i + ',\'noHighlight\',this.checked)"> <span style="font-size:0.78rem;color:#475569">No highlight</span>';
+  footer.appendChild(noHlCheck);
+
+  var moveGroup = document.createElement('div');
+  moveGroup.className = 'step-actions';
+  if (step.isInvalid) {
+    var pickBtn = document.createElement('button');
+    pickBtn.className = 'btn-warning btn-sm';
+    pickBtn.textContent = 'Pick replacement';
+    pickBtn.onclick = (function(idx) { return function() { startPickMode(idx); }; })(i);
+    moveGroup.appendChild(pickBtn);
+  }
+  var upBtn = document.createElement('button');
+  upBtn.className = 'btn-icon btn-sm';
+  upBtn.title = 'Move up';
+  upBtn.disabled = i === 0;
+  upBtn.innerHTML = '↑';
+  upBtn.onclick = (function(idx) { return function() { moveStep(idx, -1); }; })(i);
+  moveGroup.appendChild(upBtn);
+
+  var downBtn = document.createElement('button');
+  downBtn.className = 'btn-icon btn-sm';
+  downBtn.title = 'Move down';
+  downBtn.disabled = i === state.steps.length - 1;
+  downBtn.innerHTML = '↓';
+  downBtn.onclick = (function(idx) { return function() { moveStep(idx, 1); }; })(i);
+  moveGroup.appendChild(downBtn);
+
+  var delBtn = document.createElement('button');
+  delBtn.className = 'btn-danger btn-sm';
+  delBtn.textContent = '✕';
+  delBtn.title = 'Delete step';
+  delBtn.onclick = (function(idx) { return function() { deleteStep(idx); }; })(i);
+  moveGroup.appendChild(delBtn);
+
+  footer.appendChild(moveGroup);
+  card.appendChild(footer);
+
+  // Drag events
+  card.addEventListener('dragstart', onDragStart);
+  card.addEventListener('dragover', onDragOver);
+  card.addEventListener('dragleave', onDragLeave);
+  card.addEventListener('drop', onDrop);
+  card.addEventListener('dragend', onDragEnd);
+
+  return card;
+}
+
+function buildStepBodyHtml(step, i) {
+  var selOptions = (step.selectors || []).map(function(s) {
+    return '<option value="' + escapeHtml(s) + '"' + (s === step.selectedSelector ? ' selected' : '') + '>' + escapeHtml(s) + '</option>';
+  }).join('') + '<option value="__custom__"' + (!step.selectors.includes(step.selectedSelector) ? ' selected' : '') + '>custom…</option>';
+
+  var actionOptions = [
+    'click','highlight','add-class','remove-class','toggle-class',
+    'set-attribute','remove-attribute','set-value','set-text','set-html',
+    'type-text','scroll-into-view','scroll-to','dispatch-event','pause'
+  ].map(function(a) {
+    return '<option value="' + a + '"' + (a === step.action ? ' selected' : '') + '>' + a + '</option>';
+  }).join('');
+
+  var showValue = VALUE_BEARING_ACTIONS.has(step.action);
+  var valueLabel = VALUE_LABELS[step.action] || 'Value';
+
+  return '' +
+    '<div class="field field-full">' +
+      '<label>Selector</label>' +
+      '<select onchange="onStepSelectorChange(' + i + ',this)">' + selOptions + '</select>' +
+      '<input type="text" placeholder="Custom selector…" value="' + ((!step.selectors || !step.selectors.includes(step.selectedSelector)) ? escapeHtml(step.selectedSelector) : '') + '" ' +
+        'style="margin-top:0.3rem;' + ((!step.selectors || !step.selectors.includes(step.selectedSelector)) ? '' : 'display:none') + '" ' +
+        'onchange="updateStepField(' + i + ',\'selectedSelector\',this.value)">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label>Action</label>' +
+      '<select onchange="onStepActionChange(' + i + ',this)">' + actionOptions + '</select>' +
+    '</div>' +
+    '<div class="field" id="step-value-field-' + i + '" style="' + (showValue ? '' : 'display:none') + '">' +
+      '<label id="step-value-label-' + i + '">' + escapeHtml(valueLabel) + '</label>' +
+      '<input type="text" value="' + escapeHtml(step.value || '') + '" onchange="updateStepField(' + i + ',\'value\',this.value)">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label>Delay (ms)</label>' +
+      '<input type="number" value="' + (step.delay !== undefined ? step.delay : 2000) + '" min="0" step="100" onchange="updateStepField(' + i + ',\'delay\',+this.value)">' +
+    '</div>' +
+    '<div class="field field-full">' +
+      '<label>Caption</label>' +
+      '<textarea rows="2" onchange="updateStepField(' + i + ',\'caption\',this.value)">' + escapeHtml(step.caption || '') + '</textarea>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label>Caption position</label>' +
+      '<select onchange="updateStepField(' + i + ',\'captionPosition\',this.value)">' +
+        '<option value="auto"' + (step.captionPosition === 'auto' ? ' selected' : '') + '>auto</option>' +
+        '<option value="top"' + (step.captionPosition === 'top' ? ' selected' : '') + '>top</option>' +
+        '<option value="bottom"' + (step.captionPosition === 'bottom' ? ' selected' : '') + '>bottom</option>' +
+      '</select>' +
+    '</div>';
+}
+
+function onStepSelectorChange(i, sel) {
+  var val = sel.value;
+  var card = document.querySelector('[data-index="' + i + '"]');
+  var customInput = card.querySelector('.step-body input[type="text"]');
+  if (val === '__custom__') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    state.steps[i].selectedSelector = val;
+    updateStepSummary(i);
+    updateOutputPanel();
+  }
+}
+
+function onStepActionChange(i, sel) {
+  var action = sel.value;
+  state.steps[i].action = action;
+  var vf = document.getElementById('step-value-field-' + i);
+  var vl = document.getElementById('step-value-label-' + i);
+  if (vf) {
+    vf.style.display = VALUE_BEARING_ACTIONS.has(action) ? 'block' : 'none';
+    if (vl) vl.textContent = VALUE_LABELS[action] || 'Value';
+  }
+  updateStepSummary(i);
+  updateOutputPanel();
+}
+
+function updateStepField(i, field, value) {
+  if (!state.steps[i]) return;
+  state.steps[i][field] = value;
+  updateStepSummary(i);
+  updateOutputPanel();
+}
+
+function updateStepSummary(i) {
+  var card = document.querySelector('[data-index="' + i + '"]');
+  if (!card) return;
+  var summary = card.querySelector('.step-summary');
+  if (summary) {
+    var step = state.steps[i];
+    summary.textContent = step.action === 'pause'
+      ? 'pause (' + (step.delay || 0) + 'ms)'
+      : (step.selectedSelector || '(no target)') + ' → ' + step.action;
+  }
+}
+
+// ── Step list management ───────────────────────────────────────────
+function addManualStep() {
+  state.steps.push({
+    selectors: [],
+    selectedSelector: '',
+    action: 'click',
+    value: '',
+    delay: 2000,
+    caption: '',
+    captionPosition: 'auto',
+    noHighlight: false,
+    noScroll: false,
+    isInvalid: false,
+  });
+  renderStepList();
+  updateOutputPanel();
+  updateClearBtn();
+  // Expand steps section
+  var body = document.getElementById('steps-body');
+  if (body.classList.contains('collapsed')) toggleCard('steps');
+  // Scroll to the new card
+  var cards = document.querySelectorAll('.step-card');
+  if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function deleteStep(i) {
+  state.steps.splice(i, 1);
+  renderStepList();
+  updateOutputPanel();
+  updateClearBtn();
+}
+
+function moveStep(i, dir) {
+  var j = i + dir;
+  if (j < 0 || j >= state.steps.length) return;
+  var tmp = state.steps[i];
+  state.steps[i] = state.steps[j];
+  state.steps[j] = tmp;
+  renderStepList();
+  updateOutputPanel();
+}
+
+function clearAllSteps() {
+  if (!confirm('Clear all ' + state.steps.length + ' steps?')) return;
+  state.steps = [];
+  renderStepList();
+  updateOutputPanel();
+  updateClearBtn();
+}
+
+function updateClearBtn() {
+  document.getElementById('btn-clear-steps').disabled = state.steps.length === 0;
+}
+
+// ── Drag & drop reorder ────────────────────────────────────────────
+var _dragIndex = null;
+
+function onDragStart(e) {
+  _dragIndex = +this.dataset.index;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  this.classList.add('drag-over');
+}
+function onDragLeave() { this.classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  var dropIndex = +this.dataset.index;
+  if (_dragIndex === null || _dragIndex === dropIndex) return;
+  var moved = state.steps.splice(_dragIndex, 1)[0];
+  state.steps.splice(dropIndex, 0, moved);
+  renderStepList();
+  updateOutputPanel();
+}
+function onDragEnd() {
+  _dragIndex = null;
+  document.querySelectorAll('.step-card').forEach(function(c) {
+    c.classList.remove('dragging', 'drag-over');
+  });
+}
+
+// ── Preview ────────────────────────────────────────────────────────
+function renderPreview() {
+  clearPreview();
+  var config = buildConfig();
+  var height = document.getElementById('opt-height').value || '480px';
+
+  var container = document.getElementById('preview-container');
+  var div = document.createElement('div');
+  div.setAttribute('data-guidestar', '');
+  div.setAttribute('data-guidestar-config', JSON.stringify(config));
+  div.style.height = height;
+  container.appendChild(div);
+
+  // Use htmlContent since we have the HTML string already
+  // We already injected the wireframe - Guidestar will load via htmlSrc if set
+  // Ensure guidestar-controller.js is loaded
+  if (!document.getElementById('gs-controller-script')) {
+    var script = document.createElement('script');
+    script.id = 'gs-controller-script';
+    script.src = './guidestar-controller.js';
+    document.head.appendChild(script);
+    script.onload = function() { initGuidestar(div, config); };
+  } else {
+    // Already loaded — need to re-init
+    initGuidestar(div, config);
+  }
+
+  // Expand preview section
+  var body = document.getElementById('preview-body');
+  if (body.classList.contains('collapsed')) toggleCard('preview');
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initGuidestar(el, config) {
+  if (window.Guidestar) {
+    new window.Guidestar(el, config);
+  } else {
+    // Script not yet evaluated — wait
+    setTimeout(function() { initGuidestar(el, config); }, 100);
+  }
+}
+
+function clearPreview() {
+  var c = document.getElementById('preview-container');
+  c.innerHTML = '';
+}
+
+// ── Config builder ─────────────────────────────────────────────────
+function buildConfig() {
+  var steps = state.steps.map(function(step) {
+    var isPause = step.action === 'pause' || step.selectedSelector === 'pause';
+    var obj = isPause
+      ? { action: 'pause' }
+      : { target: step.selectedSelector || '', action: step.action };
+    if (!isPause && step.value) obj.value = step.value;
+    if (step.delay !== undefined) obj.delay = step.delay;
+    if (!isPause && step.caption) obj.caption = step.caption;
+    if (!isPause && step.noHighlight) obj.noHighlight = true;
+    if (!isPause && step.noScroll) obj.noScroll = true;
+    if (!isPause && step.caption && step.captionPosition && step.captionPosition !== 'auto') {
+      obj.captionOptions = { position: step.captionPosition };
+    }
+    return obj;
+  });
+
+  var config = { steps: steps };
+
+  // htmlSrc: use original if known
+  if (state.wireframeSrc && !state.wireframeHtml) {
+    config.htmlSrc = state.wireframeSrc;
+  } else if (state.wireframeSrc) {
+    config.htmlSrc = state.wireframeSrc;
+  }
+
+  var viewport = document.getElementById('opt-viewport').value;
+  if (viewport) config.viewport = parseInt(viewport, 10);
+
+  config.repeat    = document.getElementById('opt-repeat').checked;
+  config.autoStart = document.getElementById('opt-auto-start').checked;
+  config.cursor    = document.getElementById('opt-cursor').checked;
+  config.timeline  = document.getElementById('opt-timeline').checked;
+  config.pauseOnInteraction = document.getElementById('opt-pause-interaction').checked;
+  var cs = document.getElementById('opt-cursor-speed').value;
+  if (cs) config.cursorSpeed = parseInt(cs, 10);
+
+  return config;
+}
+
+// ── Output generation ──────────────────────────────────────────────
+function switchTab(tab) {
+  state.currentTab = tab;
+  document.getElementById('tab-html').classList.toggle('active', tab === 'html');
+  document.getElementById('tab-sphinx').classList.toggle('active', tab === 'sphinx');
+  updateOutputPanel();
+  // Expand output section
+  var body = document.getElementById('output-body');
+  if (body.classList.contains('collapsed')) toggleCard('output');
+}
+
+function updateOutputPanel() {
+  var ta = document.getElementById('output-textarea');
+  if (state.currentTab === 'html') {
+    ta.value = generateHtmlOutput();
+  } else {
+    ta.value = generateSphinxOutput();
+  }
+}
+
+function generateHtmlOutput() {
+  var config = buildConfig();
+  var height = document.getElementById('opt-height').value || '480px';
+  var configStr = JSON.stringify(config, null, 2);
+  // Note about wireframe path
+  var note = '';
+  if (!config.htmlSrc || config.htmlSrc.startsWith('blob:') || !config.htmlSrc.startsWith('http')) {
+    note = '\n<!-- ⚠ Update htmlSrc in the config below to point to your hosted wireframe. -->';
+  }
+  return '<!-- Guidestar Demo -->' + note + '\n' +
+    '<link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">\n' +
+    '<div data-guidestar\n' +
+    '     data-guidestar-config=\'' + configStr.replace(/'/g, '&#39;') + '\'\n' +
+    '     style="height: ' + escapeHtml(height) + '; width: 100%;">\n' +
+    '</div>\n' +
+    '<script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"><\/script>';
+}
+
+function generateSphinxOutput() {
+  var config = buildConfig();
+  var height = document.getElementById('opt-height').value || '480px';
+  var wireframePath = (config.htmlSrc || '_static/your-wireframe.html').replace(/^https?:\/\/[^/]+\//, '');
+  // Best-effort: if it looks like a full URL, prompt user
+  var pathNote = config.htmlSrc && config.htmlSrc.startsWith('http')
+    ? '   .. note:: Replace the path below with the _static/ path in your Sphinx project.\n\n'
+    : '';
+
+  var lines = ['.. guidestar-demo:: ' + wireframePath];
+  lines.push('   :height: ' + height);
+  var viewport = document.getElementById('opt-viewport').value;
+  if (viewport) lines.push('   :viewport: ' + viewport);
+
+  var stepsJson = JSON.stringify(config.steps);
+  lines.push('   :steps-json: ' + stepsJson);
+
+  if (!document.getElementById('opt-repeat').checked) lines.push('   :repeat: false');
+  if (!document.getElementById('opt-auto-start').checked) lines.push('   :auto-start: false');
+  if (!document.getElementById('opt-cursor').checked) lines.push('   :cursor: false');
+  if (!document.getElementById('opt-timeline').checked) lines.push('   :timeline: false');
+  if (!document.getElementById('opt-pause-interaction').checked) lines.push('   :pause-on-interaction: false');
+  var cs = document.getElementById('opt-cursor-speed').value;
+  if (cs && cs !== '300') lines.push('   :cursor-speed: ' + cs);
+
+  return pathNote + lines.join('\n');
+}
+
+function copyOutput() {
+  var text = document.getElementById('output-textarea').value;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(function() {
+    var fb = document.getElementById('copy-feedback');
+    fb.style.display = 'inline';
+    setTimeout(function() { fb.style.display = 'none'; }, 2000);
+  }).catch(function() {
+    showToast('Copy failed — select all text in the box and copy manually.');
+  });
+}
+
+// ── Utilities ──────────────────────────────────────────────────────
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Keyboard: close modal on Escape ───────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+    // Cancel pick mode
+    if (state.pickModeStepIndex !== null) {
+      var iframe = getIframe();
+      if (iframe) iframe.contentWindow.postMessage({ type: 'disable-recording' }, '*');
+      state.pickModeStepIndex = null;
+      var status = document.getElementById('recording-status');
+      status.className = 'recording-status';
+      status.innerHTML = '<span class="dot"></span> Idle';
+      document.getElementById('iframe-wrap').classList.remove('pick-mode');
+    }
+  }
+});
+
+// Close modal on backdrop click
+document.getElementById('action-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── Auto-generate output on option changes ─────────────────────────
+['opt-height','opt-viewport','opt-cursor-speed'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', updateOutputPanel);
+});
+['opt-repeat','opt-auto-start','opt-cursor','opt-timeline','opt-pause-interaction'].forEach(function(id) {
+  document.getElementById(id).addEventListener('change', updateOutputPanel);
+});
+
+// ── Init ───────────────────────────────────────────────────────────
+updateOutputPanel();
+</script>
+</body>
+</html>
