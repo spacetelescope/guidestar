@@ -8,7 +8,7 @@ the live examples on GitHub Pages:
 .. raw:: html
 
    <p>
-     <a href="https://spacetelescope.github.io/guidestar/demo-builder/"
+     <a href="https://spacetelescope.github.io/guidestar/demo-builder"
         target="_blank" rel="noopener"
         style="display:inline-flex;align-items:center;gap:0.4em;
                background:#6366f1;color:#fff;padding:0.45em 1em;
