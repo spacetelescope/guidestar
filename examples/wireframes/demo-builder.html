@@ -411,6 +411,12 @@ input[type="checkbox"] { accent-color: #6366f1; width: 14px; height: 14px; }
 
 /* ── State modifiers applied by guidestar steps ─────────────────── */
 
+/* Source section expand/collapse */
+#section-source.expanded .card-body { display: block; }
+#section-source:not(.expanded) .card-body { display: none; }
+#section-source.expanded .chevron { transform: rotate(0deg); }
+#section-source:not(.expanded) .chevron { transform: rotate(-90deg); }
+
 /* Source loaded state */
 #section-source.loaded .type-badge { display: inline-flex; }
 #section-source:not(.loaded) .type-badge { display: none; }
@@ -427,6 +433,18 @@ input[type="checkbox"] { accent-color: #6366f1; width: 14px; height: 14px; }
 
 /* Modal open */
 #action-modal.open { display: flex; }
+
+/* Recording section expand/collapse */
+#section-recording.expanded .card-body { display: block; }
+#section-recording:not(.expanded) .card-body { display: none; }
+#section-recording.expanded .chevron { transform: rotate(0deg); }
+#section-recording:not(.expanded) .chevron { transform: rotate(-90deg); }
+
+/* Steps section expand/collapse */
+#section-steps.expanded .card-body { display: block; }
+#section-steps:not(.expanded) .card-body { display: none; }
+#section-steps.expanded .chevron { transform: rotate(0deg); }
+#section-steps:not(.expanded) .chevron { transform: rotate(-90deg); }
 
 /* Step added */
 #steps-empty { display: block; }
