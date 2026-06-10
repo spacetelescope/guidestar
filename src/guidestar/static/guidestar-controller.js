@@ -247,11 +247,11 @@
         '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
         '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
         '.gs-control-btn:hover::after { opacity: 1; }',
-        /* Speed row — just the +/- buttons, fits in button width */
         '.gs-speed-row {',
         '  display: flex; align-items: center; gap: 4px;',
         '  width: var(--gs-control-size, 44px);',
@@ -280,6 +280,7 @@
         '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
         '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
@@ -287,6 +288,7 @@
         /* Speed label below play button */
         '.gs-speed-label {',
         '  font-size: 11px; font-weight: 600;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  width: var(--gs-control-size, 44px);',
         '  height: 16px; line-height: 16px;',
         '  text-align: center; color: var(--gs-control-color, #fff);',
