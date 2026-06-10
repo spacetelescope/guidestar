@@ -105,6 +105,9 @@
     color: var(--gs-control-tooltip-color, #fff);
     padding: 4px 10px;
     border-radius: 4px;
+    font-family: var(--pst-font-family-base,
+        -apple-system, "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue",
+        Arial, sans-serif);
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
@@ -176,6 +179,9 @@
     right: 4px;
     background: var(--gs-control-tooltip-bg, rgba(0, 0, 0, 0.8));
     color: var(--gs-control-tooltip-color, #fff);
+    font-family: var(--pst-font-family-base,
+        -apple-system, "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue",
+        Arial, sans-serif);
     font-size: 11px;
     font-weight: 600;
     padding: 3px 8px;
@@ -252,6 +258,9 @@
     color: var(--gs-control-tooltip-color, #fff);
     padding: 4px 10px;
     border-radius: 4px;
+    font-family: var(--pst-font-family-base,
+        -apple-system, "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue",
+        Arial, sans-serif);
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
@@ -316,6 +325,13 @@
     padding: 0 16px;
     background: var(--gs-caption-bg, rgba(0, 0, 0, 0.72));
     color: var(--gs-caption-color, #fff);
+    /* Inherit the host page's font when embedded in a Sphinx/pydata-sphinx-theme
+       page (--pst-font-family-base is set on :root there); fall back to the same
+       system stack when running in a standalone iframe where that variable is absent.
+       This keeps captions visually consistent across both embedding modes. */
+    font-family: var(--pst-font-family-base,
+        -apple-system, "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue",
+        Arial, sans-serif);
     font-size: var(--gs-caption-font-size, 14px);
     line-height: 1.4;
     text-align: center;
@@ -419,14 +435,21 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--gs-timeline-dot-size, 10px);
-    height: var(--gs-timeline-dot-size, 10px);
+    width: var(--gs-timeline-dot-size, 8px);
+    height: var(--gs-timeline-dot-size, 8px);
     transform: translate(-50%, -50%);
     border-radius: 50%;
     border: 2px solid var(--gs-timeline-dot-color, var(--gs-control-color, #fff));
     background: transparent;
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     pointer-events: none;
+}
+
+/* Chapter dot: larger size to mark a narrative section boundary */
+.gs-timeline__dot--chapter::after {
+    width: var(--gs-timeline-chapter-dot-size, 14px);
+    height: var(--gs-timeline-chapter-dot-size, 14px);
+    border-width: 2.5px;
 }
 
 .gs-timeline__dot:hover::after {
@@ -444,6 +467,15 @@
 
 .gs-timeline__dot--current:hover::after {
     transform: translate(-50%, -50%) scale(1.4);
+}
+
+/* Out-of-range dots (outside stepRange window): dimmed border/fill but still clickable */
+.gs-timeline__dot--out-of-range::after {
+    opacity: 0.3;
+}
+
+.gs-timeline__dot--out-of-range.gs-timeline__dot--filled::after {
+    opacity: 0.25;
 }
 
 /* ── Timeline dot hover tooltip ──────────────────────────────────── */
@@ -616,6 +648,9 @@
         transition: none;
     }
     .gs-timeline__dot::after {
+        transition: none;
+    }
+    .gs-timeline__dot--chapter::after {
         transition: none;
     }
     .gs-timeline__dot:hover::after {
