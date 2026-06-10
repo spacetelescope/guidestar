@@ -47,6 +47,7 @@
         var delay = 2000;
         var noHighlight = false;
         var noScroll = false;
+        var chapter = false;
         var caption = undefined;
         var captionOptions = undefined;
         var working = str;
@@ -92,6 +93,10 @@
                 noScroll = true;
                 delayPart = delayPart.slice(0, -1);
             }
+            if (delayPart.endsWith('*')) {
+                chapter = true;
+                delayPart = delayPart.slice(0, -1);
+            }
             delay = parseInt(delayPart, 10) || 2000;
             working = before + rest;
         }
@@ -118,12 +123,14 @@
 
         if (target === 'pause') {
             var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight, noScroll: noScroll };
+            if (chapter) pauseStep.chapter = true;
             if (caption !== undefined) pauseStep.caption = caption;
             if (captionOptions) pauseStep.captionOptions = captionOptions;
             return pauseStep;
         }
 
         var step = { target: target, action: action, delay: delay, noHighlight: noHighlight, noScroll: noScroll };
+        if (chapter) step.chapter = true;
         if (value !== undefined) step.value = value;
         if (caption !== undefined) step.caption = caption;
         if (captionOptions) step.captionOptions = captionOptions;
@@ -146,7 +153,8 @@
                 var multi = {
                     actions: [],
                     delay: typeof item.delay === 'number' ? item.delay : 2000,
-                    noHighlight: !!item.noHighlight
+                    noHighlight: !!item.noHighlight,
+                    chapter: !!item.chapter
                 };
                 for (var j = 0; j < item.actions.length; j++) {
                     var sub = item.actions[j];
@@ -168,7 +176,8 @@
                     action: item.action || 'highlight',
                     value: item.value,
                     delay: typeof item.delay === 'number' ? item.delay : 2000,
-                    noHighlight: !!item.noHighlight
+                    noHighlight: !!item.noHighlight,
+                    chapter: !!item.chapter
                 };
                 if (item.caption !== undefined) obj.caption = item.caption;
                 if (item.captionOptions) obj.captionOptions = item.captionOptions;
@@ -1740,6 +1749,9 @@
         for (var i = 0; i < this._steps.length; i++) {
             var dot = document.createElement('button');
             dot.className = 'gs-timeline__dot';
+            if (this._steps[i].chapter) {
+                dot.className += ' gs-timeline__dot--chapter';
+            }
             dot.setAttribute('data-step-index', String(i));
             if (this._steps[i].caption) {
                 dot.setAttribute('data-caption', this._steps[i].caption);

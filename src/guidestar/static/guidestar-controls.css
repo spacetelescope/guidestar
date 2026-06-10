@@ -435,14 +435,21 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--gs-timeline-dot-size, 10px);
-    height: var(--gs-timeline-dot-size, 10px);
+    width: var(--gs-timeline-dot-size, 8px);
+    height: var(--gs-timeline-dot-size, 8px);
     transform: translate(-50%, -50%);
     border-radius: 50%;
     border: 2px solid var(--gs-timeline-dot-color, var(--gs-control-color, #fff));
     background: transparent;
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     pointer-events: none;
+}
+
+/* Chapter dot: larger size to mark a narrative section boundary */
+.gs-timeline__dot--chapter::after {
+    width: var(--gs-timeline-chapter-dot-size, 14px);
+    height: var(--gs-timeline-chapter-dot-size, 14px);
+    border-width: 2.5px;
 }
 
 .gs-timeline__dot:hover::after {
@@ -641,6 +648,9 @@
         transition: none;
     }
     .gs-timeline__dot::after {
+        transition: none;
+    }
+    .gs-timeline__dot--chapter::after {
         transition: none;
     }
     .gs-timeline__dot:hover::after {

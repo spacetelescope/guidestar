@@ -233,6 +233,13 @@ JSON object format
    * - ``noHighlight``
      - no
      - If ``true``, skip the highlight animation on this step.
+   * - ``chapter``
+     - no
+     - If ``true``, marks this step as a **chapter boundary** in the timeline.
+       The dot for this step is rendered larger than regular dots, making it
+       easy to see major sections at a glance.  Chapter steps behave
+       identically to ordinary steps during playback — the flag is purely
+       visual.
    * - ``caption``
      - no
      - Text to display as a semi-transparent caption overlay during this step.
@@ -312,35 +319,89 @@ Each object in the ``actions`` array supports:
        one. Defaults to ``0`` (immediate). Respects the current playback
        speed.
 
-The top-level ``delay``, ``caption``, ``captionOptions``, and
-``noHighlight`` fields work the same as on a single-action step. The
+The top-level ``delay``, ``caption``, ``captionOptions``,
+``noHighlight``, and ``chapter`` fields work the same as on a
+single-action step.  The
 cursor (if enabled) moves to the first sub-action's target element.
 
+
+.. _shorthand-string-format:
 
 Shorthand string format
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+The shorthand format packs the most common step fields into a compact string:
+
 ::
 
-   target@delay:action=value|caption text
+   target@delay[modifiers]:action[=value]|[prefix]caption
 
-Examples:
+All parts except ``target`` are optional and are parsed left-to-right:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Component
+     - Description
+   * - ``target``
+     - CSS selector for the element inside the injected HTML.  Omit (or use
+       the special value ``pause``) for a pause step.
+   * - ``@delay``
+     - Hold duration in milliseconds before advancing to the next step
+       (default ``2000``).  Written directly after the target with no space.
+   * - Modifiers
+     - One or more single-character flags placed directly after the delay
+       digits, before the ``:``.  See the table below.
+   * - ``:action``
+     - Action name (default ``highlight``).  Preceded by a colon.
+   * - ``=value``
+     - Action-specific value, appended with ``=`` directly after the action
+       name.
+   * - ``|caption``
+     - Caption text to display as an overlay during this step.  Prefix with
+       ``^`` to force **top** positioning, or ``v`` to force **bottom**.
+       Without a prefix the position is chosen automatically (opposite the
+       target element's vertical position).
+
+**Delay modifiers** (written after the delay digits, before the ``:``):
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 88
+
+   * - Modifier
+     - Effect
+   * - ``!``
+     - **noHighlight** — skip the pulse/ring animation on the target element
+       for this step.
+   * - ``~``
+     - **noScroll** — do not auto-scroll the target element into view before
+       this step executes.
+   * - ``*``
+     - **chapter** — mark this step as a chapter boundary.  Its timeline dot
+       is rendered larger than regular dots, making major sections visually
+       distinct.  Purely visual; no effect on playback order or timing.
+
+Modifiers can be combined in any order: ``@1500!~*`` applies all three.
+
+**Examples:**
 
 .. code-block:: text
 
-   #btn@1500:click                    → click #btn, hold 1500ms
-   #panel@1000:toggle-class=open      → toggle “open” class, hold 1000ms
-   #btn@1500!:click                   → click (no highlight), hold 1500ms   #btn@1500~:click                   → click, skip auto-scroll for this step   pause@3000                         → wait 3 seconds
-   #el:highlight                      → highlight with default 2000ms delay
-   #input@1000:set-value=Hello        → set input value to “Hello”   #input@1500:type-text=Hello World   → type "Hello World" letter-by-letter   #btn@1500:click|Click me           → click with auto-positioned caption
-   #btn@1500:click|^Click me          → click with caption forced to top
-   #btn@1500:click|vClick me          → click with caption forced to bottom
-
-Caption text follows the ``|`` pipe character at the end of the string.
-Prefix the caption with ``^`` to force it to the **top** of the container,
-or ``v`` to force it to the **bottom**. Without a prefix, the position is
-chosen automatically (opposite the target element’s vertical position).
-
+   #btn@1500:click                     → click #btn, hold 1500ms
+   #panel@1000:toggle-class=open       → toggle "open" class, hold 1000ms
+   #btn@1500!:click                    → click, no highlight animation
+   #btn@1500~:click                    → click, skip auto-scroll
+   #btn@1500*:click|Load the page      → click, chapter dot, with caption
+   #btn@1500!~*:click|Load the page    → all three modifiers combined
+   pause@3000                          → wait 3 seconds with no target
+   #el:highlight                       → highlight with default 2000ms delay
+   #input@1000:set-value=Hello         → set input value to "Hello"
+   #input@1500:type-text=Hello World   → type "Hello World" letter-by-letter
+   #btn@1500:click|Click me            → click with auto-positioned caption
+   #btn@1500:click|^Click me           → caption forced to top
+   #btn@1500:click|vClick me           → caption forced to bottom
 
 Supported actions
 -----------------

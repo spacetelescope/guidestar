@@ -36,7 +36,8 @@ Directive options
      - Description
    * - ``:steps:``
      - —
-     - Comma-separated shorthand step strings.
+     - Comma-separated shorthand step strings.  See
+       :ref:`shorthand-string-format` for the full syntax reference.
    * - ``:steps-json:``
      - —
      - Inline JSON array of step objects (alternative to ``:steps:``).
@@ -44,7 +45,7 @@ Directive options
      - —
      - JSON array of steps executed silently before playback (or before a
        static render). Each step supports ``target``, ``action`` /
-       ``actions``, ``value``, ``noHighlight``, ``caption``, and
+       ``actions``, ``value``, ``noHighlight``, ``chapter``, ``caption``, and
        ``captionOptions``. The ``delay`` field is accepted but ignored.
        In static mode (no ``:steps:``), the cursor is placed at the last
        targeted init step and the last caption persists.
