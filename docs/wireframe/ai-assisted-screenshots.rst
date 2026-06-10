@@ -27,6 +27,12 @@ container size.
    You are helping me build a guidestar wireframe — a self-contained HTML
    mockup used to animate a UI demo in documentation.
 
+   Before starting, read the guidestar documentation to understand the
+   wireframe format, step syntax, and available actions:
+     Docs:   https://spacetelescope.github.io/guidestar/
+     Steps:  https://spacetelescope.github.io/guidestar/demos/configuration.html
+     GitHub: https://github.com/spacetelescope/guidestar
+
    I have attached a series of screenshots that show each step of a workflow.
    Please study them carefully and produce a single file called wireframe.html
    that reproduces every screen and the transitions between them.
