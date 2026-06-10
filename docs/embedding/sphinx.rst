@@ -65,7 +65,25 @@ Directive options
      - Auto-start when visible (``true`` / ``false``).
    * - ``:pause-on-interaction:``
      - ``true``
-     - Pause on user click (``true`` / ``false``).
+     - Pause on user click (``true`` / ``false``).  Only active when
+       ``:allow-user-interactions: true``; ignored otherwise (the
+       interaction blocker handles toggling in the default mode).
+   * - ``:allow-user-interactions:``
+     - ``false``
+     - When ``false`` (the default), a transparent glass pane covers the
+       demo content so all clicks toggle play/pause instead of activating
+       links or form controls in the underlying wireframe or live source.
+       Set to ``true`` to allow full user interaction with the content
+       (e.g. clicking buttons, filling forms); ``:pause-on-interaction:``
+       then resumes its role.  For live URL sources, leave this at
+       ``false`` — see :doc:`../wireframe/live-url`.
+   * - ``:reload-on-restart:``
+     - ``false``
+     - Re-fetch ``htmlSrc`` on every restart instead of restoring the
+       initial HTML snapshot (``true`` / ``false``).  Useful for live URL
+       sources where inline scripts add global event listeners on each
+       execution cycle.  Adds a network round-trip on restart.  See
+       :doc:`../wireframe/live-url` for full details.
    * - ``:css:``
      - —
      - Path to an additional CSS file to include.

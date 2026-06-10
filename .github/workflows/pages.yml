@@ -5,6 +5,7 @@ on:
     branches: [main, confluence-support]
     paths:
       - 'examples/**'
+      - 'demo-builder/**'
       - 'src/guidestar/static/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -49,6 +50,12 @@ jobs:
 
       - name: Generate index page
         run: guidestar-index --site _site
+
+      - name: Copy static tools
+        run: |
+          cp demo-builder/index.html _site/demo-builder.html
+          mkdir -p _site/demos/web-tool
+          cp examples/demos/web-tool/*.html _site/demos/web-tool/
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

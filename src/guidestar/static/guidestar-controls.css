@@ -666,3 +666,23 @@
     animation: none;
     opacity: 0;
 }
+
+/* ── Interaction blocker ─────────────────────────────────────────────────── */
+
+/*
+ * .gs-interaction-blocker — transparent glass pane that covers the content
+ * root when allowUserInteractions: false (the default).  Intercepts all
+ * clicks over the demo area so they toggle play/pause instead of activating
+ * links or form controls in the underlying content.
+ *
+ * z-index: 1 puts it above .gs-content (z-index: auto) but below all control
+ * overlays (restart 9990, captions 9998, timeline 9999, controls 10000).
+ */
+
+.gs-interaction-blocker {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: transparent;
+    cursor: pointer;
+}

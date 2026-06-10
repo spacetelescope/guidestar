@@ -510,6 +510,8 @@
             fullscreen: true,
             resizable: true,
             poweredby: true,
+            reloadOnRestart: false,
+            allowUserInteractions: false,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -554,6 +556,7 @@
         this._fullscreenBtn = null;
         this._resizeHandle = null;
         this._resizeBadge = null;
+        this._interactionBlocker = null;
 
         this._init();
     }
@@ -615,9 +618,13 @@
         // Inject highlight style
         ensureHighlightStyle();
 
-        // Create content root (where fetched HTML goes)
+        // Create content root (where fetched HTML goes).
+        // A unique scope class is added so wireframe styles can be isolated
+        // via CSS @scope without leaking into the host page.
         this._contentRoot = document.createElement('div');
         this._contentRoot.className = 'gs-content';
+        this._scopeClass = 'gs-scope-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        this._contentRoot.classList.add(this._scopeClass);
         container.appendChild(this._contentRoot);
 
         // Create controls overlay (Shadow DOM) — not needed in static mode
@@ -665,8 +672,10 @@
             this._createBrandingBadge();
         }
 
-        // Pause on user interaction
-        if (this.config.pauseOnInteraction) {
+        // Pause on user interaction — only when content is interactive.
+        // When allowUserInteractions: false the interaction blocker handles
+        // play/pause toggling; adding this listener too would double-trigger.
+        if (this.config.pauseOnInteraction && this.config.allowUserInteractions !== false) {
             container.addEventListener('click', function (e) {
                 if (!e.isTrusted) return;
                 // Ignore clicks on the controls host, fullscreen button, resize handle, timeline, or tooltip
@@ -682,6 +691,16 @@
                     self.pause();
                 }
             }, true); // capture phase
+        }
+
+        // Interaction blocker: a transparent glass pane over the content that
+        // intercepts all clicks so they toggle play/pause instead of activating
+        // links or form controls in the underlying wireframe / live source.
+        // Also active in static mode (no steps) — clicks are simply swallowed
+        // rather than reaching the embedded content.
+        // Disabled only when allowUserInteractions: true.
+        if (this.config.allowUserInteractions === false) {
+            this._createInteractionBlocker();
         }
 
         // Load / locate wireframe content, then start.
@@ -892,6 +911,43 @@
         this._brandingEl = el;
     };
 
+    // ── Interaction blocker ──────────────────────────────────────────────────
+
+    /**
+     * Create a transparent glass-pane div that sits above the content root
+     * (z-index 1) but below all control overlays.  When allowUserInteractions
+     * is false (the default), this prevents clicks from reaching the underlying
+     * wireframe or live-URL source and instead toggles play/pause.
+     *
+     * The panel's position: absolute; inset: 0 means it exactly covers the
+     * container, relying on [data-guidestar]'s overflow: hidden to clip it.
+     */
+    Guidestar.prototype._createInteractionBlocker = function () {
+        var self = this;
+        var el = document.createElement('div');
+        el.className = 'gs-interaction-blocker';
+        el.setAttribute('aria-hidden', 'true');
+        this.container.appendChild(el);
+        this._interactionBlocker = el;
+
+        el.addEventListener('click', function (e) {
+            if (!e.isTrusted) return;
+            e.stopPropagation();
+            e.preventDefault();
+            // In static mode there is no playback to toggle.
+            if (self._isStatic) return;
+            if (self._playing) {
+                self._userPaused = true;
+                self._hideCursor();
+                self.pause();
+            } else {
+                self._userPaused = false;
+                self.play();
+            }
+        });
+    };
+
+
     // ── Scroll helpers ───────────────────────────────────────────────────────
 
     /**
@@ -1032,7 +1088,46 @@
                     }
                     self._contentRoot.innerHTML = el.outerHTML;
                 } else {
-                    self._contentRoot.innerHTML = html;
+                    // Parse the full HTML document to isolate the wireframe's styles.
+                    // Setting innerHTML directly with a complete HTML document causes <style>
+                    // blocks (including body/html rules) to leak into the host page's stylesheet.
+                    // Instead we:
+                    //   1. Extract <style> elements and re-inject them scoped via CSS @scope
+                    //      so they only apply inside this demo's content root.
+                    //   2. Use only the parsed body content for innerHTML.
+                    var parsedDoc = new DOMParser().parseFromString(html, 'text/html');
+
+                    // Collect styles from <head> and any stray <style> blocks in <body>
+                    var styleEls = Array.from(parsedDoc.querySelectorAll('style'));
+                    if (styleEls.length > 0) {
+                        var cssText = styleEls.map(function (s) { return s.textContent; }).join('\n');
+                        // Remap body/html/:root selectors to :scope so they style the
+                        // content root container rather than the outer page body.
+                        var remapped = cssText
+                            .replace(/\bbody\b/g, ':scope')
+                            .replace(/\bhtml\b/g, ':scope')
+                            .replace(/:root\b/g, ':scope');
+
+                        // Remove any previously-injected scope style (e.g. on a reload-restart)
+                        // before injecting a fresh one so styles don't stack.
+                        if (self._scopeStyleEl) {
+                            self._scopeStyleEl.remove();
+                            self._scopeStyleEl = null;
+                        }
+
+                        var styleEl = document.createElement('style');
+                        // @scope limits rule application to descendants of the content root.
+                        // :scope inside @scope refers to the scope root (.gs-scope-xxx) itself.
+                        styleEl.textContent = '@scope (.' + self._scopeClass + ') {\n' + remapped + '\n}';
+                        styleEl.setAttribute('data-gs-scope', self._scopeClass);
+                        document.head.appendChild(styleEl);
+                        self._scopeStyleEl = styleEl;
+                    }
+
+                    // Remove any <style> elements from the body so they don't leak when
+                    // innerHTML is set (browsers process <style> anywhere in the DOM tree).
+                    Array.from(parsedDoc.body.querySelectorAll('style')).forEach(function (s) { s.remove(); });
+                    self._contentRoot.innerHTML = parsedDoc.body.innerHTML;
                 }
                 self._runScripts();
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)
@@ -1318,7 +1413,28 @@
         this._stepIndex = 0;
         this._htmlSnapshots = [];
 
-        // Restore the content DOM to its initial state so the demo
+        // reloadOnRestart: re-fetch the source URL so the DOM is fully
+        // re-initialised, including all event listeners. This avoids the
+        // stale-closure problem that arises when innerHTML reset + _runScripts()
+        // is not enough to fully reset a live application page.
+        if (this.config.reloadOnRestart && this.config.htmlSrc) {
+            var self = this;
+            this._loadHTML(
+                this.config.htmlSrc,
+                this.config.htmlSrcSelector || null,
+                function () {
+                    self._runInitSteps(function () {
+                        self._initialHTML = self._contentRoot.innerHTML;
+                        self._htmlSnapshots = [];
+                        self._updateTimelineDots();
+                        self.play();
+                    });
+                }
+            );
+            return; // async path — play() called in callback above
+        }
+
+        // Default: restore the content DOM to its initial state so the demo
         // starts fresh (removes dynamically added viewers, sidebars, etc.)
         if (this._initialHTML !== undefined) {
             this._contentRoot.innerHTML = this._initialHTML;
