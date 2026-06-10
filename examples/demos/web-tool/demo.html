@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Builder &ndash; Full Walkthrough</title>
+<link rel="stylesheet" href="../../guidestar-controls.css">
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+</style>
+</head>
+<body>
+<div style="width:100%;height:540px"
+     data-guidestar
+     data-guidestar-config="{
+  &quot;htmlSrc&quot;: &quot;../../demo-builder.html&quot;,
+  &quot;viewport&quot;: 1440,
+  &quot;repeat&quot;: true,
+  &quot;initSteps&quot;: [
+    {
+      &quot;target&quot;: &quot;#paste-html&quot;,
+      &quot;action&quot;: &quot;set-value&quot;,
+      &quot;value&quot;: &quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=\&quot;en\&quot;&gt;\n&lt;head&gt;\n&lt;meta charset=\&quot;UTF-8\&quot;&gt;\n&lt;style&gt;\n  *,\n  *::before,\n  *::after {\n    box-sizing: border-box;\n  }\n\n  body {\n    margin: 0;\n    font-family: -apple-system, BlinkMacSystemFont, \&quot;Segoe UI\&quot;, Roboto, sans-serif;\n  }\n\n  /* \u2500\u2500 App shell \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .app {\n    background: #1e1e2e;\n    color: #cdd6f4;\n    min-height: 380px;\n    display: flex;\n    flex-direction: column;\n    border-radius: 8px;\n    overflow: hidden;\n  }\n\n  /* \u2500\u2500 Top bar \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .topbar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    background: #181825;\n    border-bottom: 1px solid #313244;\n  }\n\n  .topbar .logo {\n    font-weight: 600;\n    font-size: 14px;\n    color: #cba6f7;\n    margin-right: auto;\n  }\n\n  .topbar button {\n    background: #313244;\n    color: #cdd6f4;\n    border: 1px solid #45475a;\n    border-radius: 6px;\n    padding: 6px 14px;\n    cursor: pointer;\n    font-size: 13px;\n    transition: background 0.15s, border-color 0.15s, color 0.15s;\n  }\n\n  .topbar button:hover,\n  .topbar button.active {\n    background: #45475a;\n    border-color: #585b70;\n  }\n\n  .topbar button.active {\n    border-color: #cba6f7;\n    color: #cba6f7;\n  }\n\n  /* \u2500\u2500 Main body \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .main {\n    display: flex;\n    flex: 1;\n    min-height: 0;\n  }\n\n  /* \u2500\u2500 Sidebar \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .sidebar {\n    width: 0;\n    overflow: hidden;\n    background: #11111b;\n    border-right: 1px solid #313244;\n    transition: width 0.3s ease, padding 0.3s ease;\n    flex-shrink: 0;\n  }\n\n  .sidebar.open {\n    width: 220px;\n    padding: 14px;\n  }\n\n  .sidebar h3 {\n    margin: 0 0 10px;\n    font-size: 12px;\n    color: #a6adc8;\n    text-transform: uppercase;\n    letter-spacing: 0.6px;\n  }\n\n  .sidebar .field {\n    margin-bottom: 12px;\n  }\n\n  .sidebar label {\n    display: block;\n    font-size: 12px;\n    color: #6c7086;\n    margin-bottom: 3px;\n  }\n\n  .sidebar input[type=\&quot;text\&quot;],\n  .sidebar input[type=\&quot;number\&quot;] {\n    width: 100%;\n    background: #1e1e2e;\n    border: 1px solid #313244;\n    color: #cdd6f4;\n    border-radius: 4px;\n    padding: 5px 8px;\n    font-size: 13px;\n  }\n\n  .sidebar select {\n    width: 100%;\n    background: #1e1e2e;\n    border: 1px solid #313244;\n    color: #cdd6f4;\n    border-radius: 4px;\n    padding: 5px 8px;\n    font-size: 13px;\n    appearance: auto;\n  }\n\n  /* \u2500\u2500 Content area \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .content {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    padding: 16px;\n    gap: 14px;\n    overflow-y: auto;\n    max-height: 320px;\n  }\n\n  /* \u2500\u2500 Status bar \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 6px 12px;\n    background: #181825;\n    border-top: 1px solid #313244;\n    font-size: 12px;\n    color: #6c7086;\n  }\n\n  .status-bar .badge {\n    background: #313244;\n    color: #a6adc8;\n    padding: 2px 8px;\n    border-radius: 10px;\n    font-size: 11px;\n    transition: background 0.2s, color 0.2s;\n  }\n\n  .status-bar .badge.success {\n    background: #a6e3a1;\n    color: #1e1e2e;\n  }\n\n  /* \u2500\u2500 Cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .card {\n    background: #313244;\n    border: 1px solid #45475a;\n    border-radius: 8px;\n    padding: 14px;\n    transition: border-color 0.2s;\n  }\n\n  .card.highlighted {\n    border-color: #cba6f7;\n  }\n\n  .card h4 {\n    margin: 0 0 6px;\n    font-size: 14px;\n    color: #cdd6f4;\n  }\n\n  .card p {\n    margin: 0;\n    font-size: 13px;\n    color: #a6adc8;\n    line-height: 1.4;\n  }\n\n  .card .tag {\n    display: inline-block;\n    margin-top: 8px;\n    padding: 2px 8px;\n    background: #45475a;\n    border-radius: 4px;\n    font-size: 11px;\n    color: #bac2de;\n  }\n\n  /* \u2500\u2500 Notification toast \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .toast {\n    position: absolute;\n    top: 50px;\n    right: 12px;\n    background: #a6e3a1;\n    color: #1e1e2e;\n    padding: 10px 16px;\n    border-radius: 6px;\n    font-size: 13px;\n    font-weight: 500;\n    opacity: 0;\n    transform: translateY(-8px);\n    transition: opacity 0.3s, transform 0.3s;\n    pointer-events: none;\n    z-index: 100;\n  }\n\n  .toast.visible {\n    opacity: 1;\n    transform: translateY(0);\n  }\n\n  /* \u2500\u2500 Tooltip demo \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .info-icon {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 18px;\n    height: 18px;\n    border-radius: 50%;\n    background: #45475a;\n    color: #bac2de;\n    font-size: 11px;\n    font-weight: 700;\n    cursor: help;\n    position: relative;\n  }\n\n  .info-icon[data-tooltip]::after {\n    content: attr(data-tooltip);\n    position: absolute;\n    bottom: calc(100% + 6px);\n    left: 50%;\n    transform: translateX(-50%);\n    background: #11111b;\n    color: #cdd6f4;\n    padding: 4px 10px;\n    border-radius: 4px;\n    font-size: 11px;\n    font-weight: 400;\n    white-space: nowrap;\n    pointer-events: none;\n    z-index: 200;\n  }\n\n  /* \u2500\u2500 Scrollable list \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n  .log-list {\n    background: #11111b;\n    border: 1px solid #313244;\n    border-radius: 6px;\n    padding: 10px;\n    font-family: \&quot;SF Mono\&quot;, \&quot;Fira Code\&quot;, monospace;\n    font-size: 12px;\n    color: #a6adc8;\n    line-height: 1.6;\n    max-height: 90px;\n    overflow-y: auto;\n  }\n\n  .log-list .entry {\n    padding: 2px 0;\n    border-bottom: 1px solid #181825;\n  }\n\n  .log-list .entry:last-child {\n    border-bottom: none;\n  }\n\n  .log-list .entry.new {\n    color: #a6e3a1;\n  }\n&lt;/style&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;div class=\&quot;app\&quot; style=\&quot;position: relative;\&quot;&gt;\n  &lt;!-- Top bar --&gt;\n  &lt;div class=\&quot;topbar\&quot;&gt;\n    &lt;span class=\&quot;logo\&quot;&gt;DemoApp&lt;/span&gt;\n    &lt;button id=\&quot;btn-sidebar\&quot;&gt;Settings&lt;/button&gt;\n    &lt;button id=\&quot;btn-action\&quot;&gt;Run&lt;/button&gt;\n    &lt;button id=\&quot;btn-theme\&quot; data-mode=\&quot;dark\&quot;&gt;Theme&lt;/button&gt;\n  &lt;/div&gt;\n\n  &lt;!-- Main body --&gt;\n  &lt;div class=\&quot;main\&quot;&gt;\n    &lt;!-- Sidebar --&gt;\n    &lt;div class=\&quot;sidebar\&quot; id=\&quot;sidebar\&quot;&gt;\n      &lt;h3&gt;Configuration&lt;/h3&gt;\n      &lt;div class=\&quot;field\&quot;&gt;\n        &lt;label for=\&quot;input-search\&quot;&gt;Search&lt;/label&gt;\n        &lt;input type=\&quot;text\&quot; id=\&quot;input-search\&quot; placeholder=\&quot;Type to filter\u2026\&quot; /&gt;\n      &lt;/div&gt;\n      &lt;div class=\&quot;field\&quot;&gt;\n        &lt;label for=\&quot;input-count\&quot;&gt;Count&lt;/label&gt;\n        &lt;input type=\&quot;number\&quot; id=\&quot;input-count\&quot; value=\&quot;10\&quot; min=\&quot;1\&quot; max=\&quot;100\&quot; /&gt;\n      &lt;/div&gt;\n      &lt;div class=\&quot;field\&quot;&gt;\n        &lt;label for=\&quot;select-mode\&quot;&gt;Mode&lt;/label&gt;\n        &lt;select id=\&quot;select-mode\&quot;&gt;\n          &lt;option value=\&quot;auto\&quot;&gt;Auto&lt;/option&gt;\n          &lt;option value=\&quot;manual\&quot;&gt;Manual&lt;/option&gt;\n          &lt;option value=\&quot;batch\&quot;&gt;Batch&lt;/option&gt;\n        &lt;/select&gt;\n      &lt;/div&gt;\n    &lt;/div&gt;\n\n    &lt;!-- Content area --&gt;\n    &lt;div class=\&quot;content\&quot;&gt;\n      &lt;div class=\&quot;card\&quot; id=\&quot;card-1\&quot;&gt;\n        &lt;h4&gt;Data Pipeline &lt;span class=\&quot;info-icon\&quot; id=\&quot;info-1\&quot;&gt;?&lt;/span&gt;&lt;/h4&gt;\n        &lt;p id=\&quot;card-1-desc\&quot;&gt;Processes incoming data streams in real time.&lt;/p&gt;\n        &lt;span class=\&quot;tag\&quot; id=\&quot;card-1-tag\&quot;&gt;active&lt;/span&gt;\n      &lt;/div&gt;\n      &lt;div class=\&quot;card\&quot; id=\&quot;card-2\&quot;&gt;\n        &lt;h4&gt;Batch Processor&lt;/h4&gt;\n        &lt;p id=\&quot;card-2-desc\&quot;&gt;Handles large-scale batch transformations.&lt;/p&gt;\n        &lt;span class=\&quot;tag\&quot; id=\&quot;card-2-tag\&quot;&gt;idle&lt;/span&gt;\n      &lt;/div&gt;\n      &lt;div class=\&quot;card\&quot; id=\&quot;card-3\&quot;&gt;\n        &lt;h4&gt;Event Log&lt;/h4&gt;\n        &lt;div class=\&quot;log-list\&quot; id=\&quot;log-list\&quot;&gt;\n          &lt;div class=\&quot;entry\&quot;&gt;10:01 \u2014 System initialized&lt;/div&gt;\n          &lt;div class=\&quot;entry\&quot;&gt;10:02 \u2014 Config loaded&lt;/div&gt;\n          &lt;div class=\&quot;entry\&quot;&gt;10:03 \u2014 Waiting for input&lt;/div&gt;\n          &lt;div class=\&quot;entry\&quot;&gt;10:05 \u2014 Idle timeout&lt;/div&gt;\n          &lt;div class=\&quot;entry\&quot; id=\&quot;log-last\&quot;&gt;10:06 \u2014 Heartbeat OK&lt;/div&gt;\n        &lt;/div&gt;\n      &lt;/div&gt;\n    &lt;/div&gt;\n  &lt;/div&gt;\n\n  &lt;!-- Status bar --&gt;\n  &lt;div class=\&quot;status-bar\&quot;&gt;\n    &lt;span id=\&quot;status-text\&quot;&gt;Ready&lt;/span&gt;\n    &lt;span style=\&quot;margin-left: auto;\&quot;&gt;&lt;/span&gt;\n    &lt;span class=\&quot;badge\&quot; id=\&quot;status-badge\&quot;&gt;idle&lt;/span&gt;\n  &lt;/div&gt;\n\n  &lt;!-- Toast notification (hidden by default) --&gt;\n  &lt;div class=\&quot;toast\&quot; id=\&quot;toast\&quot;&gt;Action completed!&lt;/div&gt;\n&lt;/div&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#options-body&quot;,
+      &quot;action&quot;: &quot;add-class&quot;,
+      &quot;value&quot;: &quot;collapsed&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#recording-body&quot;,
+      &quot;action&quot;: &quot;add-class&quot;,
+      &quot;value&quot;: &quot;collapsed&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#steps-body&quot;,
+      &quot;action&quot;: &quot;add-class&quot;,
+      &quot;value&quot;: &quot;collapsed&quot;
+    }
+  ],
+  &quot;steps&quot;: [
+    {
+      &quot;target&quot;: &quot;#source-url&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 1: Enter the URL of your wireframe or existing demo&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#btn-fetch&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 1: Click Load to fetch and auto-detect the source&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#source-type-badge&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1500,
+      &quot;caption&quot;: &quot;Step 1: A badge confirms the detected type \u2014 Wireframe, Demo (HTML), or Demo (Sphinx)&quot;
+    },
+    {
+      &quot;actions&quot;: [
+        {
+          &quot;target&quot;: &quot;#source-body&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#options-body&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        }
+      ],
+      &quot;delay&quot;: 600,
+      &quot;noHighlight&quot;: true
+    },
+    {
+      &quot;target&quot;: &quot;#options-body&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 800,
+      &quot;caption&quot;: &quot;Step 2: The Demo Options panel \u2014 configure height, viewport, and playback settings&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#opt-height&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 2: Set the container height (e.g. 480px)&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#opt-viewport&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 2: Set the viewport width to enable scale mode&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#opt-repeat&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1000,
+      &quot;caption&quot;: &quot;Step 2: Toggle repeat, cursor, timeline, and other options&quot;
+    },
+    {
+      &quot;actions&quot;: [
+        {
+          &quot;target&quot;: &quot;#options-body&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#recording-body&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        }
+      ],
+      &quot;delay&quot;: 600,
+      &quot;noHighlight&quot;: true
+    },
+    {
+      &quot;target&quot;: &quot;#btn-record-toggle&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1000,
+      &quot;caption&quot;: &quot;Step 3: Click Enable Record Mode to start capturing clicks&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#demo-iframe&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1400,
+      &quot;caption&quot;: &quot;Step 3: Click any element in the wireframe to capture a step&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#recording-status&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1000,
+      &quot;caption&quot;: &quot;Step 3: The recording badge shows the current state&quot;
+    },
+    {
+      &quot;actions&quot;: [
+        {
+          &quot;target&quot;: &quot;#recording-body&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#steps-body&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        }
+      ],
+      &quot;delay&quot;: 600,
+      &quot;noHighlight&quot;: true
+    },
+    {
+      &quot;target&quot;: &quot;#steps-body&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 4: Each recorded step appears as an editable card&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#step-list&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1400,
+      &quot;caption&quot;: &quot;Step 4: Edit the selector, action, delay, and caption inline&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#btn-clear-steps&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 4: Remove individual steps or clear all at once&quot;
+    },
+    {
+      &quot;actions&quot;: [
+        {
+          &quot;target&quot;: &quot;#steps-body&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#preview-body&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#section-preview .card-header&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        }
+      ],
+      &quot;delay&quot;: 600,
+      &quot;noHighlight&quot;: true
+    },
+    {
+      &quot;target&quot;: &quot;#preview-body&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1000,
+      &quot;caption&quot;: &quot;Step 5: The Preview Demo panel \u2014 play back the full demo in-place&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#btn-preview&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1400,
+      &quot;caption&quot;: &quot;Step 5: Click Render Preview to play back the demo using the live guidestar player&quot;
+    },
+    {
+      &quot;actions&quot;: [
+        {
+          &quot;target&quot;: &quot;#preview-body&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#section-preview .card-header&quot;,
+          &quot;action&quot;: &quot;add-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#output-body&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        },
+        {
+          &quot;target&quot;: &quot;#section-output .card-header&quot;,
+          &quot;action&quot;: &quot;remove-class&quot;,
+          &quot;value&quot;: &quot;collapsed&quot;
+        }
+      ],
+      &quot;delay&quot;: 600,
+      &quot;noHighlight&quot;: true
+    },
+    {
+      &quot;target&quot;: &quot;#tab-html&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 6: The HTML tab shows a self-contained embed snippet&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#tab-sphinx&quot;,
+      &quot;action&quot;: &quot;click&quot;,
+      &quot;delay&quot;: 1000,
+      &quot;caption&quot;: &quot;Step 6: Switch to the Sphinx Directive tab&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#output-textarea&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1400,
+      &quot;caption&quot;: &quot;Step 6: The Sphinx tab shows a ready-to-paste .. guidestar-demo:: directive&quot;
+    },
+    {
+      &quot;target&quot;: &quot;#output-body .copy-btn-wrap button&quot;,
+      &quot;action&quot;: &quot;highlight&quot;,
+      &quot;delay&quot;: 1200,
+      &quot;caption&quot;: &quot;Step 6: Click Copy to copy the output to the clipboard&quot;
+    }
+  ]
+}"></div>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var value = params.get('range');
+  if (!value) {
+    return;
+  }
+
+  var match = value.match(/^(\d+)[,\-](\d+)$/);
+  if (!match) {
+    return;
+  }
+
+  var start = Number(match[1]);
+  var end = Number(match[2]);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) {
+    return;
+  }
+
+  var host = document.querySelector('[data-guidestar-config]');
+  if (!host) {
+    return;
+  }
+
+  try {
+    var cfg = JSON.parse(host.getAttribute('data-guidestar-config'));
+    cfg.stepRange = [start, end];
+    host.setAttribute('data-guidestar-config', JSON.stringify(cfg));
+  } catch (err) {
+    // Ignore malformed configs so the demo can still run with defaults.
+  }
+})();
+</script>
+<script src="../../guidestar-controller.js"></script>
+</body>
+</html>

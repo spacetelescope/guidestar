@@ -68,6 +68,12 @@ Directive options
      - Pause on user click (``true`` / ``false``).  Only active when
        ``:allow-user-interactions: true``; ignored otherwise (the
        interaction blocker handles toggling in the default mode).
+   * - ``:step-range:``
+     - —
+     - Restrict autoplay and loop to a slice of the step list, e.g.
+       ``:step-range: 0-2`` or ``:step-range: 0 2``.  Timeline dots
+       outside the range are shown at reduced opacity but remain
+       clickable.  Omit to play all steps.
    * - ``:allow-user-interactions:``
      - ``false``
      - When ``false`` (the default), a transparent glass pane covers the

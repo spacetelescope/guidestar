@@ -53,6 +53,13 @@ When creating a ``Guidestar`` programmatically or via the
        effect in the default ``allowUserInteractions: false`` mode because
        all content-area clicks are handled by the interaction blocker
        before they can reach this listener.
+   * - ``stepRange``
+     - array
+     - ``null``
+     - A two-element array ``[start, end]`` (0-based, inclusive) that
+       restricts autoplay and loop boundaries to that slice of the step
+       list.  Dots outside the range are rendered at reduced opacity but
+       remain clickable.  ``null`` (default) means all steps are active.
    * - ``allowUserInteractions``
      - bool
      - ``false``

@@ -37,7 +37,7 @@ and shows a coloured badge indicating what it found:
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-1.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=0,2"
            style="width:100%;height:320px;border:none;display:block" loading="lazy"
            title="Demo: Load a source"></iframe>
 
@@ -52,7 +52,7 @@ mode), and toggles for ``repeat``, ``cursor``, and ``timeline``.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-2.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=3,7"
            style="width:100%;height:380px;border:none;display:block" loading="lazy"
            title="Demo: Set demo options"></iframe>
 
@@ -68,7 +68,7 @@ an optional caption, then click **Add Step**.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-3.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=8,11"
            style="width:100%;height:520px;border:none;display:block" loading="lazy"
            title="Demo: Record steps"></iframe>
 
@@ -88,7 +88,7 @@ wireframe, the card shows a red **⚠ Invalid selector** badge — see
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-4.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=12,15"
            style="width:100%;height:400px;border:none;display:block" loading="lazy"
            title="Demo: Edit steps"></iframe>
 
@@ -102,7 +102,7 @@ demo in full using the live guidestar player.  After editing steps, click
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-5.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=16,18"
            style="width:100%;height:280px;border:none;display:block" loading="lazy"
            title="Demo: Preview"></iframe>
 
@@ -116,7 +116,7 @@ the clipboard and paste it directly into your page or ``.rst`` file.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/step-6.html"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=19,23"
            style="width:100%;height:340px;border:none;display:block" loading="lazy"
            title="Demo: Copy output"></iframe>
 

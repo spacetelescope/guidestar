@@ -462,6 +462,15 @@
     transform: translate(-50%, -50%) scale(1.4);
 }
 
+/* Out-of-range dots (outside stepRange window): dimmed border/fill but still clickable */
+.gs-timeline__dot--out-of-range::after {
+    opacity: 0.3;
+}
+
+.gs-timeline__dot--out-of-range.gs-timeline__dot--filled::after {
+    opacity: 0.25;
+}
+
 /* ── Timeline dot hover tooltip ──────────────────────────────────── */
 
 .gs-timeline-tooltip {

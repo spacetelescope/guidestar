@@ -514,6 +514,7 @@
             poweredby: true,
             reloadOnRestart: false,
             allowUserInteractions: false,
+            stepRange: null,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -613,6 +614,17 @@
         // Parse steps
         this._steps = parseSteps(this.config.steps);
         this._initSteps = parseSteps(this.config.initSteps);
+
+        // Derive the active step range: [_rangeStart, _rangeEnd] (both inclusive).
+        // stepRange: null or [start, end] (0-based). Clamped to valid step indices.
+        var totalSteps = this._steps.length;
+        if (this.config.stepRange && Array.isArray(this.config.stepRange) && totalSteps > 0) {
+            this._rangeStart = Math.max(0, Math.min(this.config.stepRange[0] || 0, totalSteps - 1));
+            this._rangeEnd   = Math.max(this._rangeStart, Math.min(this.config.stepRange[1] != null ? this.config.stepRange[1] : totalSteps - 1, totalSteps - 1));
+        } else {
+            this._rangeStart = 0;
+            this._rangeEnd   = totalSteps - 1;
+        }
 
         // Static mode: no steps means no playback controls or timeline
         this._isStatic = this._steps.length === 0;
@@ -1322,12 +1334,12 @@
                 }
                 break;
             case 'Home':
-                this.jumpToStep(0);
-                this._announce('Step 1 of ' + this._steps.length);
+                this.jumpToStep(this._rangeStart);
+                this._announce('Step ' + (this._rangeStart + 1) + ' of ' + this._steps.length);
                 break;
             case 'End':
-                this.jumpToStep(this._steps.length - 1);
-                this._announce('Step ' + this._steps.length + ' of ' + this._steps.length);
+                this.jumpToStep(this._rangeEnd);
+                this._announce('Step ' + (this._rangeEnd + 1) + ' of ' + this._steps.length);
                 break;
             case '+':
             case '=':
@@ -1378,6 +1390,12 @@
 
     Guidestar.prototype.play = function () {
         if (this._playing) return;
+        // If stepRange is set and the current index is outside the range
+        // (e.g. user jumped out-of-range or this is the first play), snap
+        // back to the range start so autoplay stays within the window.
+        if (this._stepIndex < this._rangeStart || this._stepIndex > this._rangeEnd) {
+            this._stepIndex = this._rangeStart;
+        }
         this._playing = true;
         this._started = true;
         this._userPaused = false;
@@ -1412,7 +1430,7 @@
         this._clearHighlights();
         this._hideCaption();
         this._resetCursor();
-        this._stepIndex = 0;
+        this._stepIndex = this._rangeStart;
         this._htmlSnapshots = [];
 
         // reloadOnRestart: re-fetch the source URL so the DOM is fully
@@ -2036,6 +2054,12 @@
         if (!this._timelineDots.length) return;
         for (var i = 0; i < this._timelineDots.length; i++) {
             var dot = this._timelineDots[i];
+            // Out-of-range dots are dimmed but remain clickable
+            if (i < this._rangeStart || i > this._rangeEnd) {
+                dot.classList.add('gs-timeline__dot--out-of-range');
+            } else {
+                dot.classList.remove('gs-timeline__dot--out-of-range');
+            }
             if (i <= this._stepIndex) {
                 dot.classList.add('gs-timeline__dot--filled');
             } else {
@@ -2201,7 +2225,8 @@
 
     Guidestar.prototype._runStep = function () {
         if (!this._playing) return;
-        if (this._stepIndex >= this._steps.length) {
+        // End of range (respects stepRange; falls through to _onSequenceEnd for repeat/stop)
+        if (this._stepIndex > this._rangeEnd || this._stepIndex >= this._steps.length) {
             this._onSequenceEnd();
             return;
         }
@@ -2297,7 +2322,7 @@
         }
         if (this.config.repeat) {
             var self = this;
-            this._stepIndex = 0;
+            this._stepIndex = this._rangeStart;
             this._htmlSnapshots = [];
 
             // Restore the content DOM to its initial state before replaying
