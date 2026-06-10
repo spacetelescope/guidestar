@@ -36,7 +36,8 @@ Directive options
      - Description
    * - ``:steps:``
      - —
-     - Comma-separated shorthand step strings.
+     - Comma-separated shorthand step strings.  See
+       :ref:`shorthand-string-format` for the full syntax reference.
    * - ``:steps-json:``
      - —
      - Inline JSON array of step objects (alternative to ``:steps:``).
@@ -44,7 +45,7 @@ Directive options
      - —
      - JSON array of steps executed silently before playback (or before a
        static render). Each step supports ``target``, ``action`` /
-       ``actions``, ``value``, ``noHighlight``, ``caption``, and
+       ``actions``, ``value``, ``noHighlight``, ``chapter``, ``caption``, and
        ``captionOptions``. The ``delay`` field is accepted but ignored.
        In static mode (no ``:steps:``), the cursor is placed at the last
        targeted init step and the last caption persists.
@@ -68,6 +69,12 @@ Directive options
      - Pause on user click (``true`` / ``false``).  Only active when
        ``:allow-user-interactions: true``; ignored otherwise (the
        interaction blocker handles toggling in the default mode).
+   * - ``:step-range:``
+     - —
+     - Restrict autoplay and loop to a slice of the step list, e.g.
+       ``:step-range: 0-2`` or ``:step-range: 0 2``.  Timeline dots
+       outside the range are shown at reduced opacity but remain
+       clickable.  Omit to play all steps.
    * - ``:allow-user-interactions:``
      - ``false``
      - When ``false`` (the default), a transparent glass pane covers the

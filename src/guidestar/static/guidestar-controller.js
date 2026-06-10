@@ -47,6 +47,7 @@
         var delay = 2000;
         var noHighlight = false;
         var noScroll = false;
+        var chapter = false;
         var caption = undefined;
         var captionOptions = undefined;
         var working = str;
@@ -92,6 +93,10 @@
                 noScroll = true;
                 delayPart = delayPart.slice(0, -1);
             }
+            if (delayPart.endsWith('*')) {
+                chapter = true;
+                delayPart = delayPart.slice(0, -1);
+            }
             delay = parseInt(delayPart, 10) || 2000;
             working = before + rest;
         }
@@ -118,12 +123,14 @@
 
         if (target === 'pause') {
             var pauseStep = { target: null, action: 'pause', delay: delay, noHighlight: noHighlight, noScroll: noScroll };
+            if (chapter) pauseStep.chapter = true;
             if (caption !== undefined) pauseStep.caption = caption;
             if (captionOptions) pauseStep.captionOptions = captionOptions;
             return pauseStep;
         }
 
         var step = { target: target, action: action, delay: delay, noHighlight: noHighlight, noScroll: noScroll };
+        if (chapter) step.chapter = true;
         if (value !== undefined) step.value = value;
         if (caption !== undefined) step.caption = caption;
         if (captionOptions) step.captionOptions = captionOptions;
@@ -146,7 +153,8 @@
                 var multi = {
                     actions: [],
                     delay: typeof item.delay === 'number' ? item.delay : 2000,
-                    noHighlight: !!item.noHighlight
+                    noHighlight: !!item.noHighlight,
+                    chapter: !!item.chapter
                 };
                 for (var j = 0; j < item.actions.length; j++) {
                     var sub = item.actions[j];
@@ -168,7 +176,8 @@
                     action: item.action || 'highlight',
                     value: item.value,
                     delay: typeof item.delay === 'number' ? item.delay : 2000,
-                    noHighlight: !!item.noHighlight
+                    noHighlight: !!item.noHighlight,
+                    chapter: !!item.chapter
                 };
                 if (item.caption !== undefined) obj.caption = item.caption;
                 if (item.captionOptions) obj.captionOptions = item.captionOptions;
@@ -247,11 +256,11 @@
         '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
         '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
         '.gs-control-btn:hover::after { opacity: 1; }',
-        /* Speed row — just the +/- buttons, fits in button width */
         '.gs-speed-row {',
         '  display: flex; align-items: center; gap: 4px;',
         '  width: var(--gs-control-size, 44px);',
@@ -280,6 +289,7 @@
         '  background: var(--gs-control-tooltip-bg, rgba(0,0,0,0.8));',
         '  color: var(--gs-control-tooltip-color, #fff);',
         '  padding: 4px 10px; border-radius: 4px; font-size: 12px;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  font-weight: 600; white-space: nowrap; pointer-events: none;',
         '  opacity: 0; transition: opacity 0.2s;',
         '}',
@@ -287,6 +297,7 @@
         /* Speed label below play button */
         '.gs-speed-label {',
         '  font-size: 11px; font-weight: 600;',
+        '  font-family: -apple-system,"BlinkMacSystemFont","Segoe UI","Helvetica Neue",Arial,sans-serif;',
         '  width: var(--gs-control-size, 44px);',
         '  height: 16px; line-height: 16px;',
         '  text-align: center; color: var(--gs-control-color, #fff);',
@@ -512,6 +523,7 @@
             poweredby: true,
             reloadOnRestart: false,
             allowUserInteractions: false,
+            stepRange: null,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -611,6 +623,17 @@
         // Parse steps
         this._steps = parseSteps(this.config.steps);
         this._initSteps = parseSteps(this.config.initSteps);
+
+        // Derive the active step range: [_rangeStart, _rangeEnd] (both inclusive).
+        // stepRange: null or [start, end] (0-based). Clamped to valid step indices.
+        var totalSteps = this._steps.length;
+        if (this.config.stepRange && Array.isArray(this.config.stepRange) && totalSteps > 0) {
+            this._rangeStart = Math.max(0, Math.min(this.config.stepRange[0] || 0, totalSteps - 1));
+            this._rangeEnd   = Math.max(this._rangeStart, Math.min(this.config.stepRange[1] != null ? this.config.stepRange[1] : totalSteps - 1, totalSteps - 1));
+        } else {
+            this._rangeStart = 0;
+            this._rangeEnd   = totalSteps - 1;
+        }
 
         // Static mode: no steps means no playback controls or timeline
         this._isStatic = this._steps.length === 0;
@@ -1103,9 +1126,11 @@
                         var cssText = styleEls.map(function (s) { return s.textContent; }).join('\n');
                         // Remap body/html/:root selectors to :scope so they style the
                         // content root container rather than the outer page body.
+                        // Use a negative lookbehind for '-' so compound class names like
+                        // .card-body, .modal-body, .step-body are NOT remapped.
                         var remapped = cssText
-                            .replace(/\bbody\b/g, ':scope')
-                            .replace(/\bhtml\b/g, ':scope')
+                            .replace(/(?<!-)\bbody\b/g, ':scope')
+                            .replace(/(?<!-)\bhtml\b/g, ':scope')
                             .replace(/:root\b/g, ':scope');
 
                         // Remove any previously-injected scope style (e.g. on a reload-restart)
@@ -1320,12 +1345,12 @@
                 }
                 break;
             case 'Home':
-                this.jumpToStep(0);
-                this._announce('Step 1 of ' + this._steps.length);
+                this.jumpToStep(this._rangeStart);
+                this._announce('Step ' + (this._rangeStart + 1) + ' of ' + this._steps.length);
                 break;
             case 'End':
-                this.jumpToStep(this._steps.length - 1);
-                this._announce('Step ' + this._steps.length + ' of ' + this._steps.length);
+                this.jumpToStep(this._rangeEnd);
+                this._announce('Step ' + (this._rangeEnd + 1) + ' of ' + this._steps.length);
                 break;
             case '+':
             case '=':
@@ -1376,6 +1401,12 @@
 
     Guidestar.prototype.play = function () {
         if (this._playing) return;
+        // If stepRange is set and the current index is outside the range
+        // (e.g. user jumped out-of-range or this is the first play), snap
+        // back to the range start so autoplay stays within the window.
+        if (this._stepIndex < this._rangeStart || this._stepIndex > this._rangeEnd) {
+            this._stepIndex = this._rangeStart;
+        }
         this._playing = true;
         this._started = true;
         this._userPaused = false;
@@ -1410,7 +1441,7 @@
         this._clearHighlights();
         this._hideCaption();
         this._resetCursor();
-        this._stepIndex = 0;
+        this._stepIndex = this._rangeStart;
         this._htmlSnapshots = [];
 
         // reloadOnRestart: re-fetch the source URL so the DOM is fully
@@ -1718,6 +1749,9 @@
         for (var i = 0; i < this._steps.length; i++) {
             var dot = document.createElement('button');
             dot.className = 'gs-timeline__dot';
+            if (this._steps[i].chapter) {
+                dot.className += ' gs-timeline__dot--chapter';
+            }
             dot.setAttribute('data-step-index', String(i));
             if (this._steps[i].caption) {
                 dot.setAttribute('data-caption', this._steps[i].caption);
@@ -2034,6 +2068,12 @@
         if (!this._timelineDots.length) return;
         for (var i = 0; i < this._timelineDots.length; i++) {
             var dot = this._timelineDots[i];
+            // Out-of-range dots are dimmed but remain clickable
+            if (i < this._rangeStart || i > this._rangeEnd) {
+                dot.classList.add('gs-timeline__dot--out-of-range');
+            } else {
+                dot.classList.remove('gs-timeline__dot--out-of-range');
+            }
             if (i <= this._stepIndex) {
                 dot.classList.add('gs-timeline__dot--filled');
             } else {
@@ -2120,15 +2160,27 @@
             self._updateTooltip();
         };
 
-        // Animate cursor, then execute action
+        // Animate cursor, then execute action.
+        // When autoScroll is enabled, scroll the target into view first so the
+        // cursor animation lands on a visible element.
         if (this.config.cursor && el) {
             var cursorSpeed = this.config.cursorSpeed / this._speedFactor;
-            this._moveCursorTo(el, function () {
-                if (!self._playing) return;
-                self._executeAction(step, el, function () {
-                    afterAction(cursorSpeed);
+            var doMove = function () {
+                self._moveCursorTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(cursorSpeed);
+                    });
                 });
-            });
+            };
+            if (self.config.autoScroll && !step.noScroll && step.action !== 'pause') {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    doMove();
+                });
+            } else {
+                doMove();
+            }
         } else {
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
@@ -2199,7 +2251,8 @@
 
     Guidestar.prototype._runStep = function () {
         if (!this._playing) return;
-        if (this._stepIndex >= this._steps.length) {
+        // End of range (respects stepRange; falls through to _onSequenceEnd for repeat/stop)
+        if (this._stepIndex > this._rangeEnd || this._stepIndex >= this._steps.length) {
             this._onSequenceEnd();
             return;
         }
@@ -2256,15 +2309,27 @@
             }, remaining);
         };
 
-        // Animate cursor to target, then execute action
+        // Animate cursor to target, then execute action.
+        // When autoScroll is enabled, scroll the target into view first so the
+        // cursor animation lands on a visible element.
         if (this.config.cursor && el) {
             var cursorSpeed = this.config.cursorSpeed / this._speedFactor;
-            this._moveCursorTo(el, function () {
-                if (!self._playing) return;
-                self._executeAction(step, el, function () {
-                    afterAction(cursorSpeed);
+            var doMove = function () {
+                self._moveCursorTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(cursorSpeed);
+                    });
                 });
-            });
+            };
+            if (self.config.autoScroll && !step.noScroll && step.action !== 'pause') {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    doMove();
+                });
+            } else {
+                doMove();
+            }
         } else {
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
@@ -2280,7 +2345,7 @@
                     });
                 });
             } else {
-                this._executeAction(step, el, function () {
+                self._executeAction(step, el, function () {
                     afterAction(0);
                 });
             }
@@ -2295,7 +2360,7 @@
         }
         if (this.config.repeat) {
             var self = this;
-            this._stepIndex = 0;
+            this._stepIndex = this._rangeStart;
             this._htmlSnapshots = [];
 
             // Restore the content DOM to its initial state before replaying

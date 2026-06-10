@@ -71,6 +71,7 @@ class GuidestarDirective(SphinxDirective):
         'poweredby': str,
         'reload-on-restart': str,
         'allow-user-interactions': str,
+        'step-range': str,
     }
 
     def run(self):
@@ -178,6 +179,15 @@ class GuidestarDirective(SphinxDirective):
             val = self.options.get(opt)
             if val is not None:
                 config[key] = val.strip().lower() != 'false'
+
+        # Step range: "start end" or "start-end" → [start, end] (0-based inclusive)
+        step_range = self.options.get('step-range')
+        if step_range is not None:
+            parts = step_range.replace('-', ' ').split()
+            try:
+                config['stepRange'] = [int(parts[0]), int(parts[1])]
+            except (IndexError, ValueError):
+                pass
 
         config_json = json.dumps(config)
         config_escaped = html_module.escape(config_json)
