@@ -1,0 +1,26 @@
+name: Wireframe Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'demo-builder/**'
+      - 'examples/wireframes/demo-builder.html'
+      - 'docs/_static/demo-builder-wireframe.html'
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+      models: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/wireframe-review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          docs-root: docs/
+          config-path: .github/wireframe-review.yml

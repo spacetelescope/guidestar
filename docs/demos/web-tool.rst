@@ -22,40 +22,104 @@ the live examples on GitHub Pages:
 Workflow
 --------
 
-1. **Load a source** — Enter a URL (wireframe HTML, hosted demo page, or
-   Sphinx ``.rst`` file) in the *Source* box and click **Load**.  The tool
-   auto-detects what you have loaded and shows a coloured badge:
+Step 1 — Load a source
+~~~~~~~~~~~~~~~~~~~~~~~
 
-   - **Wireframe** — a plain HTML file to record steps against.
-   - **Demo (HTML)** — an existing ``data-guidestar-config`` page; options
-     and steps are pre-populated automatically.
-   - **Demo (Sphinx)** — a ``.. guidestar-demo::`` directive; steps and
-     options are parsed and pre-populated.
+Enter a URL pointing to a wireframe HTML file, a hosted demo page, or paste
+a Sphinx directive block, then click **Load**.  The tool fetches the content
+and shows a coloured badge indicating what it found:
 
-2. **Set demo options** — Expand the *Demo Options* panel to adjust the
-   height, viewport width, repeat behaviour, cursor, timeline, and
-   interaction settings.
+- **Wireframe** — a plain HTML file to record steps against.
+- **Demo (HTML)** — an existing ``data-guidestar-config`` page; options and
+  steps are pre-populated automatically.
+- **Demo (Sphinx)** — a ``.. guidestar-demo::`` directive block; steps and
+  options are parsed and pre-populated.
 
-3. **Record steps** — Click **Enable Record Mode**.  The wireframe gains a
-   red border.  Click any element inside the wireframe: a popup appears so
-   you can choose the selector, action, delay, and caption for that step.
-   Click **Add Step** to append it to the list.  Click **Stop Recording**
-   when done.
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 200px
+   :repeat: false
+   :steps-json: [{"target":"#source-url-input","action":"highlight","delay":1200,"caption":"Enter the URL of your wireframe or existing demo"},{"target":"#btn-load","action":"highlight","delay":1200,"caption":"Click Load to fetch and auto-detect the source"},{"target":"#source-badge","action":"highlight","delay":1500,"caption":"A badge confirms the detected type — Wireframe, Demo (HTML), or Demo (Sphinx)"}]
 
-4. **Edit steps** — Each step appears as a card in the *Steps* panel.  You
-   can change the selector, action, value, delay, caption, and caption
-   position inline.  Drag cards to reorder, or use the ↑/↓ buttons.  Use
-   **+ Add step manually** to insert a step without clicking in the
-   wireframe.
 
-5. **Preview** — Expand the *Preview Demo* panel and click **Render
-   Preview** to play back the demo in full using the guidestar player.
-   After editing steps, click **Render Preview** again to refresh.
+Step 2 — Set demo options
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-6. **Copy output** — The *Output* panel shows the ready-to-use code.
-   Switch between the **HTML** and **Sphinx Directive** tabs, then click
-   **Copy** to copy it to the clipboard.  Paste it directly into your page
-   or ``.rst`` file.
+Expand the **Demo Options** panel to configure the demo before recording.
+Key settings include ``height`` (the container height in CSS units),
+``viewport`` (the pixel width the wireframe was designed at — enables scale
+mode), and toggles for ``repeat``, ``cursor``, and ``timeline``.
+
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 340px
+   :repeat: false
+   :steps-json: [{"target":"#options-header","action":"click","delay":1000,"caption":"Click Demo Options to expand the panel"},{"target":"#opt-height","action":"highlight","delay":1200,"caption":"Set the container height (e.g. 480px)"},{"target":"#opt-viewport","action":"highlight","delay":1200,"caption":"Set the viewport width to enable scale mode"},{"target":"#opt-repeat","action":"highlight","delay":1000,"caption":"Toggle repeat, cursor, timeline, and other options"}]
+
+
+Step 3 — Record steps
+~~~~~~~~~~~~~~~~~~~~~~
+
+Click **Enable Record Mode** — the wireframe area gains a red border and a
+*Recording* badge.  Click any element inside the wireframe and a popup
+appears.  Choose the CSS selector from the ranked list of candidates, pick
+an action (``click``, ``type-text``, ``add-class``, etc.), set the delay and
+an optional caption, then click **Add Step**.
+
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 560px
+   :repeat: false
+   :steps-json: [{"target":"#btn-record","action":"click","delay":1000,"caption":"Click Enable Record Mode"},{"target":"#iframe-wrap","action":"add-class","value":"recording","delay":800,"noHighlight":true},{"target":"#record-status","action":"add-class","value":"recording","delay":200,"noHighlight":true},{"target":"#btn-record","action":"set-text","value":"Stop Recording","delay":200,"noHighlight":true,"caption":"The wireframe gains a red border — click any element inside it"},{"target":"#wf-resolve-btn","action":"highlight","delay":1400,"caption":"Clicking an element opens the step popup…"},{"target":"#action-modal","action":"add-class","value":"open","delay":600,"noHighlight":true},{"target":"#modal-selector","action":"highlight","delay":1200,"caption":"Choose the best selector from the ranked candidates"},{"target":"#modal-action","action":"highlight","delay":1000,"caption":"Pick an action: click, type-text, add-class, and more"},{"target":"#modal-caption","action":"highlight","delay":1000,"caption":"Add an optional caption to display during the step"},{"target":"#btn-add-step","action":"highlight","delay":1200,"caption":"Click Add Step to append it to the steps list"}]
+
+
+Step 4 — Edit steps
+~~~~~~~~~~~~~~~~~~~~
+
+After recording, each step appears as a numbered card in the **Steps**
+panel.  You can adjust the selector, action, value, delay, caption, and
+caption position directly in each card.  Drag cards to reorder, or use
+the ↑/↓ buttons.  Use **+ Add step manually** to insert a step without
+clicking in the wireframe.
+
+If an imported step targets a selector that no longer exists in the loaded
+wireframe, the card shows a red **⚠ Invalid selector** badge — see
+`Editing Existing Demos`_ for the replacement flow.
+
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 540px
+   :repeat: false
+   :init-steps-json: [{"target":"#section-steps","action":"add-class","value":"has-steps"}]
+   :steps-json: [{"target":"#step-list-content","action":"highlight","delay":1400,"caption":"Each recorded step appears as an editable card"},{"target":"#step-card-1","action":"highlight","delay":1400,"caption":"Edit the selector, action, delay, and caption inline"},{"target":"#step-card-2","action":"highlight","delay":1200,"caption":"Cards can be reordered by dragging or with the ↑/↓ buttons"},{"target":"#step-card-invalid","action":"highlight","delay":1600,"caption":"A red badge flags steps whose selector is missing from the wireframe"},{"target":"#btn-pick-replacement","action":"highlight","delay":1400,"caption":"Click Pick replacement, then click the correct element in the wireframe"},{"target":"#btn-add-manual","action":"highlight","delay":1200,"caption":"Or add a step manually without clicking in the wireframe"}]
+
+
+Step 5 — Preview
+~~~~~~~~~~~~~~~~~
+
+Expand the **Preview Demo** panel and click **Render Preview** to play the
+demo in full using the live guidestar player.  After editing steps, click
+**Render Preview** again to refresh.
+
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 400px
+   :repeat: false
+   :steps-json: [{"target":"#preview-header","action":"click","delay":800,"caption":"Expand the Preview Demo panel"},{"target":"#btn-render-preview","action":"highlight","delay":1400,"caption":"Click Render Preview to play back the demo using the live guidestar player"}]
+
+
+Step 6 — Copy output
+~~~~~~~~~~~~~~~~~~~~~
+
+The **Output** panel shows the ready-to-use code.  Switch between the
+**HTML** and **Sphinx Directive** tabs, then click **Copy** to copy it to
+the clipboard and paste it directly into your page or ``.rst`` file.
+
+.. guidestar-demo:: _static/demo-builder-wireframe.html
+   :viewport: 1440
+   :height: 420px
+   :repeat: false
+   :steps-json: [{"target":"#output-header","action":"click","delay":800,"caption":"Expand the Output panel"},{"target":"#tab-html","action":"highlight","delay":1200,"caption":"The HTML tab shows a self-contained embed snippet"},{"target":"#tab-sphinx","action":"click","delay":1000,"caption":"Switch to the Sphinx Directive tab"},{"target":"#out-sphinx","action":"highlight","delay":1400,"caption":"The Sphinx tab shows a ready-to-paste .. guidestar-demo:: directive"},{"target":"#btn-copy","action":"highlight","delay":1200,"caption":"Click Copy to copy the output to the clipboard"}]
 
 
 Editing Existing Demos

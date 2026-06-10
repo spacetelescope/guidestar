@@ -1,0 +1,11 @@
+wireframes:
+  - html: examples/wireframes/demo-builder.html
+    context: >
+      This wireframe is a faithful mockup of the Guidestar Demo Builder web
+      tool (demo-builder/index.html). It must stay in sync with the tool's
+      actual UI — section layout, labelled controls, step-card structure,
+      action-modal fields, preview area, and output tabs should all match.
+      The wireframe uses kitchen-sink.html (a dark-themed "MyApp" sidebar/card
+      app) as the simulated source loaded inside the iframe preview area.
+    watch:
+      - demo-builder/index.html

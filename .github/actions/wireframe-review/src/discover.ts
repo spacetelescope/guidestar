@@ -118,7 +118,7 @@ function findFileByName(dir: string, filename: string): string | null {
 // ── RST directive parsing ──────────────────────────────────────────────
 
 /**
- * Parse RST files for `.. wireframe-demo::` directives.
+ * Parse RST files for `.. guidestar-demo::` directives.
  */
 function parseRstFile(
   filePath: string,
@@ -129,7 +129,8 @@ function parseRstFile(
   const demos: DiscoveredDemo[] = [];
 
   // Match directive with its argument and indented options block
-  const directiveRegex = /^\.\.\s+wireframe-demo::\s+(.+)$/gm;
+  // Support both the canonical guidestar-demo:: and the legacy wireframe-demo:: name
+  const directiveRegex = /^\.\.\ +(?:guidestar-demo|wireframe-demo)::\s+(.+)$/gm;
   let match: RegExpExecArray | null;
 
   while ((match = directiveRegex.exec(content)) !== null) {
@@ -233,7 +234,8 @@ function parseRstOptions(block: string): Record<string, string> {
 // ── HTML/Jinja attribute parsing ───────────────────────────────────────
 
 /**
- * Parse HTML/Jinja files for `data-wireframe-demo` attributes.
+ * Parse HTML/Jinja files for `data-guidestar` attributes.
+ * Also supports the legacy `data-wireframe-demo` attribute name.
  */
 function parseHtmlFile(
   filePath: string,
@@ -243,9 +245,9 @@ function parseHtmlFile(
   const content = fs.readFileSync(filePath, 'utf-8');
   const demos: DiscoveredDemo[] = [];
 
-  // Find elements with data-wireframe-demo attribute
-  // We look for data-wireframe-config that follows it
-  const attrRegex = /data-wireframe-demo[\s\S]*?data-wireframe-config\s*=\s*'([\s\S]*?)'/g;
+  // Find elements with data-guidestar (or legacy data-wireframe-demo) attribute
+  // followed by data-guidestar-config (or data-wireframe-config) with a JSON value
+  const attrRegex = /data-(?:guidestar|wireframe-demo)[\s\S]*?data-(?:guidestar|wireframe)-config\s*=\s*'([\s\S]*?)'/g;
   let match: RegExpExecArray | null;
 
   while ((match = attrRegex.exec(content)) !== null) {
