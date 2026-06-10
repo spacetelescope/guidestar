@@ -8,6 +8,7 @@ Wireframe Demos
    ../wireframe/manual
    ../wireframe/ai-assisted-vue
    ../wireframe/ai-assisted-url
+   ../wireframe/ai-assisted-screenshots
    ../wireframe/live-url
 
 .. toctree::
