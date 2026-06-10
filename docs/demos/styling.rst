@@ -255,6 +255,8 @@ Or include it via the directive's ``:css:`` option:
       :steps: #btn@1500:click
 
 
+.. _css-isolation:
+
 Wireframe CSS isolation
 ------------------------
 

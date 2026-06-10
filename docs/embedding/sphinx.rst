@@ -66,6 +66,13 @@ Directive options
    * - ``:pause-on-interaction:``
      - ``true``
      - Pause on user click (``true`` / ``false``).
+   * - ``:reload-on-restart:``
+     - ``false``
+     - Re-fetch ``htmlSrc`` on every restart instead of restoring the
+       initial HTML snapshot (``true`` / ``false``).  Useful for live URL
+       sources where inline scripts add global event listeners on each
+       execution cycle.  Adds a network round-trip on restart.  See
+       :doc:`../wireframe/live-url` for full details.
    * - ``:css:``
      - —
      - Path to an additional CSS file to include.

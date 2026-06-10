@@ -510,6 +510,7 @@
             fullscreen: true,
             resizable: true,
             poweredby: true,
+            reloadOnRestart: false,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -1065,6 +1066,13 @@
                         self._scopeStyleEl = styleEl;
                     }
 
+                    // Remove any previously-injected scope style (e.g. on a reload-restart)
+                    // before injecting a fresh one so styles don't stack.
+                    if (self._scopeStyleEl) {
+                        self._scopeStyleEl.remove();
+                        self._scopeStyleEl = null;
+                    }
+
                     // Remove any <style> elements from the body so they don't leak when
                     // innerHTML is set (browsers process <style> anywhere in the DOM tree).
                     Array.from(parsedDoc.body.querySelectorAll('style')).forEach(function (s) { s.remove(); });
@@ -1354,7 +1362,28 @@
         this._stepIndex = 0;
         this._htmlSnapshots = [];
 
-        // Restore the content DOM to its initial state so the demo
+        // reloadOnRestart: re-fetch the source URL so the DOM is fully
+        // re-initialised, including all event listeners. This avoids the
+        // stale-closure problem that arises when innerHTML reset + _runScripts()
+        // is not enough to fully reset a live application page.
+        if (this.config.reloadOnRestart && this.config.htmlSrc) {
+            var self = this;
+            this._loadHTML(
+                this.config.htmlSrc,
+                this.config.htmlSrcSelector || null,
+                function () {
+                    self._runInitSteps(function () {
+                        self._initialHTML = self._contentRoot.innerHTML;
+                        self._htmlSnapshots = [];
+                        self._updateTimelineDots();
+                        self.play();
+                    });
+                }
+            );
+            return; // async path — play() called in callback above
+        }
+
+        // Default: restore the content DOM to its initial state so the demo
         // starts fresh (removes dynamically added viewers, sidebars, etc.)
         if (this._initialHTML !== undefined) {
             this._contentRoot.innerHTML = this._initialHTML;
