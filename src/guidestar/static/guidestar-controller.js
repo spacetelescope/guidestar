@@ -511,6 +511,7 @@
             resizable: true,
             poweredby: true,
             reloadOnRestart: false,
+            allowUserInteractions: false,
             onStepStart: null,
             onStepEnd: null,
             onComplete: null
@@ -555,6 +556,7 @@
         this._fullscreenBtn = null;
         this._resizeHandle = null;
         this._resizeBadge = null;
+        this._interactionBlocker = null;
 
         this._init();
     }
@@ -670,8 +672,10 @@
             this._createBrandingBadge();
         }
 
-        // Pause on user interaction
-        if (this.config.pauseOnInteraction) {
+        // Pause on user interaction — only when content is interactive.
+        // When allowUserInteractions: false the interaction blocker handles
+        // play/pause toggling; adding this listener too would double-trigger.
+        if (this.config.pauseOnInteraction && this.config.allowUserInteractions !== false) {
             container.addEventListener('click', function (e) {
                 if (!e.isTrusted) return;
                 // Ignore clicks on the controls host, fullscreen button, resize handle, timeline, or tooltip
@@ -687,6 +691,16 @@
                     self.pause();
                 }
             }, true); // capture phase
+        }
+
+        // Interaction blocker: a transparent glass pane over the content that
+        // intercepts all clicks so they toggle play/pause instead of activating
+        // links or form controls in the underlying wireframe / live source.
+        // Also active in static mode (no steps) — clicks are simply swallowed
+        // rather than reaching the embedded content.
+        // Disabled only when allowUserInteractions: true.
+        if (this.config.allowUserInteractions === false) {
+            this._createInteractionBlocker();
         }
 
         // Load / locate wireframe content, then start.
@@ -896,6 +910,43 @@
         this.container.appendChild(el);
         this._brandingEl = el;
     };
+
+    // ── Interaction blocker ──────────────────────────────────────────────────
+
+    /**
+     * Create a transparent glass-pane div that sits above the content root
+     * (z-index 1) but below all control overlays.  When allowUserInteractions
+     * is false (the default), this prevents clicks from reaching the underlying
+     * wireframe or live-URL source and instead toggles play/pause.
+     *
+     * The panel's position: absolute; inset: 0 means it exactly covers the
+     * container, relying on [data-guidestar]'s overflow: hidden to clip it.
+     */
+    Guidestar.prototype._createInteractionBlocker = function () {
+        var self = this;
+        var el = document.createElement('div');
+        el.className = 'gs-interaction-blocker';
+        el.setAttribute('aria-hidden', 'true');
+        this.container.appendChild(el);
+        this._interactionBlocker = el;
+
+        el.addEventListener('click', function (e) {
+            if (!e.isTrusted) return;
+            e.stopPropagation();
+            e.preventDefault();
+            // In static mode there is no playback to toggle.
+            if (self._isStatic) return;
+            if (self._playing) {
+                self._userPaused = true;
+                self._hideCursor();
+                self.pause();
+            } else {
+                self._userPaused = false;
+                self.play();
+            }
+        });
+    };
+
 
     // ── Scroll helpers ───────────────────────────────────────────────────────
 

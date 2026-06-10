@@ -119,6 +119,66 @@ The ``loading="lazy"`` attribute defers fetching until the iframe scrolls
 into view, keeping the initial page-load fast.
 
 
+Preventing user interaction with the source
+--------------------------------------------
+
+When using a live URL, the injected page is fully functional — buttons,
+links, accordions, and forms all work.  For demo purposes you almost
+always want to **prevent** viewers from interacting with the content so
+they don't accidentally navigate away, collapse a section mid-step, or
+submit a form.
+
+Guidestar's ``allowUserInteractions`` option (default: ``false``) places
+a transparent glass pane over the demo content.  All clicks on the
+content area toggle play/pause instead of reaching the underlying page.
+The playback controls, timeline, and fullscreen button are above the pane
+and always usable.
+
+.. code-block:: json
+
+   {
+     "htmlSrc": "https://example.com/app.html",
+     "allowUserInteractions": false
+   }
+
+In RST (the default — you don't need to specify it explicitly):
+
+.. code-block:: rst
+
+   .. guidestar-demo:: https://example.com/app.html
+
+To **allow** interaction (e.g. you want viewers to try the UI themselves
+while the demo is paused):
+
+.. code-block:: rst
+
+   .. guidestar-demo:: https://example.com/app.html
+      :allow-user-interactions: true
+      :pause-on-interaction: true
+
+.. note::
+
+   ``:pause-on-interaction:`` only takes effect when
+   ``:allow-user-interactions: true``.  With the default ``false``, all
+   content-area clicks are handled by the interaction blocker and
+   ``:pause-on-interaction:`` is ignored.
+
+For live URL sources, **always leave** ``allowUserInteractions`` at its
+default (``false``).  A viewer clicking a link in the embedded live page
+could navigate the live application to an unexpected state with no way to
+undo it short of a full reload.
+
+.. note::
+
+   With ``allowUserInteractions: false``, the overlay that intercepts
+   clicks also prevents text selection inside the demo.  Viewers cannot
+   copy text, URLs, or code snippets shown in the content.  If your demo
+   contains copyable text (e.g. a command shown in a terminal pane), set
+   ``allowUserInteractions: true`` — but only when using a static wireframe
+   where there is no risk of real navigation.  Never set it to ``true`` for
+   live-URL sources.
+
+
 Restart and timeline seek behaviour
 -------------------------------------
 

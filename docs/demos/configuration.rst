@@ -49,6 +49,32 @@ When creating a ``Guidestar`` programmatically or via the
      - bool
      - ``true``
      - Pause the demo when the user clicks inside the container.
+       Only active when ``allowUserInteractions`` is ``true``; has no
+       effect in the default ``allowUserInteractions: false`` mode because
+       all content-area clicks are handled by the interaction blocker
+       before they can reach this listener.
+   * - ``allowUserInteractions``
+     - bool
+     - ``false``
+     - When ``false`` (the default), a transparent overlay covers the demo
+       content so all pointer events over it are swallowed instead of
+       reaching the underlying wireframe or live-URL source.  In animated
+       demos, clicks on the content area toggle play/pause; in static
+       (single-frame) demos, clicks are simply discarded.  This prevents
+       viewers from accidentally activating links, submitting forms, or
+       navigating the embedded page in both modes.
+
+       **Side-effect:** because the overlay intercepts all pointer events,
+       users cannot select or copy text from the demo content while this
+       is active.  If your demo contains text that viewers should be able
+       to copy (e.g. command-line snippets shown in a terminal pane), set
+       ``allowUserInteractions: true`` — the ``pauseOnInteraction``
+       listener then resumes its role and clicks will pause playback
+       before reaching the content.
+
+       For live-URL sources, keep this at ``false`` to prevent viewers
+       from interacting with the real application.  See
+       :doc:`../wireframe/live-url`.
    * - ``cursor``
      - bool
      - ``true``
@@ -130,6 +156,16 @@ When creating a ``Guidestar`` programmatically or via the
        is hovered.  Set to ``false`` to hide the badge entirely.
 
        In the Sphinx directive, use ``:poweredby: false``.
+   * - ``reloadOnRestart``
+     - bool
+     - ``false``
+     - When ``true``, guidestar re-fetches ``htmlSrc`` on every restart
+       (and on every loop when ``repeat`` is ``true``) instead of restoring
+       the saved ``_initialHTML`` snapshot.  This guarantees a fully clean
+       DOM on each cycle, including all event listeners and closures, at the
+       cost of one network round-trip per restart.  Recommended only for
+       live-URL sources where inline scripts add global event listeners that
+       would otherwise stack.  See :doc:`../wireframe/live-url`.
    * - ``onStepStart``
      - function
      - ``null``

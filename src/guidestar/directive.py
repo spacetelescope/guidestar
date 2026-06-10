@@ -70,6 +70,7 @@ class GuidestarDirective(SphinxDirective):
         'resizable': str,
         'poweredby': str,
         'reload-on-restart': str,
+        'allow-user-interactions': str,
     }
 
     def run(self):
@@ -123,7 +124,8 @@ class GuidestarDirective(SphinxDirective):
         for opt, key in [('repeat', 'repeat'),
                          ('auto-start', 'autoStart'),
                          ('pause-on-interaction', 'pauseOnInteraction'),
-                         ('reload-on-restart', 'reloadOnRestart')]:
+                         ('reload-on-restart', 'reloadOnRestart'),
+                         ('allow-user-interactions', 'allowUserInteractions')]:
             val = self.options.get(opt)
             if val is not None:
                 config[key] = val.strip().lower() == 'true'
