@@ -23,6 +23,12 @@ the repository path and the list of components to focus on as needed.
    You are helping me build a guidestar wireframe — a self-contained HTML
    mockup used to animate a UI demo in documentation.
 
+   Before starting, read the guidestar documentation to understand the
+   wireframe format, step syntax, and available actions:
+     Docs:   https://spacetelescope.github.io/guidestar/
+     Steps:  https://spacetelescope.github.io/guidestar/demos/configuration.html
+     GitHub: https://github.com/spacetelescope/guidestar
+
    Please prompt for the location of the repository, explore the files, and
    produce a single file called wireframe.html that represents the main
    application shell.
