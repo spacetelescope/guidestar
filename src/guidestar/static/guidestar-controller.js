@@ -1107,21 +1107,21 @@
                             .replace(/\bbody\b/g, ':scope')
                             .replace(/\bhtml\b/g, ':scope')
                             .replace(/:root\b/g, ':scope');
+
+                        // Remove any previously-injected scope style (e.g. on a reload-restart)
+                        // before injecting a fresh one so styles don't stack.
+                        if (self._scopeStyleEl) {
+                            self._scopeStyleEl.remove();
+                            self._scopeStyleEl = null;
+                        }
+
                         var styleEl = document.createElement('style');
                         // @scope limits rule application to descendants of the content root.
                         // :scope inside @scope refers to the scope root (.gs-scope-xxx) itself.
                         styleEl.textContent = '@scope (.' + self._scopeClass + ') {\n' + remapped + '\n}';
                         styleEl.setAttribute('data-gs-scope', self._scopeClass);
                         document.head.appendChild(styleEl);
-                        // Track for potential future cleanup
                         self._scopeStyleEl = styleEl;
-                    }
-
-                    // Remove any previously-injected scope style (e.g. on a reload-restart)
-                    // before injecting a fresh one so styles don't stack.
-                    if (self._scopeStyleEl) {
-                        self._scopeStyleEl.remove();
-                        self._scopeStyleEl = null;
                     }
 
                     // Remove any <style> elements from the body so they don't leak when
