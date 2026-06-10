@@ -26,8 +26,8 @@ Step 1 — Load a source
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Enter a URL pointing to a wireframe HTML file, a hosted demo page, or paste
-a Sphinx directive block, then click **Load**.  The tool fetches the content
-and shows a coloured badge indicating what it found:
+a Sphinx directive block into the fallback text area, then click **Load**.
+The tool fetches the content and auto-detects the source type:
 
 - **Wireframe** — a plain HTML file to record steps against.
 - **Demo (HTML)** — an existing ``data-guidestar-config`` page; options and
@@ -37,7 +37,7 @@ and shows a coloured badge indicating what it found:
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=0,2"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=0,1"
            style="width:100%;height:320px;border:none;display:block" loading="lazy"
            title="Demo: Load a source"></iframe>
 
@@ -52,15 +52,15 @@ mode), and toggles for ``repeat``, ``cursor``, and ``timeline``.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=3,7"
-           style="width:100%;height:380px;border:none;display:block" loading="lazy"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=3,3"
+           style="width:100%;height:320px;border:none;display:block" loading="lazy"
            title="Demo: Set demo options"></iframe>
 
 
 Step 3 — Record steps
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Click **Enable Record Mode** — the wireframe area gains a red border and a
+Click **Enable Record Mode** — the wireframe gains a red border and a
 *Recording* badge.  Click any element inside the wireframe and a popup
 appears.  Choose the CSS selector from the ranked list of candidates, pick
 an action (``click``, ``type-text``, ``add-class``, etc.), set the delay and
@@ -68,8 +68,8 @@ an optional caption, then click **Add Step**.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=8,11"
-           style="width:100%;height:520px;border:none;display:block" loading="lazy"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=5,8"
+           style="width:100%;height:460px;border:none;display:block" loading="lazy"
            title="Demo: Record steps"></iframe>
 
 
@@ -88,7 +88,7 @@ wireframe, the card shows a red **⚠ Invalid selector** badge — see
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=12,15"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=10,12"
            style="width:100%;height:400px;border:none;display:block" loading="lazy"
            title="Demo: Edit steps"></iframe>
 
@@ -102,7 +102,7 @@ demo in full using the live guidestar player.  After editing steps, click
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=16,18"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=14,15"
            style="width:100%;height:280px;border:none;display:block" loading="lazy"
            title="Demo: Preview"></iframe>
 
@@ -116,7 +116,7 @@ the clipboard and paste it directly into your page or ``.rst`` file.
 
 .. raw:: html
 
-   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=19,23"
+   <iframe src="https://spacetelescope.github.io/guidestar/demos/web-tool/demo.html?range=17,20"
            style="width:100%;height:340px;border:none;display:block" loading="lazy"
            title="Demo: Copy output"></iframe>
 

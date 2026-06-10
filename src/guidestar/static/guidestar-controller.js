@@ -1117,9 +1117,11 @@
                         var cssText = styleEls.map(function (s) { return s.textContent; }).join('\n');
                         // Remap body/html/:root selectors to :scope so they style the
                         // content root container rather than the outer page body.
+                        // Use a negative lookbehind for '-' so compound class names like
+                        // .card-body, .modal-body, .step-body are NOT remapped.
                         var remapped = cssText
-                            .replace(/\bbody\b/g, ':scope')
-                            .replace(/\bhtml\b/g, ':scope')
+                            .replace(/(?<!-)\bbody\b/g, ':scope')
+                            .replace(/(?<!-)\bhtml\b/g, ':scope')
                             .replace(/:root\b/g, ':scope');
 
                         // Remove any previously-injected scope style (e.g. on a reload-restart)
@@ -2146,15 +2148,27 @@
             self._updateTooltip();
         };
 
-        // Animate cursor, then execute action
+        // Animate cursor, then execute action.
+        // When autoScroll is enabled, scroll the target into view first so the
+        // cursor animation lands on a visible element.
         if (this.config.cursor && el) {
             var cursorSpeed = this.config.cursorSpeed / this._speedFactor;
-            this._moveCursorTo(el, function () {
-                if (!self._playing) return;
-                self._executeAction(step, el, function () {
-                    afterAction(cursorSpeed);
+            var doMove = function () {
+                self._moveCursorTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(cursorSpeed);
+                    });
                 });
-            });
+            };
+            if (self.config.autoScroll && !step.noScroll && step.action !== 'pause') {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    doMove();
+                });
+            } else {
+                doMove();
+            }
         } else {
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
@@ -2283,15 +2297,27 @@
             }, remaining);
         };
 
-        // Animate cursor to target, then execute action
+        // Animate cursor to target, then execute action.
+        // When autoScroll is enabled, scroll the target into view first so the
+        // cursor animation lands on a visible element.
         if (this.config.cursor && el) {
             var cursorSpeed = this.config.cursorSpeed / this._speedFactor;
-            this._moveCursorTo(el, function () {
-                if (!self._playing) return;
-                self._executeAction(step, el, function () {
-                    afterAction(cursorSpeed);
+            var doMove = function () {
+                self._moveCursorTo(el, function () {
+                    if (!self._playing) return;
+                    self._executeAction(step, el, function () {
+                        afterAction(cursorSpeed);
+                    });
                 });
-            });
+            };
+            if (self.config.autoScroll && !step.noScroll && step.action !== 'pause') {
+                this._scrollTo(el, function () {
+                    if (!self._playing) return;
+                    doMove();
+                });
+            } else {
+                doMove();
+            }
         } else {
             if (this.config.cursor && !step.actions && step.action === 'pause') {
                 this._hideCursor();
@@ -2307,7 +2333,7 @@
                     });
                 });
             } else {
-                this._executeAction(step, el, function () {
+                self._executeAction(step, el, function () {
                     afterAction(0);
                 });
             }
