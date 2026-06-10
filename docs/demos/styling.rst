@@ -253,3 +253,54 @@ Or include it via the directive's ``:css:`` option:
    .. guidestar-demo:: _static/my-wireframe.html
       :css: _static/my-project-wireframe.css
       :steps: #btn@1500:click
+
+
+Wireframe CSS isolation
+------------------------
+
+When guidestar loads a wireframe HTML file, the full document (including
+its ``<style>`` blocks) is fetched and rendered.  Browsers apply
+``<style>`` elements globally — even those inserted inside a ``<div>`` —
+so a wireframe with rules like ``body { background: #111; font-size: 14px; }``
+would ordinarily leak those styles into the surrounding documentation page.
+
+Guidestar prevents this automatically using the CSS ``@scope`` rule
+(supported in Chrome 118+, Firefox 128+, Safari 17.4+).  When a wireframe
+is loaded, the controller:
+
+1. Parses the HTML with ``DOMParser`` to keep styles out of the live DOM.
+2. Collects all ``<style>`` blocks from the wireframe.
+3. Rewrites ``body``, ``html``, and ``:root`` selectors to ``:scope``
+   (which, inside ``@scope``, refers to the demo container element).
+4. Wraps the collected CSS in ``@scope (.gs-scope-xxxx) { … }`` and
+   injects it into ``<head>`` so it only applies inside that container.
+5. Sets the content div's ``innerHTML`` to the parsed body content only,
+   with no leftover ``<style>`` elements.
+
+In practice, wireframe authors write normal HTML and CSS without any
+special precautions — the isolation is transparent.
+
+.. note::
+
+   `@keyframes` rules are *not* scoped (they are inherently global and
+   browsers hoist them out of ``@scope``). If two wireframes on the same
+   page define keyframes with the same name, the second definition wins.
+   Use unique keyframe names (e.g. prefix with your project name) if this
+   matters.
+
+External stylesheets (``<link rel="stylesheet">``) in wireframes are
+fetched and applied globally and are not automatically scoped.  If your
+wireframe links to an external stylesheet, wrap the relevant rules in a
+selector that matches only your wireframe's root element instead of
+``body``:
+
+.. code-block:: css
+
+   /* Instead of: */
+   body { background: #1e1e2e; }
+
+   /* Use a root wrapper element: */
+   .my-app { background: #1e1e2e; }
+
+Alternatively, keep all styles inline (``<style>`` in the wireframe HTML)
+so guidestar can scope them automatically.

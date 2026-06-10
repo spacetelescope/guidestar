@@ -615,9 +615,13 @@
         // Inject highlight style
         ensureHighlightStyle();
 
-        // Create content root (where fetched HTML goes)
+        // Create content root (where fetched HTML goes).
+        // A unique scope class is added so wireframe styles can be isolated
+        // via CSS @scope without leaking into the host page.
         this._contentRoot = document.createElement('div');
         this._contentRoot.className = 'gs-content';
+        this._scopeClass = 'gs-scope-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        this._contentRoot.classList.add(this._scopeClass);
         container.appendChild(this._contentRoot);
 
         // Create controls overlay (Shadow DOM) — not needed in static mode
@@ -1032,7 +1036,39 @@
                     }
                     self._contentRoot.innerHTML = el.outerHTML;
                 } else {
-                    self._contentRoot.innerHTML = html;
+                    // Parse the full HTML document to isolate the wireframe's styles.
+                    // Setting innerHTML directly with a complete HTML document causes <style>
+                    // blocks (including body/html rules) to leak into the host page's stylesheet.
+                    // Instead we:
+                    //   1. Extract <style> elements and re-inject them scoped via CSS @scope
+                    //      so they only apply inside this demo's content root.
+                    //   2. Use only the parsed body content for innerHTML.
+                    var parsedDoc = new DOMParser().parseFromString(html, 'text/html');
+
+                    // Collect styles from <head> and any stray <style> blocks in <body>
+                    var styleEls = Array.from(parsedDoc.querySelectorAll('style'));
+                    if (styleEls.length > 0) {
+                        var cssText = styleEls.map(function (s) { return s.textContent; }).join('\n');
+                        // Remap body/html/:root selectors to :scope so they style the
+                        // content root container rather than the outer page body.
+                        var remapped = cssText
+                            .replace(/\bbody\b/g, ':scope')
+                            .replace(/\bhtml\b/g, ':scope')
+                            .replace(/:root\b/g, ':scope');
+                        var styleEl = document.createElement('style');
+                        // @scope limits rule application to descendants of the content root.
+                        // :scope inside @scope refers to the scope root (.gs-scope-xxx) itself.
+                        styleEl.textContent = '@scope (.' + self._scopeClass + ') {\n' + remapped + '\n}';
+                        styleEl.setAttribute('data-gs-scope', self._scopeClass);
+                        document.head.appendChild(styleEl);
+                        // Track for potential future cleanup
+                        self._scopeStyleEl = styleEl;
+                    }
+
+                    // Remove any <style> elements from the body so they don't leak when
+                    // innerHTML is set (browsers process <style> anywhere in the DOM tree).
+                    Array.from(parsedDoc.body.querySelectorAll('style')).forEach(function (s) { s.remove(); });
+                    self._contentRoot.innerHTML = parsedDoc.body.innerHTML;
                 }
                 self._runScripts();
                 // Dispatch event so external code can react (sets up toolbar handlers, etc.)

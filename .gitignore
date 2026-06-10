@@ -22,3 +22,8 @@ _site/
 # dist/ is committed for the action (required by GitHub Actions)
 !.github/actions/wireframe-review/dist/
 .github/actions/wireframe-review/dist/*.map
+
+# guidestar-controller.js in docs/_static is a stale duplicate; the canonical
+# source is src/guidestar/static/guidestar-controller.js which the Sphinx
+# extension copies into the build automatically via html_static_path.
+docs/_static/guidestar-controller.js
