@@ -440,3 +440,59 @@ If you hit the token limit, the PR comment will include guidance. Your options:
 
       with:
         max-prompt-tokens: '4000'
+
+
+Troubleshooting
+----------------
+
+"Resource not accessible by integration" when posting comment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This error means the ``GITHUB_TOKEN`` lacks the ``pull-requests: write``
+permission needed to create a PR comment. There are two places to check:
+
+**1. Workflow permissions block**
+
+Ensure your workflow job declares the required permissions:
+
+.. code-block:: yaml
+
+   jobs:
+     review:
+       runs-on: ubuntu-latest
+       permissions:
+         pull-requests: write
+         contents: write
+         models: read
+
+This must be present — a global ``permissions:`` key at the workflow level is
+not sufficient on its own for some organization configurations.
+
+**2. Repository / organization Actions settings**
+
+Even with the ``permissions:`` block, the organization or repository may
+restrict the default token to read-only. A repository admin needs to check:
+
+   **Settings → Actions → General → Workflow permissions**
+
+   Select either:
+
+   - *Read and write permissions*, or
+   - *Read repository contents and packages permissions* **plus** tick
+     *Allow GitHub Actions to create and approve pull requests*
+
+**3. Fork PRs**
+
+Pull requests opened from a **fork** receive a read-only ``GITHUB_TOKEN``
+by default — this is a GitHub security restriction that cannot be overridden
+with the ``permissions:`` block. The action will still run and log its
+analysis; the comment simply cannot be posted. To post comments on fork PRs
+you would need a separate ``pull_request_target`` trigger, which carries
+security implications and is not covered here.
+
+.. note::
+
+   As of the current version, a comment-posting failure will log a warning
+   but will **not** fail the action. The analysis still runs to completion
+   and the ``needs-update`` output is still set correctly.
+
