@@ -214,9 +214,18 @@ async function run(): Promise<void> {
     // ── Post comment ───────────────────────────────────────────────
     const anyUpdates = results.some(r => r.needsUpdate);
     const commentBody = formatComment(results, validationResults, { autoApplied: !!appliedPrUrl, appliedPrUrl });
-    await postComment(githubToken, commentBody, anyUpdates);
-
-    core.info('Wireframe review comment posted.');
+    try {
+      await postComment(githubToken, commentBody, anyUpdates);
+      core.info('Wireframe review comment posted.');
+    } catch (commentError) {
+      const msg = commentError instanceof Error ? commentError.message : String(commentError);
+      core.warning(`Could not post PR comment: ${msg}`);
+      core.warning(
+        'Ensure the workflow job has `pull-requests: write` permission. ' +
+        'Check repository/org Settings → Actions → General → Workflow permissions ' +
+        'and enable "Read and write permissions" or "Allow GitHub Actions to create and approve pull requests".'
+      );
+    }
 
     // Set outputs
     core.setOutput('needs-update', anyUpdates.toString());

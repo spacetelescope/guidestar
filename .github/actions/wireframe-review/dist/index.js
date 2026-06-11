@@ -31699,8 +31699,17 @@ async function run() {
         // ── Post comment ───────────────────────────────────────────────
         const anyUpdates = results.some(r => r.needsUpdate);
         const commentBody = (0, comment_1.formatComment)(results, validationResults, { autoApplied: !!appliedPrUrl, appliedPrUrl });
-        await (0, comment_1.postComment)(githubToken, commentBody, anyUpdates);
-        core.info('Wireframe review comment posted.');
+        try {
+            await (0, comment_1.postComment)(githubToken, commentBody, anyUpdates);
+            core.info('Wireframe review comment posted.');
+        }
+        catch (commentError) {
+            const msg = commentError instanceof Error ? commentError.message : String(commentError);
+            core.warning(`Could not post PR comment: ${msg}`);
+            core.warning('Ensure the workflow job has `pull-requests: write` permission. ' +
+                'Check repository/org Settings → Actions → General → Workflow permissions ' +
+                'and enable "Read and write permissions" or "Allow GitHub Actions to create and approve pull requests".');
+        }
         // Set outputs
         core.setOutput('needs-update', anyUpdates.toString());
         core.setOutput('demo-count', demos.length.toString());
