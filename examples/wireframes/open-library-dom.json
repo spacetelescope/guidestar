@@ -1,0 +1,40 @@
+{
+  "wireframe": "open-library-dom.html",
+  "title": "Open Library Dom",
+  "height": "460px",
+  "repeat": true,
+  "steps": [
+    {
+      "actions": [
+        {
+          "target": "#gs-capture-root",
+          "action": "remove-class",
+          "value": "gs-slide-active-0"
+        },
+        {
+          "target": "#gs-capture-root",
+          "action": "add-class",
+          "value": "gs-slide-active-1"
+        }
+      ],
+      "delay": 2000,
+      "caption": "Type a search query"
+    },
+    {
+      "actions": [
+        {
+          "target": "#gs-capture-root",
+          "action": "remove-class",
+          "value": "gs-slide-active-1"
+        },
+        {
+          "target": "#gs-capture-root",
+          "action": "add-class",
+          "value": "gs-slide-active-2"
+        }
+      ],
+      "delay": 3500,
+      "caption": "Results appear from the demo\u2019s mock data \u2014 no real API request was made"
+    }
+  ]
+}

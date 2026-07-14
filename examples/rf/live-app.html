@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<!--
+  Live demo page for the Robot Framework Capture documentation examples.
+
+  A simple package-registry search UI that calls a fictional API endpoint
+  (https://data.example.org/api/packages).  When loaded standalone the fetch
+  returns a "Could not reach the API" error — the page is designed to be
+  captured via guidestar-capture which intercepts the call with mock data via
+  page.route() before the request is made.
+
+  Viewport: 960px — use :viewport: 960 in any Guidestar directive.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package Registry Search</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 32px 24px 24px;
+  }
+
+  .app {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .app-header { margin-bottom: 24px; }
+
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .app-header p { font-size: 13px; color: #64748b; }
+
+  .search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  #pkg-input {
+    flex: 1;
+    padding: 9px 13px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #0f172a;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  #pkg-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+
+  #pkg-btn {
+    padding: 9px 18px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  #pkg-btn:hover  { background: #4f46e5; }
+  #pkg-btn:active { background: #4338ca; }
+  #pkg-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+  .result-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    padding: 13px 15px;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .result-icon {
+    width: 36px;
+    height: 36px;
+    background: #eef2ff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .result-body { flex: 1; min-width: 0; }
+
+  .result-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .result-desc { font-size: 12px; color: #64748b; line-height: 1.4; }
+
+  .result-meta {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .badge-version { background: #f0fdf4; color: #166534; }
+  .badge-lang    { background: #f0f9ff; color: #0369a1; }
+
+  .status {
+    padding: 28px 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+  }
+
+  .status-icon { font-size: 26px; margin-bottom: 6px; }
+  .error-msg   { color: #ef4444; }
+
+  /* ── Responsive layout ───────────────────────────────────────────────── */
+
+  /* Wide: two-column result grid */
+  @media (min-width: 560px) {
+    #results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+    .result-card { margin-bottom: 0; }
+    .result-desc { display: block; }
+  }
+
+  /* Narrow: stack the search row, hide descriptions, tighten padding */
+  @media (max-width: 440px) {
+    body { padding: 18px 12px 16px; }
+    .app-header { margin-bottom: 16px; }
+    .search-row { flex-direction: column; }
+    #pkg-btn { width: 100%; text-align: center; }
+    .result-desc { display: none; }
+    .result-card { padding: 9px 11px; }
+    .result-icon { width: 28px; height: 28px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <h1>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="8" height="8" rx="2" fill="#6366f1"/>
+        <rect x="13" y="3" width="8" height="8" rx="2" fill="#a5b4fc"/>
+        <rect x="3" y="13" width="8" height="8" rx="2" fill="#a5b4fc"/>
+        <rect x="13" y="13" width="8" height="8" rx="2" fill="#6366f1"/>
+      </svg>
+      Package Registry
+    </h1>
+    <p>Search packages from the registry API.</p>
+  </div>
+
+  <div class="search-row">
+    <input id="pkg-input" type="text"
+           placeholder="Search by name, keyword, or author…"
+           autocomplete="off">
+    <button id="pkg-btn" type="button">Search</button>
+  </div>
+
+  <div id="results">
+    <div class="status">
+      <div class="status-icon">📦</div>
+      Enter a search term to find packages.
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var btn  = document.getElementById('pkg-btn');
+  var inp  = document.getElementById('pkg-input');
+  var area = document.getElementById('results');
+
+  if (!btn) return;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function render(pkgs) {
+    if (!pkgs || !pkgs.length) {
+      area.innerHTML = '<div class="status"><div class="status-icon">🔍</div>No packages found.</div>';
+      return;
+    }
+    area.innerHTML = pkgs.map(function (p) {
+      return (
+        '<div class="result-card">' +
+          '<div class="result-icon">📦</div>' +
+          '<div class="result-body">' +
+            '<div class="result-name">' + esc(p.name) + '</div>' +
+            '<div class="result-desc">' + esc(p.description) + '</div>' +
+            '<div class="result-meta">' +
+              '<span class="badge badge-version">v' + esc(p.version) + '</span>' +
+              '<span class="badge badge-lang">' + esc(p.language) + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  function doSearch() {
+    var q = (inp.value || '').trim();
+    if (!q) return;
+
+    var orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    area.innerHTML = '<div class="status">Loading…</div>';
+
+    // API endpoint — intercepted by page.route() during Guidestar capture;
+    // returns an error when used standalone (the endpoint is fictional).
+    fetch('https://data.example.org/api/packages?q=' + encodeURIComponent(q) + '&limit=5')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) { render(d.packages || d); })
+      .catch(function (e) {
+        area.innerHTML =
+          '<div class="status error-msg"><div class="status-icon">⚠️</div>' +
+          'Could not reach the registry API: ' + esc(e.message) + '<br>' +
+          '<small style="color:#94a3b8">This page is designed to be used with guidestar-capture.</small></div>';
+      })
+      .finally(function () { btn.disabled = false; btn.textContent = orig; });
+  }
+
+  btn.addEventListener('click', doSearch);
+  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
+}());
+</script>
+</body>
+</html>

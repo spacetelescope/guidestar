@@ -330,3 +330,9 @@ Limitations
        changed in a way that breaks recorded step selectors.  Consider
        running the :doc:`../gh_actions/wireframe-review` action targeting
        the demo HTML files to catch broken selectors in CI.
+   * - **Complex SPAs and external origins**
+     - Single-page applications that rely on external JS bundles, client-side
+       routing, or cross-origin APIs cannot be loaded via ``htmlSrc`` reliably.
+       Use :doc:`rf-capture` instead: Playwright drives the real browser at
+       build time, API calls are mocked via ``page.route()``, and the output
+       is a static wireframe that Guidestar replays with no live page required.

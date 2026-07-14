@@ -1,0 +1,313 @@
+{
+  "messages": [],
+  "search_params": {
+    "target": [
+      "NGC 1300"
+    ],
+    "radius": 3.0,
+    "radius_units": "arcminutes",
+    "offset": 0,
+    "limit": 5,
+    "sort_by": [
+      "ang_sep",
+      "fileSetName",
+      "targprop"
+    ],
+    "sort_desc": [
+      false,
+      false,
+      false
+    ],
+    "skip_count": false,
+    "count_only": false,
+    "select_cols": [
+      "ArchiveFileID",
+      "fileSetName",
+      "productLevel",
+      "targprop",
+      "targ_ra",
+      "targ_dec",
+      "instrume",
+      "exp_type",
+      "opticalElements",
+      "date_obs",
+      "duration",
+      "program",
+      "observtn",
+      "visit",
+      "publicReleaseDate",
+      "pi_name",
+      "proposal_type",
+      "proposal_cycle",
+      "targtype",
+      "access",
+      "cal_ver",
+      "ang_sep",
+      "includedLevels",
+      "s_region"
+    ],
+    "search_key": [],
+    "user_fields": [],
+    "conditions": []
+  },
+  "totalResults": 5,
+  "info": [
+    {
+      "name": "ArchiveFileID",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "fileSetName",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "productLevel",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "targprop",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "targ_ra",
+      "type": "double",
+      "sortable": "yes"
+    },
+    {
+      "name": "targ_dec",
+      "type": "double",
+      "sortable": "yes"
+    },
+    {
+      "name": "instrume",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "exp_type",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "opticalElements",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "date_obs",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "duration",
+      "type": "float",
+      "sortable": "yes"
+    },
+    {
+      "name": "program",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "observtn",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "visit",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "publicReleaseDate",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "pi_name",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "proposal_type",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "proposal_cycle",
+      "type": "long",
+      "sortable": "no"
+    },
+    {
+      "name": "targtype",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "access",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "cal_ver",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "ang_sep",
+      "type": "float",
+      "sortable": "no"
+    },
+    {
+      "name": "s_region",
+      "type": "char",
+      "sortable": "yes"
+    }
+  ],
+  "results": [
+    {
+      "ArchiveFileID": 236924201,
+      "fileSetName": "jw02107002001_02101_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T14:53:08.6650000",
+      "duration": 22.2,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924201",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920997609 -19.424844671 49.952917896 -19.416358066 49.943922523 -19.386112215 49.911872305 -19.394332139",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:02",
+      "opticalElements": "F770W",
+      "access": "PUBLIC",
+      "includedLevels": null
+    },
+    {
+      "ArchiveFileID": 236924195,
+      "fileSetName": "jw02107002001_02101_00003",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T14:54:56.8890000",
+      "duration": 22.2,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924195",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920352335 -19.420411296 49.952271787 -19.411924809 49.943276785 -19.381678924 49.911227406 -19.389898731",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:03",
+      "opticalElements": "F770W",
+      "access": "PUBLIC",
+      "includedLevels": null
+    },
+    {
+      "ArchiveFileID": 236924182,
+      "fileSetName": "jw02107002001_02103_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:02:45.9390000",
+      "duration": 30.525,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924182",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920979894 -19.424853313 49.952899663 -19.416367074 49.943904301 -19.386120983 49.911854576 -19.394340984",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:06",
+      "opticalElements": "F1000W",
+      "access": "PUBLIC",
+      "includedLevels": null
+    },
+    {
+      "ArchiveFileID": 236924094,
+      "fileSetName": "jw02107002001_02103_00003",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:04:36.9150000",
+      "duration": 30.525,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924094",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920334775 -19.420419951 49.952253708 -19.411933827 49.943258715 -19.381687704 49.911209829 -19.389907589",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:05",
+      "opticalElements": "F1000W",
+      "access": "PUBLIC",
+      "includedLevels": null
+    },
+    {
+      "ArchiveFileID": 236925923,
+      "fileSetName": "jw02107002001_02105_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:12:14.8270000",
+      "duration": 77.701,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236925923",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920978204 -19.424844267 49.952898153 -19.416357951 49.943902614 -19.386111907 49.911852988 -19.394331826",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:26:54",
+      "opticalElements": "F1130W",
+      "access": "PUBLIC",
+      "includedLevels": null
+    }
+  ]
+}

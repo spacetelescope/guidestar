@@ -9,6 +9,7 @@ Wireframe Demos
    ../wireframe/ai-assisted-vue
    ../wireframe/ai-assisted-url
    ../wireframe/ai-assisted-screenshots
+   ../wireframe/rf-capture
    ../wireframe/live-url
 
 .. toctree::
