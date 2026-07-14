@@ -1,97 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.2 (Python 3.11.15 on darwin)" generated="2026-07-14T13:07:48.176272" rpa="false" schemaversion="5">
-<suite id="s1" name="Open-Library-Screenshot" source="/Users/kconroy/repos/docs-wireframe-demo/examples/rf/open-library-screenshot.robot">
-<test id="s1-t1" name="Package Registry Search Screenshot Demo" line="29">
+<robot generator="Robot 7.4.2 (Python 3.11.15 on darwin)" generated="2026-07-14T13:45:37.125709" rpa="false" schemaversion="5">
+<suite id="s1" name="Mast-Jwst-Dom" source="/Users/kconroy/repos/docs-wireframe-demo/examples/rf/mast-jwst-dom.robot">
+<test id="s1-t1" name="MAST JWST Search Screenshot" line="16">
 <kw name="Route Api" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:48.221754" level="INFO">[capture] Route registered: **/api/packages**</msg>
-<arg>**/api/packages**</arg>
+<msg time="2026-07-14T13:45:37.164713" level="INFO">[capture] Route registered: **/search/jwst/api/v0.1/search**</msg>
+<arg>**/search/jwst/api/v0.1/search**</arg>
 <arg>body_file=${MOCK_FILE}</arg>
 <doc>Intercept requests matching *url_pattern* and return mock data.</doc>
-<status status="PASS" start="2026-07-14T13:07:48.221601" elapsed="0.000184"/>
+<status status="PASS" start="2026-07-14T13:45:37.164555" elapsed="0.000202"/>
 </kw>
 <kw name="Open Capture" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:48.991047" level="INFO">[capture] Opened file:///Users/kconroy/repos/docs-wireframe-demo/examples/rf/live-app.html at 960×460</msg>
-<arg>${APP_URL}</arg>
-<arg>wait_until=load</arg>
+<msg time="2026-07-14T13:45:38.852911" level="INFO">[capture] Opened https://mast.stsci.edu/search/ui/#/jwst at 1440×720</msg>
+<arg>${MAST_URL}</arg>
+<arg>wait_until=networkidle</arg>
 <doc>Open a browser and navigate to *url*.</doc>
-<status status="PASS" start="2026-07-14T13:07:48.221851" elapsed="0.769348"/>
+<status status="PASS" start="2026-07-14T13:45:37.164831" elapsed="1.688288"/>
 </kw>
 <kw name="Wait For Selector" owner="guidestar.rf.GuidestarCapture">
-<arg>${SEL_BTN}</arg>
-<arg>timeout=5000</arg>
-<doc>Wait until *selector* is in the given *state* (default ``visible``).</doc>
-<status status="PASS" start="2026-07-14T13:07:48.991403" elapsed="0.020194"/>
-</kw>
-<kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:49.041632" level="INFO">[capture] Step 0: '^Package Registry Search' (screenshot mode)</msg>
-<arg>caption=^Package Registry Search</arg>
-<arg>delay=2000</arg>
-<doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.011778" elapsed="0.029924"/>
-</kw>
-<kw name="Fill Text" owner="guidestar.rf.GuidestarCapture">
 <arg>${SEL_INPUT}</arg>
-<arg>astronomy</arg>
-<doc>Fill a form field identified by *selector*.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.041810" elapsed="0.012630"/>
+<arg>timeout=20000</arg>
+<doc>Wait until *selector* is in the given *state* (default ``visible``).</doc>
+<status status="PASS" start="2026-07-14T13:45:38.853434" elapsed="0.024257"/>
 </kw>
 <kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
-<arg>300</arg>
+<arg>500</arg>
 <doc>Wait for *ms* milliseconds (useful between interactions).</doc>
-<status status="PASS" start="2026-07-14T13:07:49.054575" elapsed="0.302169"/>
+<status status="PASS" start="2026-07-14T13:45:38.877829" elapsed="0.503053"/>
 </kw>
 <kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:49.379486" level="INFO">[capture] Step 1: 'Type a search query' (screenshot mode)</msg>
-<arg>caption=Type a search query</arg>
-<arg>delay=2000</arg>
+<msg time="2026-07-14T13:45:39.538839" level="INFO">[capture] Step 0: '^The JWST Observation Search form' (dom mode)</msg>
+<arg>caption=^The JWST Observation Search form</arg>
+<arg>delay=2500</arg>
 <doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.356868" elapsed="0.022683"/>
+<status status="PASS" start="2026-07-14T13:45:39.381089" elapsed="0.157816"/>
 </kw>
 <kw name="Click Element" owner="guidestar.rf.GuidestarCapture">
-<arg>${SEL_BTN}</arg>
+<arg>${SEL_INPUT}</arg>
 <doc>Click the element identified by *selector*.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.379671" elapsed="0.023649"/>
-</kw>
-<kw name="Wait For Selector" owner="guidestar.rf.GuidestarCapture">
-<arg>${SEL_RESULT}</arg>
-<arg>timeout=6000</arg>
-<doc>Wait until *selector* is in the given *state* (default ``visible``).</doc>
-<status status="PASS" start="2026-07-14T13:07:49.403456" elapsed="0.021063"/>
+<status status="PASS" start="2026-07-14T13:45:39.539012" elapsed="0.045216"/>
 </kw>
 <kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
 <arg>200</arg>
 <doc>Wait for *ms* milliseconds (useful between interactions).</doc>
-<status status="PASS" start="2026-07-14T13:07:49.424633" elapsed="0.203458"/>
+<status status="PASS" start="2026-07-14T13:45:39.584341" elapsed="0.201805"/>
+</kw>
+<kw name="Fill Text" owner="guidestar.rf.GuidestarCapture">
+<arg>${SEL_INPUT}</arg>
+<arg>NGC 1300</arg>
+<doc>Fill a form field identified by *selector*.</doc>
+<status status="PASS" start="2026-07-14T13:45:39.786368" elapsed="0.010902"/>
+</kw>
+<kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
+<arg>800</arg>
+<doc>Wait for *ms* milliseconds (useful between interactions).</doc>
+<status status="PASS" start="2026-07-14T13:45:39.797528" elapsed="0.803666"/>
 </kw>
 <kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:49.652515" level="INFO">[capture] Step 2: 'Results appear from the demo’s mock data — no real API request was made' (screenshot mode)</msg>
-<arg>caption=Results appear from the demo\u2019s mock data \u2014 no real API request was made</arg>
+<msg time="2026-07-14T13:45:40.750053" level="INFO">[capture] Step 1: 'Enter an object name or sky coordinates' (dom mode)</msg>
+<arg>caption=Enter an object name or sky coordinates</arg>
+<arg>delay=2200</arg>
+<doc>Capture the current page state as a demo step.</doc>
+<status status="PASS" start="2026-07-14T13:45:40.601327" elapsed="0.148794"/>
+</kw>
+<kw name="Click Element" owner="guidestar.rf.GuidestarCapture">
+<arg>${SEL_SEARCH}</arg>
+<doc>Click the element identified by *selector*.</doc>
+<status status="PASS" start="2026-07-14T13:45:40.750215" elapsed="0.042548"/>
+</kw>
+<kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
+<arg>4000</arg>
+<doc>Wait for *ms* milliseconds (useful between interactions).</doc>
+<status status="PASS" start="2026-07-14T13:45:40.792889" elapsed="4.002117"/>
+</kw>
+<kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
+<msg time="2026-07-14T13:45:44.959182" level="INFO">[capture] Step 2: 'Search results load from the mock API' (dom mode)</msg>
+<arg>caption=Search results load from the mock API</arg>
 <arg>delay=3500</arg>
 <doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.628275" elapsed="0.024329"/>
+<status status="PASS" start="2026-07-14T13:45:44.795134" elapsed="0.164116"/>
+</kw>
+<kw name="Evaluate" owner="guidestar.rf.GuidestarCapture">
+<msg time="2026-07-14T13:45:44.959340" level="WARN">Keyword 'Evaluate' found both from a custom library 'guidestar.rf.GuidestarCapture' and a standard library 'BuiltIn'. The custom keyword is used. To select explicitly, and to get rid of this warning, use either 'guidestar.rf.GuidestarCapture.Evaluate' or 'BuiltIn.Evaluate'.</msg>
+<arg>window.scrollTo(0, 600)</arg>
+<doc>Evaluate a JavaScript *expression* in the page context and return result.</doc>
+<status status="PASS" start="2026-07-14T13:45:44.959372" elapsed="0.002266"/>
+</kw>
+<kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
+<arg>600</arg>
+<doc>Wait for *ms* milliseconds (useful between interactions).</doc>
+<status status="PASS" start="2026-07-14T13:45:44.961742" elapsed="0.601733"/>
+</kw>
+<kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
+<msg time="2026-07-14T13:45:45.734729" level="INFO">[capture] Step 3: 'Scroll through the observation list' (dom mode)</msg>
+<arg>caption=Scroll through the observation list</arg>
+<arg>delay=2500</arg>
+<doc>Capture the current page state as a demo step.</doc>
+<status status="PASS" start="2026-07-14T13:45:45.563608" elapsed="0.171188"/>
 </kw>
 <kw name="Export Demo" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T13:07:49.697918" level="INFO">[capture] Wrote wireframe: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot.html
-  [capture] Wrote config:    /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot.json
-  [capture] Wrote standalone: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot-standalone.html
-  [capture] Done. 3 step(s) captured.</msg>
-<arg>open-library-screenshot</arg>
-<arg>out_dir=/Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes</arg>
+<msg time="2026-07-14T13:45:46.726529" level="INFO">[capture] Wrote wireframe: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../../examples/wireframes/mast-jwst-dom.html
+  [capture] Wrote config:    /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../../examples/wireframes/mast-jwst-dom.json
+  [capture] Wrote standalone: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../../examples/wireframes/mast-jwst-dom-standalone.html
+  [capture] Done. 4 step(s) captured.</msg>
+<arg>mast-jwst-dom</arg>
+<arg>out_dir=/Users/kconroy/repos/docs-wireframe-demo/examples/rf/../../examples/wireframes</arg>
 <arg>standalone=True</arg>
 <doc>Write wireframe HTML and JSON demo config to *out_dir*.</doc>
-<status status="PASS" start="2026-07-14T13:07:49.652700" elapsed="0.045293"/>
+<status status="PASS" start="2026-07-14T13:45:45.734898" elapsed="0.991727"/>
 </kw>
-<status status="PASS" start="2026-07-14T13:07:48.221145" elapsed="1.476978"/>
+<status status="PASS" start="2026-07-14T13:45:37.164123" elapsed="9.562628"/>
 </test>
-<doc>Captures the Open Library search demo in both screenshot and DOM modes.
-Used to produce the side-by-side comparison embedded in the
-Robot Framework Capture documentation page (docs/wireframe/rf-capture.rst).
-
-Run:
-    conda run -n wireframe-demo guidestar-capture         examples/rf/open-library-screenshot.robot         --out examples/wireframes --standalone
-
-    conda run -n wireframe-demo guidestar-capture         examples/rf/open-library-dom.robot         --out examples/wireframes --standalone</doc>
-<status status="PASS" start="2026-07-14T13:07:48.177098" elapsed="1.521276"/>
+<doc>DOM-mode capture of MAST JWST Observation Search.</doc>
+<status status="PASS" start="2026-07-14T13:45:37.126749" elapsed="9.602398"/>
 </suite>
 <statistics>
 <total>
@@ -100,9 +120,10 @@ Run:
 <tag>
 </tag>
 <suite>
-<stat name="Open-Library-Screenshot" id="s1" pass="1" fail="0" skip="0">Open-Library-Screenshot</stat>
+<stat name="Mast-Jwst-Dom" id="s1" pass="1" fail="0" skip="0">Mast-Jwst-Dom</stat>
 </suite>
 </statistics>
 <errors>
+<msg time="2026-07-14T13:45:44.959340" level="WARN">Keyword 'Evaluate' found both from a custom library 'guidestar.rf.GuidestarCapture' and a standard library 'BuiltIn'. The custom keyword is used. To select explicitly, and to get rid of this warning, use either 'guidestar.rf.GuidestarCapture.Evaluate' or 'BuiltIn.Evaluate'.</msg>
 </errors>
 </robot>

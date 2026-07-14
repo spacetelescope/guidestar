@@ -59,6 +59,9 @@ jobs:
           mkdir -p _site/demos/rf-capture
           cp examples/wireframes/open-library-screenshot-standalone.html _site/demos/rf-capture/screenshot-demo.html
           cp examples/wireframes/open-library-dom-standalone.html _site/demos/rf-capture/dom-demo.html
+          mkdir -p _site/demos/mast-jwst
+          cp examples/wireframes/mast-jwst-search-standalone.html _site/demos/mast-jwst/screenshot-demo.html
+          cp examples/wireframes/mast-jwst-dom-standalone.html _site/demos/mast-jwst/dom-demo.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

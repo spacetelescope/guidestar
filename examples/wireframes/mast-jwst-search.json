@@ -1,0 +1,57 @@
+{
+  "wireframe": "mast-jwst-search.html",
+  "title": "Mast Jwst Search",
+  "height": "720px",
+  "repeat": true,
+  "steps": [
+    {
+      "actions": [
+        {
+          "target": "#gs-capture-root",
+          "action": "remove-class",
+          "value": "gs-slide-active-0"
+        },
+        {
+          "target": "#gs-capture-root",
+          "action": "add-class",
+          "value": "gs-slide-active-1"
+        }
+      ],
+      "delay": 2200,
+      "caption": "Enter an object name or sky coordinates"
+    },
+    {
+      "actions": [
+        {
+          "target": "#gs-capture-root",
+          "action": "remove-class",
+          "value": "gs-slide-active-1"
+        },
+        {
+          "target": "#gs-capture-root",
+          "action": "add-class",
+          "value": "gs-slide-active-2"
+        }
+      ],
+      "delay": 3500,
+      "caption": "Search results load from the mock API"
+    },
+    {
+      "actions": [
+        {
+          "target": "#gs-capture-root",
+          "action": "remove-class",
+          "value": "gs-slide-active-2"
+        },
+        {
+          "target": "#gs-capture-root",
+          "action": "add-class",
+          "value": "gs-slide-active-3"
+        }
+      ],
+      "delay": 2500,
+      "caption": "Scroll through the observation list"
+    }
+  ],
+  "viewport": 1440
+}

@@ -1,149 +1,313 @@
 {
-  "_comment": "Mock response for the MAST v0.1 search API endpoint: /api/v0.1/missions/search",
-  "_note": "This fixture matches the real MAST JSON envelope. Fields are a subset of those returned for JWST NIRCam observations of NGC 1300. Update target_name / coordinates to match your demo query.",
-
-  "status": "COMPLETE",
-  "msg": "",
-  "paging": {
-    "page": 1,
-    "pageSize": 25,
-    "pagesFiltered": 1,
-    "rows": 10,
-    "rowsFiltered": 10,
-    "rowsTotal": 10
+  "messages": [],
+  "search_params": {
+    "target": [
+      "NGC 1300"
+    ],
+    "radius": 3.0,
+    "radius_units": "arcminutes",
+    "offset": 0,
+    "limit": 5,
+    "sort_by": [
+      "ang_sep",
+      "fileSetName",
+      "targprop"
+    ],
+    "sort_desc": [
+      false,
+      false,
+      false
+    ],
+    "skip_count": false,
+    "count_only": false,
+    "select_cols": [
+      "ArchiveFileID",
+      "fileSetName",
+      "productLevel",
+      "targprop",
+      "targ_ra",
+      "targ_dec",
+      "instrume",
+      "exp_type",
+      "opticalElements",
+      "date_obs",
+      "duration",
+      "program",
+      "observtn",
+      "visit",
+      "publicReleaseDate",
+      "pi_name",
+      "proposal_type",
+      "proposal_cycle",
+      "targtype",
+      "access",
+      "cal_ver",
+      "ang_sep",
+      "includedLevels",
+      "s_region"
+    ],
+    "search_key": [],
+    "user_fields": [],
+    "conditions": []
   },
-  "fields": [
-    {"name": "obs_id",           "type": "string"},
-    {"name": "target_name",      "type": "string"},
-    {"name": "instrument_name",  "type": "string"},
-    {"name": "filters",          "type": "string"},
-    {"name": "t_exptime",        "type": "float"},
-    {"name": "calib_level",      "type": "int"},
-    {"name": "obs_collection",   "type": "string"},
-    {"name": "proposal_id",      "type": "string"},
-    {"name": "t_min",            "type": "float"},
-    {"name": "dataproduct_type", "type": "string"}
+  "totalResults": 5,
+  "info": [
+    {
+      "name": "ArchiveFileID",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "fileSetName",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "productLevel",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "targprop",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "targ_ra",
+      "type": "double",
+      "sortable": "yes"
+    },
+    {
+      "name": "targ_dec",
+      "type": "double",
+      "sortable": "yes"
+    },
+    {
+      "name": "instrume",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "exp_type",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "opticalElements",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "date_obs",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "duration",
+      "type": "float",
+      "sortable": "yes"
+    },
+    {
+      "name": "program",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "observtn",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "visit",
+      "type": "long",
+      "sortable": "yes"
+    },
+    {
+      "name": "publicReleaseDate",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "pi_name",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "proposal_type",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "proposal_cycle",
+      "type": "long",
+      "sortable": "no"
+    },
+    {
+      "name": "targtype",
+      "type": "char",
+      "sortable": "yes"
+    },
+    {
+      "name": "access",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "cal_ver",
+      "type": "char",
+      "sortable": "no"
+    },
+    {
+      "name": "ang_sep",
+      "type": "float",
+      "sortable": "no"
+    },
+    {
+      "name": "s_region",
+      "type": "char",
+      "sortable": "yes"
+    }
   ],
-  "data": [
+  "results": [
     {
-      "obs_id":           "jw01783001001_02101_00001_nrcb1",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F200W",
-      "t_exptime":        1289.674,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.12,
-      "dataproduct_type": "image"
+      "ArchiveFileID": 236924201,
+      "fileSetName": "jw02107002001_02101_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T14:53:08.6650000",
+      "duration": 22.2,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924201",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920997609 -19.424844671 49.952917896 -19.416358066 49.943922523 -19.386112215 49.911872305 -19.394332139",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:02",
+      "opticalElements": "F770W",
+      "access": "PUBLIC",
+      "includedLevels": null
     },
     {
-      "obs_id":           "jw01783001001_02101_00002_nrcb2",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F277W",
-      "t_exptime":        1289.674,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.12,
-      "dataproduct_type": "image"
+      "ArchiveFileID": 236924195,
+      "fileSetName": "jw02107002001_02101_00003",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T14:54:56.8890000",
+      "duration": 22.2,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924195",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920352335 -19.420411296 49.952271787 -19.411924809 49.943276785 -19.381678924 49.911227406 -19.389898731",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:03",
+      "opticalElements": "F770W",
+      "access": "PUBLIC",
+      "includedLevels": null
     },
     {
-      "obs_id":           "jw01783001001_02101_00003_nrcb3",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F356W",
-      "t_exptime":        2579.348,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.15,
-      "dataproduct_type": "image"
+      "ArchiveFileID": 236924182,
+      "fileSetName": "jw02107002001_02103_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:02:45.9390000",
+      "duration": 30.525,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924182",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920979894 -19.424853313 49.952899663 -19.416367074 49.943904301 -19.386120983 49.911854576 -19.394340984",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:06",
+      "opticalElements": "F1000W",
+      "access": "PUBLIC",
+      "includedLevels": null
     },
     {
-      "obs_id":           "jw01783001001_02101_00004_nrcb4",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F444W",
-      "t_exptime":        2579.348,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.15,
-      "dataproduct_type": "image"
+      "ArchiveFileID": 236924094,
+      "fileSetName": "jw02107002001_02103_00003",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:04:36.9150000",
+      "duration": 30.525,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236924094",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920334775 -19.420419951 49.952253708 -19.411933827 49.943258715 -19.381687704 49.911209829 -19.389907589",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:27:05",
+      "opticalElements": "F1000W",
+      "access": "PUBLIC",
+      "includedLevels": null
     },
     {
-      "obs_id":           "jw01783001001_04101_00001_nrca1",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F115W",
-      "t_exptime":        644.837,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.18,
-      "dataproduct_type": "image"
-    },
-    {
-      "obs_id":           "jw01783001001_04101_00002_nrca2",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRCAM",
-      "filters":          "F150W",
-      "t_exptime":        644.837,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "1783",
-      "t_min":            59945.19,
-      "dataproduct_type": "image"
-    },
-    {
-      "obs_id":           "jw02107001001_02101_00001_mirimage",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "MIRI",
-      "filters":          "F770W",
-      "t_exptime":        3218.36,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "2107",
-      "t_min":            59980.44,
-      "dataproduct_type": "image"
-    },
-    {
-      "obs_id":           "jw02107001001_02101_00002_mirimage",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "MIRI",
-      "filters":          "F1000W",
-      "t_exptime":        3218.36,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "2107",
-      "t_min":            59980.44,
-      "dataproduct_type": "image"
-    },
-    {
-      "obs_id":           "jw02107001001_02101_00003_mirimage",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "MIRI",
-      "filters":          "F1500W",
-      "t_exptime":        4827.54,
-      "calib_level":      3,
-      "obs_collection":   "JWST",
-      "proposal_id":      "2107",
-      "t_min":            59980.47,
-      "dataproduct_type": "image"
-    },
-    {
-      "obs_id":           "jw02107001001_06101_00001_nis",
-      "target_name":      "NGC-1300",
-      "instrument_name":  "NIRISS",
-      "filters":          "CLEAR;F150W",
-      "t_exptime":        5239.12,
-      "calib_level":      2,
-      "obs_collection":   "JWST",
-      "proposal_id":      "2107",
-      "t_min":            59981.02,
-      "dataproduct_type": "spectrum"
+      "ArchiveFileID": 236925923,
+      "fileSetName": "jw02107002001_02105_00002",
+      "productLevel": "1b, 2a, 2b, 2c",
+      "targprop": "NGC-1300",
+      "targ_ra": 49.91742333333333,
+      "targ_dec": -19.41313333333335,
+      "instrume": "MIRI",
+      "exp_type": "MIR_IMAGE",
+      "date_obs": "2023-01-25T15:12:14.8270000",
+      "duration": 77.701,
+      "program": 2107,
+      "observtn": 2,
+      "visit": 1,
+      "pi_name": "Lee, Janice",
+      "targtype": "FIXED",
+      "search_key": "236925923",
+      "cal_ver": "2.0.1",
+      "s_region": "POLYGON ICRS  49.920978204 -19.424844267 49.952898153 -19.416357951 49.943902614 -19.386111907 49.911852988 -19.394331826",
+      "ang_sep": 0,
+      "search_pos": "49.92103 -19.41116",
+      "proposal_type": "GO",
+      "proposal_cycle": 1,
+      "publicReleaseDate": "2025-05-29T09:26:54",
+      "opticalElements": "F1130W",
+      "access": "PUBLIC",
+      "includedLevels": null
     }
   ]
 }
