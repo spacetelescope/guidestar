@@ -225,12 +225,10 @@ are in ``examples/rf/`` and the wireframes were generated locally with:
 
 .. code-block:: bash
 
-   conda run -n wireframe-demo guidestar-capture \
-       examples/rf/open-library-screenshot.robot \
+   guidestar-capture examples/rf/open-library-screenshot.robot \
        --out examples/wireframes --standalone
 
-   conda run -n wireframe-demo guidestar-capture \
-       examples/rf/open-library-dom.robot \
+   guidestar-capture examples/rf/open-library-dom.robot \
        --out examples/wireframes --standalone
 
 **Screenshot mode** — each step is a pixel-perfect PNG; the cursor points to

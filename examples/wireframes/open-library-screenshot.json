@@ -2,7 +2,6 @@
   "wireframe": "open-library-screenshot.html",
   "title": "Open Library Screenshot",
   "height": "460px",
-  "viewport": 960,
   "repeat": true,
   "steps": [
     {
@@ -37,5 +36,6 @@
       "delay": 3500,
       "caption": "Results appear from the demo\u2019s mock data \u2014 no real API request was made"
     }
-  ]
+  ],
+  "viewport": 960
 }

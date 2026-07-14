@@ -1,97 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.2 (Python 3.11.15 on darwin)" generated="2026-07-14T12:45:14.755455" rpa="false" schemaversion="5">
-<suite id="s1" name="Open-Library-Dom" source="/Users/kconroy/repos/docs-wireframe-demo/examples/rf/open-library-dom.robot">
+<robot generator="Robot 7.4.2 (Python 3.11.15 on darwin)" generated="2026-07-14T13:07:48.176272" rpa="false" schemaversion="5">
+<suite id="s1" name="Open-Library-Screenshot" source="/Users/kconroy/repos/docs-wireframe-demo/examples/rf/open-library-screenshot.robot">
 <test id="s1-t1" name="Package Registry Search Screenshot Demo" line="29">
 <kw name="Route Api" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:14.795650" level="INFO">[capture] Route registered: **/api/packages**</msg>
+<msg time="2026-07-14T13:07:48.221754" level="INFO">[capture] Route registered: **/api/packages**</msg>
 <arg>**/api/packages**</arg>
 <arg>body_file=${MOCK_FILE}</arg>
 <doc>Intercept requests matching *url_pattern* and return mock data.</doc>
-<status status="PASS" start="2026-07-14T12:45:14.795511" elapsed="0.000168"/>
+<status status="PASS" start="2026-07-14T13:07:48.221601" elapsed="0.000184"/>
 </kw>
 <kw name="Open Capture" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:15.925308" level="INFO">[capture] Opened file:///Users/kconroy/repos/docs-wireframe-demo/examples/rf/live-app.html at 960×460</msg>
+<msg time="2026-07-14T13:07:48.991047" level="INFO">[capture] Opened file:///Users/kconroy/repos/docs-wireframe-demo/examples/rf/live-app.html at 960×460</msg>
 <arg>${APP_URL}</arg>
 <arg>wait_until=load</arg>
 <doc>Open a browser and navigate to *url*.</doc>
-<status status="PASS" start="2026-07-14T12:45:14.795741" elapsed="1.129745"/>
+<status status="PASS" start="2026-07-14T13:07:48.221851" elapsed="0.769348"/>
 </kw>
 <kw name="Wait For Selector" owner="guidestar.rf.GuidestarCapture">
 <arg>${SEL_BTN}</arg>
 <arg>timeout=5000</arg>
 <doc>Wait until *selector* is in the given *state* (default ``visible``).</doc>
-<status status="PASS" start="2026-07-14T12:45:15.925779" elapsed="0.031910"/>
+<status status="PASS" start="2026-07-14T13:07:48.991403" elapsed="0.020194"/>
 </kw>
 <kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:15.965927" level="INFO">[capture] Step 0: '^Package Registry Search' (dom mode)</msg>
+<msg time="2026-07-14T13:07:49.041632" level="INFO">[capture] Step 0: '^Package Registry Search' (screenshot mode)</msg>
 <arg>caption=^Package Registry Search</arg>
 <arg>delay=2000</arg>
 <doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T12:45:15.957823" elapsed="0.008166"/>
+<status status="PASS" start="2026-07-14T13:07:49.011778" elapsed="0.029924"/>
 </kw>
 <kw name="Fill Text" owner="guidestar.rf.GuidestarCapture">
 <arg>${SEL_INPUT}</arg>
 <arg>astronomy</arg>
 <doc>Fill a form field identified by *selector*.</doc>
-<status status="PASS" start="2026-07-14T12:45:15.966082" elapsed="0.015455"/>
+<status status="PASS" start="2026-07-14T13:07:49.041810" elapsed="0.012630"/>
 </kw>
 <kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
 <arg>300</arg>
 <doc>Wait for *ms* milliseconds (useful between interactions).</doc>
-<status status="PASS" start="2026-07-14T12:45:15.981706" elapsed="0.303282"/>
+<status status="PASS" start="2026-07-14T13:07:49.054575" elapsed="0.302169"/>
 </kw>
 <kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:16.289017" level="INFO">[capture] Step 1: 'Type a search query' (dom mode)</msg>
+<msg time="2026-07-14T13:07:49.379486" level="INFO">[capture] Step 1: 'Type a search query' (screenshot mode)</msg>
 <arg>caption=Type a search query</arg>
 <arg>delay=2000</arg>
 <doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T12:45:16.285237" elapsed="0.003850"/>
+<status status="PASS" start="2026-07-14T13:07:49.356868" elapsed="0.022683"/>
 </kw>
 <kw name="Click Element" owner="guidestar.rf.GuidestarCapture">
 <arg>${SEL_BTN}</arg>
 <doc>Click the element identified by *selector*.</doc>
-<status status="PASS" start="2026-07-14T12:45:16.289223" elapsed="0.052648"/>
+<status status="PASS" start="2026-07-14T13:07:49.379671" elapsed="0.023649"/>
 </kw>
 <kw name="Wait For Selector" owner="guidestar.rf.GuidestarCapture">
 <arg>${SEL_RESULT}</arg>
 <arg>timeout=6000</arg>
 <doc>Wait until *selector* is in the given *state* (default ``visible``).</doc>
-<status status="PASS" start="2026-07-14T12:45:16.341985" elapsed="0.008307"/>
+<status status="PASS" start="2026-07-14T13:07:49.403456" elapsed="0.021063"/>
 </kw>
 <kw name="Wait For Timeout" owner="guidestar.rf.GuidestarCapture">
 <arg>200</arg>
 <doc>Wait for *ms* milliseconds (useful between interactions).</doc>
-<status status="PASS" start="2026-07-14T12:45:16.350391" elapsed="0.201316"/>
+<status status="PASS" start="2026-07-14T13:07:49.424633" elapsed="0.203458"/>
 </kw>
 <kw name="Capture Step" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:16.555681" level="INFO">[capture] Step 2: 'Results appear from the demo’s mock data — no real API request was made' (dom mode)</msg>
+<msg time="2026-07-14T13:07:49.652515" level="INFO">[capture] Step 2: 'Results appear from the demo’s mock data — no real API request was made' (screenshot mode)</msg>
 <arg>caption=Results appear from the demo\u2019s mock data \u2014 no real API request was made</arg>
 <arg>delay=3500</arg>
 <doc>Capture the current page state as a demo step.</doc>
-<status status="PASS" start="2026-07-14T12:45:16.551910" elapsed="0.003891"/>
+<status status="PASS" start="2026-07-14T13:07:49.628275" elapsed="0.024329"/>
 </kw>
 <kw name="Export Demo" owner="guidestar.rf.GuidestarCapture">
-<msg time="2026-07-14T12:45:16.598526" level="INFO">[capture] Wrote wireframe: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-dom.html
-  [capture] Wrote config:    /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-dom.json
-  [capture] Wrote standalone: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-dom-standalone.html
+<msg time="2026-07-14T13:07:49.697918" level="INFO">[capture] Wrote wireframe: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot.html
+  [capture] Wrote config:    /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot.json
+  [capture] Wrote standalone: /Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes/open-library-screenshot-standalone.html
   [capture] Done. 3 step(s) captured.</msg>
-<arg>open-library-dom</arg>
+<arg>open-library-screenshot</arg>
 <arg>out_dir=/Users/kconroy/repos/docs-wireframe-demo/examples/rf/../wireframes</arg>
 <arg>standalone=True</arg>
 <doc>Write wireframe HTML and JSON demo config to *out_dir*.</doc>
-<status status="PASS" start="2026-07-14T12:45:16.555931" elapsed="0.042651"/>
+<status status="PASS" start="2026-07-14T13:07:49.652700" elapsed="0.045293"/>
 </kw>
-<status status="PASS" start="2026-07-14T12:45:14.795115" elapsed="1.803584"/>
+<status status="PASS" start="2026-07-14T13:07:48.221145" elapsed="1.476978"/>
 </test>
 <doc>Captures the Open Library search demo in both screenshot and DOM modes.
 Used to produce the side-by-side comparison embedded in the
 Robot Framework Capture documentation page (docs/wireframe/rf-capture.rst).
 
 Run:
-    conda run -n wireframe-demo guidestar-capture         examples/rf/open-library-dom.robot         --out examples/wireframes --standalone
+    conda run -n wireframe-demo guidestar-capture         examples/rf/open-library-screenshot.robot         --out examples/wireframes --standalone
 
     conda run -n wireframe-demo guidestar-capture         examples/rf/open-library-dom.robot         --out examples/wireframes --standalone</doc>
-<status status="PASS" start="2026-07-14T12:45:14.756290" elapsed="1.842786"/>
+<status status="PASS" start="2026-07-14T13:07:48.177098" elapsed="1.521276"/>
 </suite>
 <statistics>
 <total>
@@ -100,7 +100,7 @@ Run:
 <tag>
 </tag>
 <suite>
-<stat name="Open-Library-Dom" id="s1" pass="1" fail="0" skip="0">Open-Library-Dom</stat>
+<stat name="Open-Library-Screenshot" id="s1" pass="1" fail="0" skip="0">Open-Library-Screenshot</stat>
 </suite>
 </statistics>
 <errors>
