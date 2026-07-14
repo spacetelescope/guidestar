@@ -135,11 +135,20 @@ different step sequences.  The build script produces a separate
 self-contained HTML page and GIF for each.
 
 
-From a Live URL
----------------
+From a Live Application (SPAs and External Sites)
+--------------------------------------------------
 
-.. note::
+For complex single-page applications — or any site on a different origin
+that cannot be loaded via ``htmlSrc`` — the :doc:`../wireframe/rf-capture`
+pipeline captures the real browser at build time instead of at view time.
 
-   Recording from a live URL is **coming soon**.  This feature will allow
-   you to point the recorder at any running web application and capture a
-   GIF of the real UI without authoring a wireframe.
+* **Playwright** drives the real Chromium browser against the live URL.
+* **API mocking** intercepts calls with fixture data via ``page.route()``
+  (no application modifications required).
+* **Screenshots or DOM snapshots** are captured at each marked step and
+  assembled into a static wireframe that Guidestar replays without any
+  live page injection.
+
+The captured wireframe feeds the same ``guidestar-build`` pipeline and can
+also be recorded as a GIF with ``guidestar-record`` — see
+:doc:`../wireframe/rf-capture` for the full workflow.

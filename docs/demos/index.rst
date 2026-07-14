@@ -10,6 +10,7 @@ Wireframe Demos
    ../wireframe/ai-assisted-url
    ../wireframe/ai-assisted-screenshots
    ../wireframe/live-url
+   ../wireframe/rf-capture
 
 .. toctree::
    :maxdepth: 1

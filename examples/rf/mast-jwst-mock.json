@@ -1,0 +1,149 @@
+{
+  "_comment": "Mock response for the MAST v0.1 search API endpoint: /api/v0.1/missions/search",
+  "_note": "This fixture matches the real MAST JSON envelope. Fields are a subset of those returned for JWST NIRCam observations of NGC 1300. Update target_name / coordinates to match your demo query.",
+
+  "status": "COMPLETE",
+  "msg": "",
+  "paging": {
+    "page": 1,
+    "pageSize": 25,
+    "pagesFiltered": 1,
+    "rows": 10,
+    "rowsFiltered": 10,
+    "rowsTotal": 10
+  },
+  "fields": [
+    {"name": "obs_id",           "type": "string"},
+    {"name": "target_name",      "type": "string"},
+    {"name": "instrument_name",  "type": "string"},
+    {"name": "filters",          "type": "string"},
+    {"name": "t_exptime",        "type": "float"},
+    {"name": "calib_level",      "type": "int"},
+    {"name": "obs_collection",   "type": "string"},
+    {"name": "proposal_id",      "type": "string"},
+    {"name": "t_min",            "type": "float"},
+    {"name": "dataproduct_type", "type": "string"}
+  ],
+  "data": [
+    {
+      "obs_id":           "jw01783001001_02101_00001_nrcb1",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F200W",
+      "t_exptime":        1289.674,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.12,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw01783001001_02101_00002_nrcb2",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F277W",
+      "t_exptime":        1289.674,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.12,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw01783001001_02101_00003_nrcb3",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F356W",
+      "t_exptime":        2579.348,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.15,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw01783001001_02101_00004_nrcb4",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F444W",
+      "t_exptime":        2579.348,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.15,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw01783001001_04101_00001_nrca1",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F115W",
+      "t_exptime":        644.837,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.18,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw01783001001_04101_00002_nrca2",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRCAM",
+      "filters":          "F150W",
+      "t_exptime":        644.837,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "1783",
+      "t_min":            59945.19,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw02107001001_02101_00001_mirimage",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "MIRI",
+      "filters":          "F770W",
+      "t_exptime":        3218.36,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "2107",
+      "t_min":            59980.44,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw02107001001_02101_00002_mirimage",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "MIRI",
+      "filters":          "F1000W",
+      "t_exptime":        3218.36,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "2107",
+      "t_min":            59980.44,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw02107001001_02101_00003_mirimage",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "MIRI",
+      "filters":          "F1500W",
+      "t_exptime":        4827.54,
+      "calib_level":      3,
+      "obs_collection":   "JWST",
+      "proposal_id":      "2107",
+      "t_min":            59980.47,
+      "dataproduct_type": "image"
+    },
+    {
+      "obs_id":           "jw02107001001_06101_00001_nis",
+      "target_name":      "NGC-1300",
+      "instrument_name":  "NIRISS",
+      "filters":          "CLEAR;F150W",
+      "t_exptime":        5239.12,
+      "calib_level":      2,
+      "obs_collection":   "JWST",
+      "proposal_id":      "2107",
+      "t_min":            59981.02,
+      "dataproduct_type": "spectrum"
+    }
+  ]
+}

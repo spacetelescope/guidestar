@@ -21,10 +21,15 @@ record = [
     "playwright>=1.40",
     "Pillow>=10.0",
 ]
+capture = [
+    "robotframework>=6.0",
+    "playwright>=1.40",
+]
 
 [project.scripts]
 guidestar-build = "guidestar.cli.build:main"
 guidestar-record = "guidestar.cli.record:main"
+guidestar-capture = "guidestar.cli.capture:main"
 guidestar-index = "guidestar.cli.index:main"
 
 [tool.hatch.version]
