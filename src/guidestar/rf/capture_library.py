@@ -132,49 +132,89 @@ def _strip_scripts(html: str) -> str:
 def _namespace_css(css_text: str, scope: str) -> str:
     """Prefix every CSS rule selector with a scoping data attribute selector.
 
-    E.g.  body { color: red }  →  [data-gs-capture="0"] body { color: red }
+    Handles nested @media / @supports blocks recursively so that responsive
+    rules inside @media are correctly namespaced.
 
-    Special cases: @keyframes, @font-face, and @import blocks are left as-is.
-    html/body/:root selectors are remapped to the scope root element.
+    html / body / :root selectors are remapped to the scope root element.
+    @keyframes, @font-face, @import, and @charset blocks are passed through
+    unchanged.
     """
     scope_sel = f'[data-gs-capture="{scope}"]'
 
-    def prefix_rule(m: re.Match) -> str:
-        selector_block = m.group(1)
-        body = m.group(2)
-        new_selectors = []
-        for sel in selector_block.split(","):
-            sel = sel.strip()
-            if not sel:
-                continue
-            # Remap html/body/:root to scope root
-            sel = re.sub(r'(?<![a-zA-Z-])\bhtml\b', scope_sel, sel)
-            sel = re.sub(r'(?<![a-zA-Z-])\bbody\b', scope_sel, sel)
-            sel = re.sub(r':root\b', scope_sel, sel)
-            if sel.startswith(scope_sel):
-                new_selectors.append(sel)
-            else:
-                new_selectors.append(f"{scope_sel} {sel}")
-        return ", ".join(new_selectors) + " {" + body + "}"
+    def namespace_selector(sel: str) -> str:
+        sel = sel.strip()
+        if not sel:
+            return sel
+        # Remap html/body/:root to scope root
+        sel = re.sub(r'(?<![a-zA-Z-])\bhtml\b', scope_sel, sel)
+        sel = re.sub(r'(?<![a-zA-Z-])\bbody\b', scope_sel, sel)
+        sel = re.sub(r':root\b', scope_sel, sel)
+        if sel.startswith(scope_sel) or sel.startswith('@'):
+            return sel
+        return f"{scope_sel} {sel}"
 
-    # Skip @-rules that aren't @media/@supports (handle those recursively)
-    lines = []
-    for rule in re.split(r'(?<=\})', css_text):
-        rule = rule.strip()
-        if not rule:
-            continue
-        at_m = re.match(r'@(keyframes|font-face|import|charset|namespace)\b', rule,
-                        re.IGNORECASE)
-        if at_m:
-            lines.append(rule)
-            continue
-        # Simple rule: selector { ... }
-        m = re.match(r'^([^{]+)\{([^}]*)\}', rule, re.DOTALL)
-        if m:
-            lines.append(prefix_rule(m))
-        else:
-            lines.append(rule)
-    return "\n".join(lines)
+    def process_block(text: str) -> str:
+        """Parse and namespace one CSS block (not including its outer braces)."""
+        result: list[str] = []
+        i = 0
+        n = len(text)
+        while i < n:
+            # Advance past whitespace
+            while i < n and text[i] in ' \t\n\r':
+                i += 1
+            if i >= n:
+                break
+
+            # Find next opening brace
+            brace = text.find('{', i)
+            if brace == -1:
+                # Trailing text with no block (e.g. stray comment)
+                result.append(text[i:])
+                break
+
+            selector = text[i:brace].strip()
+
+            # Strip inline comments (/* ... */) before classifying the rule
+            # type so that comments before an @media keyword don't prevent it
+            # from being recognised.
+            selector_clean = re.sub(r'/\*.*?\*/', '', selector, flags=re.DOTALL).strip()
+
+            # Find the matching closing brace using depth tracking
+            depth = 1
+            j = brace + 1
+            while j < n and depth > 0:
+                if text[j] == '{':
+                    depth += 1
+                elif text[j] == '}':
+                    depth -= 1
+                j += 1
+            body = text[brace + 1:j - 1]
+
+            # Skip to next rule
+            i = j
+
+            # ── Categorise and emit ──────────────────────────────────
+            if re.match(r'@(media|supports|layer)\b', selector_clean, re.IGNORECASE):
+                # Recurse into the block body so inner selectors get scoped
+                inner = process_block(body)
+                result.append(f"{selector_clean} {{\n{inner}\n}}")
+            elif re.match(
+                r'@(keyframes|font-face|import|charset|namespace)\b',
+                selector_clean, re.IGNORECASE
+            ):
+                # Pass through unchanged
+                result.append(f"{selector_clean} {{\n{body}\n}}")
+            else:
+                # Regular rule: namespace each comma-separated selector
+                # Use selector_clean for namespacing (comments stripped)
+                new_sels = [namespace_selector(s) for s in selector_clean.split(',')]
+                new_sel = ', '.join(s for s in new_sels if s)
+                if new_sel:
+                    result.append(f"{new_sel} {{\n{body}\n}}")
+
+        return '\n'.join(result)
+
+    return process_block(css_text)
 
 
 # ---------------------------------------------------------------------------
@@ -294,9 +334,13 @@ def _build_demo_config(
     captures: list[dict],
     wireframe_name: str,
     height: str,
-    viewport: int,
+    viewport: Optional[int],
 ) -> dict:
-    """Build a Guidestar JSON demo config for the captured steps."""
+    """Build a Guidestar JSON demo config for the captured steps.
+
+    When viewport is None the config omits the field entirely, leaving
+    the wireframe in responsive mode (no scaling).
+    """
     steps = []
     for i in range(1, len(captures)):
         prev = i - 1
@@ -314,14 +358,16 @@ def _build_demo_config(
             step["caption"] = cap
         steps.append(step)
 
-    return {
+    cfg: dict = {
         "wireframe": f"{wireframe_name}.html",
         "title": wireframe_name.replace("-", " ").replace("_", " ").title(),
         "height": height,
-        "viewport": viewport,
         "repeat": True,
         "steps": steps,
     }
+    if viewport is not None:
+        cfg["viewport"] = viewport
+    return cfg
 
 
 def _build_rst_snippet(wireframe_name: str, config: dict) -> str:
@@ -348,8 +394,8 @@ def _build_standalone_html(
     """Build a standalone demo HTML page (controller + wireframe + config inlined)."""
     import html as html_module
 
-    styles_m = re.search(r'<style[^>]*>(.*?)</style>', wireframe_html, re.DOTALL)
-    styles_html = styles_m.group(0) if styles_m else ""
+    styles_all = re.findall(r'<style[^>]*>.*?</style>', wireframe_html, re.DOTALL)
+    styles_html = "\n".join(styles_all)
     body_m = re.search(r'<body[^>]*>(.*)</body>', wireframe_html, re.DOTALL)
     body_html = body_m.group(1).strip() if body_m else wireframe_html
 
@@ -717,9 +763,13 @@ class GuidestarCapture:
                 self._captures, self._viewport_width
             )
 
-        # Build demo config
+        # Build demo config.
+        # In DOM mode omit the viewport so the wireframe reflows responsively
+        # instead of being scaled.  The browser viewport used during capture
+        # (self._viewport_width) is separate from the Guidestar config field.
+        config_viewport = None if self._mode == "dom" else self._viewport_width
         config = _build_demo_config(
-            self._captures, name, self._height, self._viewport_width
+            self._captures, name, self._height, config_viewport
         )
 
         # Write wireframe

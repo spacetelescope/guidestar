@@ -196,25 +196,70 @@ envelope exactly.
 
 For the MAST search API the envelope looks like:
 
-.. code-block:: json
+.. code-block:: javascript
 
    {
      "status": "COMPLETE",
-     "paging": {"page": 1, "pageSize": 25, "rows": 10, ...},
+     "paging": {"page": 1, "pageSize": 25, "rows": 10},
      "fields": [{"name": "obs_id", "type": "string"}, ...],
      "data": [
        {"obs_id": "jw01783001001_02101_00001_nrcb1",
         "target_name": "NGC-1300",
         "instrument_name": "NIRCAM",
         "filters": "F200W",
-        "t_exptime": 1289.674,
-        ...},
+        "t_exptime": 1289.674},
        ...
      ]
    }
 
 A complete 10-row fixture for NGC 1300 JWST observations is provided in
 ``examples/rf/mast-jwst-mock.json``.
+
+
+Live examples
+--------------
+
+Both demos below were produced from the same ``examples/rf/live-app.html``
+Package Registry page using the two capture modes.  The ``.robot`` files
+are in ``examples/rf/`` and the wireframes were generated locally with:
+
+.. code-block:: bash
+
+   conda run -n wireframe-demo guidestar-capture \
+       examples/rf/open-library-screenshot.robot \
+       --out examples/wireframes --standalone
+
+   conda run -n wireframe-demo guidestar-capture \
+       examples/rf/open-library-dom.robot \
+       --out examples/wireframes --standalone
+
+**Screenshot mode** — each step is a pixel-perfect PNG; the cursor points to
+the root container.  The wireframe is 105 KB (three screenshots, base64-encoded).
+
+.. raw:: html
+
+   <iframe
+     src="https://spacetelescope.github.io/guidestar/demos/rf-capture/screenshot-demo.html"
+     style="width:100%;height:460px;border:none;display:block"
+     loading="lazy"
+     title="RF capture demo — screenshot mode"></iframe>
+
+**DOM mode** — the captured DOM is preserved; real element selectors work,
+text is selectable, and the layout is responsive.  The wireframe is 15 KB
+(cleaned HTML, no images embedded).
+
+.. raw:: html
+
+   <iframe
+     src="https://spacetelescope.github.io/guidestar/demos/rf-capture/dom-demo.html"
+     style="width:100%;height:460px;border:none;display:block"
+     loading="lazy"
+     title="RF capture demo — DOM mode"></iframe>
+
+Notice that in the DOM demo the search input, button, and result cards are
+real DOM elements that Guidestar's cursor can navigate to by CSS selector.
+In the screenshot demo the cursor targets the root ``#gs-capture-root``
+container rather than individual elements within the screenshot.
 
 
 Running the capture
@@ -294,7 +339,7 @@ Demo JSON config
 The generated ``{name}.json`` uses multi-action steps that toggle the active
 slide class:
 
-.. code-block:: json
+.. code-block:: javascript
 
    {
      "wireframe": "mast-jwst-search.html",
@@ -310,8 +355,7 @@ slide class:
          ],
          "delay": 2200,
          "caption": "Enter a target name or sky coordinates"
-       },
-       ...
+       }
      ]
    }
 

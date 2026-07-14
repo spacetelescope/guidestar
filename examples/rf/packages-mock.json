@@ -1,0 +1,35 @@
+{
+  "_comment": "Mock response for https://data.example.org/api/packages — used by the RF capture docs examples",
+  "packages": [
+    {
+      "name": "astropy",
+      "description": "Community-developed core Python package for Astronomy",
+      "version": "6.1.0",
+      "language": "Python"
+    },
+    {
+      "name": "numpy",
+      "description": "Fundamental package for scientific computing with Python",
+      "version": "2.0.1",
+      "language": "Python"
+    },
+    {
+      "name": "scipy",
+      "description": "Fundamental algorithms for scientific computing",
+      "version": "1.13.1",
+      "language": "Python"
+    },
+    {
+      "name": "matplotlib",
+      "description": "Comprehensive library for creating static, animated, and interactive visualizations",
+      "version": "3.9.1",
+      "language": "Python"
+    },
+    {
+      "name": "pandas",
+      "description": "Powerful data structures for data analysis, time series, and statistics",
+      "version": "2.2.2",
+      "language": "Python"
+    }
+  ]
+}
