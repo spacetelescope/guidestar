@@ -20,6 +20,42 @@
 </head>
 <body>
 
+<!--
+  ① Pre-install the fetch interceptor BEFORE the controller loads.
+
+  window.fetch is wrapped here so it is already in place when the
+  controller's autoDiscover() starts fetching live-app.html and when
+  the live page's external <script src> bundles execute later.
+  This guarantees interception regardless of async loading order.
+
+  The wrapper reads window.__gsMocks by reference, so the mock-api
+  action (registered below) can populate it at any time — including
+  via initSteps after the live page has loaded — and the running
+  wrapper will immediately see the new entries.
+-->
+<script>
+(function () {
+  var origFetch = window.fetch;
+  window.__gsMocks = window.__gsMocks || {};
+  window.__gsOrigFetch = origFetch;
+  window.fetch = function (url, opts) {
+    var u = String(url);
+    var mocks = window.__gsMocks;
+    for (var pattern in mocks) {
+      if (u.indexOf(pattern) !== -1) {
+        var body = mocks[pattern];
+        return Promise.resolve({
+          ok: true, status: 200,
+          json: function () { return Promise.resolve(body); },
+          text: function () { return Promise.resolve(JSON.stringify(body)); }
+        });
+      }
+    }
+    return origFetch.call(this, url, opts);
+  };
+}());
+</script>
+
 <div style="width:100%;height:460px"
      data-guidestar
      data-guidestar-config='{
@@ -59,44 +95,29 @@
 }'></div>
 
 <!--
-  Load the controller first.  autoDiscover() fires and kicks off an
-  async fetch() of live-app.html, giving the inline script below time
-  to register the custom action before initSteps run.
+  ② Load the controller.  autoDiscover() fires and starts an async
+  fetch() of live-app.html.  The inline script above has already
+  wrapped window.fetch, so any fetch calls made during or after the
+  live page's script execution are intercepted.
 -->
 <script src="../../guidestar-controller.js"></script>
 
 <script>
-// Register the "mock-api" custom action.
+// ③ Register the "mock-api" custom action.
 //
-// Wraps window.fetch to intercept calls whose URL contains a key from
-// the step's value (a JSON object mapping URL substrings to mock response
-// bodies).  The live page is completely unmodified — it calls fetch() as
-// normal and the interceptor returns the fixture data transparently.
+// Populates window.__gsMocks with the URL-keyed fixture data.
+// The fetch wrapper installed above reads __gsMocks by reference,
+// so entries added here take effect immediately — even for API calls
+// made during SPA initialisation before this action runs.
 //
-// On each restart initSteps re-execute, so we restore the original fetch
-// before re-wrapping to avoid stacking wrappers across loop iterations.
+// On each restart initSteps re-execute, so the map is refreshed on
+// every loop iteration without stacking fetch wrappers.
 Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
   try {
     var mocks = JSON.parse(step.value); // { urlSubstring: responseBody, … }
-    // Restore original fetch before re-wrapping (handles repeat restarts)
-    if (window.__guidestarFetchOrig) {
-      window.fetch = window.__guidestarFetchOrig;
-    }
-    window.__guidestarFetchOrig = window.fetch;
-    window.fetch = function (url, opts) {
-      var urlStr = String(url);
-      for (var pattern in mocks) {
-        if (urlStr.indexOf(pattern) !== -1) {
-          var body = mocks[pattern];
-          return Promise.resolve({
-            ok: true, status: 200,
-            json: function () { return Promise.resolve(body); },
-            text: function () { return Promise.resolve(JSON.stringify(body)); }
-          });
-        }
-      }
-      return window.__guidestarFetchOrig.call(this, url, opts);
-    };
+    // Reset then repopulate so stale keys from a previous loop don't linger.
+    window.__gsMocks = {};
+    for (var k in mocks) window.__gsMocks[k] = mocks[k];
   } catch (e) {
     console.error('[Guidestar] mock-api: step value is not valid JSON', e);
   }

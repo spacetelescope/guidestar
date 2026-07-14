@@ -320,54 +320,62 @@ layer:
 
 **2 — The demo wraps** ``window.fetch`` **before playback begins**
 
-Register a ``mock-api`` custom action that installs a ``window.fetch``
-wrapper keyed by URL substring.  Every ``fetch()`` call the live page
-makes is checked against the map; matching URLs receive the fixture body
-instead of going to the network.  Non-matching calls pass through
-unchanged.
+The fetch wrapper must be installed in a ``<script>`` tag **before** the
+controller ``<script>`` tag.  This guarantees it is in place before
+``autoDiscover()`` fetches the live page and before any external scripts
+loaded by ``_runScripts()`` execute — so even SPA initialisation calls are
+intercepted regardless of async load order.
 
-Add the script **after** the controller tag in your demo HTML:
+The wrapper reads ``window.__gsMocks`` by reference.  The ``mock-api``
+action (registered below) populates that map; because it is read
+by-reference, entries added by ``initSteps`` take effect for all
+subsequent ``fetch()`` calls, including those made during SPA bootstrap.
 
 .. code-block:: html
 
+   <!-- ① Install interceptor BEFORE the controller -->
+   <script>
+   (function () {
+     var origFetch = window.fetch;
+     window.__gsMocks = window.__gsMocks || {};
+     window.__gsOrigFetch = origFetch;
+     window.fetch = function (url, opts) {
+       var u = String(url);
+       for (var pattern in window.__gsMocks) {
+         if (u.indexOf(pattern) !== -1) {
+           var body = window.__gsMocks[pattern];
+           return Promise.resolve({
+             ok: true, status: 200,
+             json: function () { return Promise.resolve(body); },
+             text: function () { return Promise.resolve(JSON.stringify(body)); }
+           });
+         }
+       }
+       return origFetch.call(this, url, opts);
+     };
+   }());
+   </script>
+
+   <!-- ② Controller — autoDiscover runs after the wrapper is installed -->
    <script src="../../guidestar-controller.js"></script>
+
+   <!-- ③ Register mock-api action — populates __gsMocks, not a new wrapper -->
    <script>
    Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
      try {
        var mocks = JSON.parse(step.value); // { urlSubstring: responseBody, … }
-       // Restore original before re-wrapping (handles repeat restarts)
-       if (window.__guidestarFetchOrig) {
-         window.fetch = window.__guidestarFetchOrig;
-       }
-       window.__guidestarFetchOrig = window.fetch;
-       window.fetch = function (url, opts) {
-         var urlStr = String(url);
-         for (var pattern in mocks) {
-           if (urlStr.indexOf(pattern) !== -1) {
-             var body = mocks[pattern];
-             return Promise.resolve({
-               ok: true, status: 200,
-               json: function () { return Promise.resolve(body); },
-               text: function () { return Promise.resolve(JSON.stringify(body)); }
-             });
-           }
-         }
-         return window.__guidestarFetchOrig.call(this, url, opts);
-       };
+       // Reset then repopulate so stale keys from a previous loop don't linger.
+       window.__gsMocks = {};
+       for (var k in mocks) window.__gsMocks[k] = mocks[k];
      } catch (e) {
        console.error('[Guidestar] mock-api: step value is not valid JSON', e);
      }
    });
    </script>
 
-The registration is synchronous; the controller's ``autoDiscover()`` starts
-an async ``fetch()`` of the live page, so the action is always registered
-before ``initSteps`` run.
-
 Because ``initSteps`` re-execute on every automatic restart (``repeat:
-true``), the wrapper is reinstalled each loop.  The ``__guidestarFetchOrig``
-stash ensures the original ``fetch`` is restored before re-wrapping, so
-wrappers never stack across restarts.
+true``), ``__gsMocks`` is refreshed on each loop.  The fetch wrapper
+itself is installed exactly once at page load and never re-stacked.
 
 **3 — Install the mock via** ``initSteps``
 

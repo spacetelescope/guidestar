@@ -1915,35 +1915,47 @@ function generateHtmlOutput() {
     note = '\n<!-- ⚠ Update htmlSrc in the config below to point to your hosted wireframe. -->';
   }
   var mockDataHtml = (document.getElementById('opt-mock-data').value || '').trim();
-  var mockScript = mockDataHtml
-    ? '\n<script>\nGuidestar.registerAction(\'mock-api\', function (step, el, contentRoot) {\n' +
+  var preScript = mockDataHtml
+    ? '<script>\n' +
+      '(function () {\n' +
+      '  var origFetch = window.fetch;\n' +
+      '  window.__gsMocks = window.__gsMocks || {};\n' +
+      '  window.__gsOrigFetch = origFetch;\n' +
+      '  window.fetch = function (url, opts) {\n' +
+      '    var u = String(url);\n' +
+      '    for (var p in window.__gsMocks) {\n' +
+      '      if (u.indexOf(p) !== -1) {\n' +
+      '        var b = window.__gsMocks[p];\n' +
+      '        return Promise.resolve({ ok:true, status:200,\n' +
+      '          json: function(){ return Promise.resolve(b); },\n' +
+      '          text: function(){ return Promise.resolve(JSON.stringify(b)); } });\n' +
+      '      }\n' +
+      '    }\n' +
+      '    return origFetch.call(this, url, opts);\n' +
+      '  };\n' +
+      '}());\n' +
+      '<\/script>\n'
+    : '';
+  var postScript = mockDataHtml
+    ? '\n<script>\n' +
+      'Guidestar.registerAction(\'mock-api\', function (step, el, contentRoot) {\n' +
       '  try {\n' +
       '    var mocks = JSON.parse(step.value);\n' +
-      '    if (window.__guidestarFetchOrig) window.fetch = window.__guidestarFetchOrig;\n' +
-      '    window.__guidestarFetchOrig = window.fetch;\n' +
-      '    window.fetch = function (url, opts) {\n' +
-      '      var u = String(url);\n' +
-      '      for (var p in mocks) {\n' +
-      '        if (u.indexOf(p) !== -1) {\n' +
-      '          var b = mocks[p];\n' +
-      '          return Promise.resolve({ ok:true, status:200,\n' +
-      '            json: function(){ return Promise.resolve(b); },\n' +
-      '            text: function(){ return Promise.resolve(JSON.stringify(b)); } });\n' +
-      '        }\n' +
-      '      }\n' +
-      '      return window.__guidestarFetchOrig.call(this, url, opts);\n' +
-      '    };\n' +
+      '    window.__gsMocks = {};\n' +
+      '    for (var k in mocks) window.__gsMocks[k] = mocks[k];\n' +
       '  } catch (e) { console.error(\'[Guidestar] mock-api:\', e); }\n' +
-      '});\n<\/script>'
+      '});\n' +
+      '<\/script>'
     : '';
   return '<!-- Guidestar Demo -->' + note + '\n' +
+    preScript +
     '<link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">\n' +
     '<div data-guidestar\n' +
     '     data-guidestar-config=\'' + configStr.replace(/'/g, '&#39;') + '\'\n' +
     '     style="height: ' + escapeHtml(height) + '; width: 100%;">\n' +
     '</div>\n' +
     '<script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"><\/script>' +
-    mockScript;
+    postScript;
 }
 
 function generateSphinxOutput() {

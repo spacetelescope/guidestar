@@ -795,7 +795,17 @@
         for (var i = 0; i < scripts.length; i++) {
             var old = scripts[i];
             var s = document.createElement('script');
-            s.textContent = old.textContent;
+            if (old.src) {
+                // External script — copy src so the browser fetches and runs it.
+                // textContent is empty for <script src>, so we must use src.
+                s.src = old.src;
+            } else {
+                s.textContent = old.textContent;
+            }
+            // Preserve type, crossOrigin, defer, async, noModule if set.
+            ['type', 'crossOrigin', 'defer', 'async', 'noModule'].forEach(function (a) {
+                if (old[a]) s[a] = old[a];
+            });
             old.parentNode.replaceChild(s, old);
         }
     };
