@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+  Guidestar demo: mock-api example.
+
+  Loads live-app.html (an Open Library search page) via htmlSrc and
+  registers a "mock-api" custom action that sets window.__guidestarMock
+  before playback begins.  The live page checks that global and bypasses
+  its real fetch() call, so the demo always returns a fixed, instant
+  response regardless of network conditions.
+
+  This file is meant to be embedded in an <iframe> from docs pages.
+  Deploy it alongside guidestar-controller.js and guidestar-controls.css.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Library Search — Mocked Demo</title>
+<link rel="stylesheet" href="../../guidestar-controls.css">
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+</style>
+</head>
+<body>
+
+<div style="width:100%;height:460px"
+     data-guidestar
+     data-guidestar-config='{
+  "htmlSrc": "live-app.html",
+  "allowUserInteractions": false,
+  "repeat": true,
+  "cursor": true,
+  "timeline": true,
+  "initSteps": [
+    {
+      "target": "#search-app",
+      "action": "mock-api",
+      "value": "[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980},{\"title\":\"The Pale Blue Dot\",\"author\":\"Carl Sagan\",\"year\":1994},{\"title\":\"A Brief History of Time\",\"author\":\"Stephen Hawking\",\"year\":1988},{\"title\":\"Astrophysics for People in a Hurry\",\"author\":\"Neil deGrasse Tyson\",\"year\":2017},{\"title\":\"The Elegant Universe\",\"author\":\"Brian Greene\",\"year\":1999}]"
+    }
+  ],
+  "steps": [
+    {
+      "target": "#search-input",
+      "action": "type-text",
+      "value": "space exploration",
+      "delay": 2200,
+      "caption": "^Type a search query"
+    },
+    {
+      "target": "#search-btn",
+      "action": "click",
+      "delay": 1800,
+      "caption": "Click Search — the demo intercepts the API call"
+    },
+    {
+      "target": "#results",
+      "action": "highlight",
+      "delay": 3500,
+      "caption": "Results appear from the demo\u2019s mock data \u2014 no real API request was made"
+    }
+  ]
+}'></div>
+
+<!--
+  Load the controller first.  autoDiscover() fires and kicks off an
+  async fetch() of live-app.html, giving the inline script below time
+  to register the custom action before initSteps run.
+-->
+<script src="../../guidestar-controller.js"></script>
+
+<script>
+// Register the "mock-api" custom action.
+//
+// This action parses the step's `value` as a JSON array of
+// { title, author, year } objects and stores it on window.__guidestarMock.
+// The live page's search handler checks that global before calling the
+// real Open Library API, so the demo uses predictable fixture data
+// instead of hitting an external server on every playthrough.
+//
+// Called from initSteps, so the mock is installed before the first
+// step runs and survives automatic restarts (initSteps re-execute on
+// each loop iteration).
+Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
+  try {
+    window.__guidestarMock = JSON.parse(step.value);
+  } catch (e) {
+    console.error('[Guidestar] mock-api: step value is not valid JSON', e);
+  }
+});
+</script>
+
+</body>
+</html>
