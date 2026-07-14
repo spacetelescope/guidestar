@@ -627,6 +627,19 @@ input[type="checkbox"] { accent-color: #6366f1; width: 15px; height: 15px; }
           <input type="checkbox" id="opt-pause-interaction" checked>
           <label for="opt-pause-interaction">Pause on interaction</label>
         </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-allow-user-interactions">
+          <label for="opt-allow-user-interactions">Allow user interactions</label>
+        </div>
+        <div class="field field-inline">
+          <input type="checkbox" id="opt-reload-on-restart">
+          <label for="opt-reload-on-restart">Reload on restart</label>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem;border-top:1px solid #e2e8f0;padding-top:0.75rem">
+        <label style="font-size:0.78rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:0.3rem">Mock API response <span style="font-weight:400;color:#94a3b8;font-size:0.75rem;text-transform:none;letter-spacing:normal">&nbsp;&mdash; optional JSON array for live-page demos</span></label>
+        <textarea id="opt-mock-data" rows="3" placeholder='[{"title":"Cosmos","author":"Carl Sagan","year":1980},{"title":"A Brief History of Time","author":"Stephen Hawking","year":1988}]' style="width:100%;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:6px;font-size:0.8rem;font-family:monospace;resize:vertical;outline:none"></textarea>
+        <p style="font-size:0.75rem;color:#64748b;margin:0.3rem 0 0">When set, adds a <code>mock-api</code> initStep that stores this array on <code>window.__guidestarMock</code> before playback. The live page must check this global before calling its real API. See <a href="https://guidestar.readthedocs.io/en/latest/wireframe/live-url.html#mocking-external-api-calls" target="_blank" rel="noopener" style="color:#6366f1">Mocking API calls</a>.</p>
       </div>
     </div>
   </section>
@@ -973,6 +986,8 @@ function parseSphinxDemo(text, baseUrl) {
     'cursor-speed': function(v) { config.cursorSpeed = parseInt(v, 10); },
     'timeline': function(v) { config.timeline = v.trim() !== 'false'; },
     'pause-on-interaction': function(v) { config.pauseOnInteraction = v.trim() !== 'false'; },
+    'allow-user-interactions': function(v) { config.allowUserInteractions = v.trim() !== 'false'; },
+    'reload-on-restart': function(v) { config.reloadOnRestart = v.trim() === 'true'; },
   };
   text.replace(/:([a-z-]+):\s*([^\n]+)/g, function(_, key, val) {
     if (optMap[key]) optMap[key](val);
@@ -987,6 +1002,12 @@ function parseSphinxDemo(text, baseUrl) {
   if (!stepsJson) {
     var mSteps = text.match(/:steps:\s*([^\n]+)/);
     if (mSteps) stepsJson = parseShorthandSteps(mSteps[1].trim());
+  }
+
+  // Parse init-steps-json (used e.g. for mock-api initSteps)
+  var mInitJson = text.match(/:init-steps-json:\s*([\s\S]+?)(?=\n\s*:[a-z]|\n\s*\n|$)/);
+  if (mInitJson) {
+    try { config.initSteps = JSON.parse(mInitJson[1].trim()); } catch(e) {}
   }
 
   populateOptions(config);
@@ -1067,6 +1088,10 @@ function populateOptions(config) {
   if (config.cursor !== undefined) document.getElementById('opt-cursor').checked = config.cursor;
   if (config.timeline !== undefined) document.getElementById('opt-timeline').checked = config.timeline;
   if (config.pauseOnInteraction !== undefined) document.getElementById('opt-pause-interaction').checked = config.pauseOnInteraction;
+  if (config.allowUserInteractions !== undefined) document.getElementById('opt-allow-user-interactions').checked = config.allowUserInteractions;
+  if (config.reloadOnRestart !== undefined) document.getElementById('opt-reload-on-restart').checked = config.reloadOnRestart;
+  var mockInitStep = (config.initSteps || []).find(function(s) { return s && s.action === 'mock-api'; });
+  if (mockInitStep && mockInitStep.value) document.getElementById('opt-mock-data').value = mockInitStep.value;
   // Open options panel
   var header = document.querySelector('#section-options .card-header');
   var body = document.getElementById('options-body');
@@ -1848,8 +1873,14 @@ function buildConfig() {
   config.cursor    = document.getElementById('opt-cursor').checked;
   config.timeline  = document.getElementById('opt-timeline').checked;
   config.pauseOnInteraction = document.getElementById('opt-pause-interaction').checked;
+  if (document.getElementById('opt-allow-user-interactions').checked) config.allowUserInteractions = true;
+  if (document.getElementById('opt-reload-on-restart').checked) config.reloadOnRestart = true;
   var cs = document.getElementById('opt-cursor-speed').value;
   if (cs) config.cursorSpeed = parseInt(cs, 10);
+  var mockData = (document.getElementById('opt-mock-data').value || '').trim();
+  if (mockData) {
+    config.initSteps = [{ action: 'mock-api', value: mockData }];
+  }
 
   return config;
 }
@@ -1883,13 +1914,21 @@ function generateHtmlOutput() {
   if (!config.htmlSrc || config.htmlSrc.startsWith('blob:') || !config.htmlSrc.startsWith('http')) {
     note = '\n<!-- ⚠ Update htmlSrc in the config below to point to your hosted wireframe. -->';
   }
+  var mockDataHtml = (document.getElementById('opt-mock-data').value || '').trim();
+  var mockScript = mockDataHtml
+    ? '\n<script>\nGuidestar.registerAction(\'mock-api\', function (step, el, contentRoot) {\n' +
+      '  try { window.__guidestarMock = JSON.parse(step.value); }\n' +
+      '  catch (e) { console.error(\'[Guidestar] mock-api:\', e); }\n' +
+      '});\n<\/script>'
+    : '';
   return '<!-- Guidestar Demo -->' + note + '\n' +
     '<link rel="stylesheet" href="https://spacetelescope.github.io/guidestar/guidestar-controls.css">\n' +
     '<div data-guidestar\n' +
     '     data-guidestar-config=\'' + configStr.replace(/'/g, '&#39;') + '\'\n' +
     '     style="height: ' + escapeHtml(height) + '; width: 100%;">\n' +
     '</div>\n' +
-    '<script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"><\/script>';
+    '<script src="https://spacetelescope.github.io/guidestar/guidestar-controller.js"><\/script>' +
+    mockScript;
 }
 
 function generateSphinxOutput() {
@@ -1914,10 +1953,21 @@ function generateSphinxOutput() {
   if (!document.getElementById('opt-cursor').checked) lines.push('   :cursor: false');
   if (!document.getElementById('opt-timeline').checked) lines.push('   :timeline: false');
   if (!document.getElementById('opt-pause-interaction').checked) lines.push('   :pause-on-interaction: false');
+  if (document.getElementById('opt-allow-user-interactions').checked) lines.push('   :allow-user-interactions: true');
+  if (document.getElementById('opt-reload-on-restart').checked) lines.push('   :reload-on-restart: true');
   var cs = document.getElementById('opt-cursor-speed').value;
   if (cs && cs !== '300') lines.push('   :cursor-speed: ' + cs);
+  var mockDataSphinx = (document.getElementById('opt-mock-data').value || '').trim();
+  if (mockDataSphinx) {
+    lines.push('   :init-steps-json: ' + JSON.stringify([{ action: 'mock-api', value: mockDataSphinx }]));
+  }
 
-  return pathNote + lines.join('\n');
+  var output = pathNote + lines.join('\n');
+  if (mockDataSphinx) {
+    output += '\n\n.. Also add: :js: _static/mock-api-action.js (register the mock-api action)';
+    output += '\n.. See https://guidestar.readthedocs.io/en/latest/wireframe/live-url.html#mocking-external-api-calls';
+  }
+  return output;
 }
 
 function copyOutput() {
@@ -1964,9 +2014,10 @@ document.getElementById('action-modal').addEventListener('click', function(e) {
 ['opt-height','opt-viewport','opt-cursor-speed'].forEach(function(id) {
   document.getElementById(id).addEventListener('input', updateOutputPanel);
 });
-['opt-repeat','opt-auto-start','opt-cursor','opt-timeline','opt-pause-interaction'].forEach(function(id) {
+['opt-repeat','opt-auto-start','opt-cursor','opt-timeline','opt-pause-interaction','opt-allow-user-interactions','opt-reload-on-restart'].forEach(function(id) {
   document.getElementById(id).addEventListener('change', updateOutputPanel);
 });
+document.getElementById('opt-mock-data').addEventListener('input', updateOutputPanel);
 
 // ── Init ───────────────────────────────────────────────────────────
 updateOutputPanel();
