@@ -56,6 +56,8 @@ jobs:
           cp demo-builder/index.html _site/demo-builder.html
           mkdir -p _site/demos/web-tool
           cp examples/demos/web-tool/*.html _site/demos/web-tool/
+          mkdir -p _site/demos/mock-api
+          cp examples/demos/mock-api/*.html _site/demos/mock-api/
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

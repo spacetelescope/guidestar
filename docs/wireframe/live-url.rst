@@ -288,6 +288,155 @@ For example, to show only the "Output" section of the Demo Builder:
    ]
 
 
+.. _live-url-mock:
+
+Mocking external API calls
+---------------------------
+
+When a live page's buttons make real API calls, every demo playthrough hits
+the external server — consuming quota, adding latency, and producing
+non-deterministic results.  The fix is a **mock hook**: a small, opt-in code
+path that a demo can activate before playback begins so that the search
+handler returns fixture data instead of calling the API.
+
+The mechanism has two parts.
+
+**1 — The live page needs no modification**
+
+The live page is a normal application that calls its API with ``fetch()``
+as usual.  No guidestar references, no mock hooks, no awareness of the demo
+layer:
+
+.. code-block:: javascript
+
+   function doSearch() {
+     var q = input.value.trim();
+     if (!q) return;
+
+     fetch('https://api.example.com/search?q=' + encodeURIComponent(q))
+       .then(function (r) { return r.json(); })
+       .then(function (d) { renderResults(d.results); });
+   }
+
+**2 — The demo wraps** ``window.fetch`` **before playback begins**
+
+Register a ``mock-api`` custom action that installs a ``window.fetch``
+wrapper keyed by URL substring.  Every ``fetch()`` call the live page
+makes is checked against the map; matching URLs receive the fixture body
+instead of going to the network.  Non-matching calls pass through
+unchanged.
+
+Add the script **after** the controller tag in your demo HTML:
+
+.. code-block:: html
+
+   <script src="../../guidestar-controller.js"></script>
+   <script>
+   Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
+     try {
+       var mocks = JSON.parse(step.value); // { urlSubstring: responseBody, … }
+       // Restore original before re-wrapping (handles repeat restarts)
+       if (window.__guidestarFetchOrig) {
+         window.fetch = window.__guidestarFetchOrig;
+       }
+       window.__guidestarFetchOrig = window.fetch;
+       window.fetch = function (url, opts) {
+         var urlStr = String(url);
+         for (var pattern in mocks) {
+           if (urlStr.indexOf(pattern) !== -1) {
+             var body = mocks[pattern];
+             return Promise.resolve({
+               ok: true, status: 200,
+               json: function () { return Promise.resolve(body); },
+               text: function () { return Promise.resolve(JSON.stringify(body)); }
+             });
+           }
+         }
+         return window.__guidestarFetchOrig.call(this, url, opts);
+       };
+     } catch (e) {
+       console.error('[Guidestar] mock-api: step value is not valid JSON', e);
+     }
+   });
+   </script>
+
+The registration is synchronous; the controller's ``autoDiscover()`` starts
+an async ``fetch()`` of the live page, so the action is always registered
+before ``initSteps`` run.
+
+Because ``initSteps`` re-execute on every automatic restart (``repeat:
+true``), the wrapper is reinstalled each loop.  The ``__guidestarFetchOrig``
+stash ensures the original ``fetch`` is restored before re-wrapping, so
+wrappers never stack across restarts.
+
+**3 — Install the mock via** ``initSteps``
+
+Put a ``mock-api`` step in ``initSteps`` so the fetch wrapper is in place
+before the first animated step executes.  The ``value`` is a JSON **object**
+whose keys are URL substrings and whose values are the response bodies the
+live page's ``.then(r => r.json())`` chain will receive.
+
+Use a substring distinctive enough to identify each endpoint without
+accidentally matching other URLs on the page:
+
+.. code-block:: json
+
+   {
+     "htmlSrc": "live-app.html",
+     "allowUserInteractions": false,
+     "initSteps": [
+       {
+         "target": "#search-app",
+         "action": "mock-api",
+         "value": "{\"openlibrary.org/search.json\":{\"numFound\":5,\"docs\":[{\"title\":\"Cosmos\",\"author_name\":[\"Carl Sagan\"],\"first_publish_year\":1980}]}}"
+       }
+     ],
+     "steps": [
+       {"target": "#search-input", "action": "type-text", "value": "space exploration", "delay": 2200},
+       {"target": "#search-btn",   "action": "click",     "delay": 1800},
+       {"target": "#results",      "action": "highlight", "delay": 3500,
+        "caption": "Results from mock data \u2014 no real API request was made"}
+     ]
+   }
+
+For a page with two independently-mockable endpoints, include both URL
+substrings in the same object.  Each key intercepts a different ``fetch()``
+call; non-matching requests pass through to the real network:
+
+.. code-block:: json
+
+   {
+     "action": "mock-api",
+     "value": "{\"api.example.com/search\":{\"results\":[{\"title\":\"Cosmos\"}]},\"api.example.com/recommend\":{\"items\":[{\"title\":\"Pale Blue Dot\"}]}}"
+   }
+
+The ``target`` field is passed to the handler as ``el`` but the ``mock-api``
+action ignores it — any stable element in the live page works fine.
+
+**Working example**
+
+The demo below loads a live book-search page
+(`live-app.html <https://spacetelescope.github.io/guidestar/demos/mock-api/live-app.html>`_)
+that normally calls the `Open Library API`_.  An ``initStep`` installs five
+fixture books via ``mock-api`` before playback begins.  The Search button
+is intercepted by the mock hook, so results appear instantly and identically
+on every playthrough — without touching the Open Library server.
+
+.. _Open Library API: https://openlibrary.org/developers/api
+
+.. raw:: html
+
+   <iframe
+     src="https://spacetelescope.github.io/guidestar/demos/mock-api/demo.html"
+     style="width:100%;height:460px;border:none;display:block"
+     loading="lazy"
+     title="Demo: mocked Open Library search"></iframe>
+
+Open `live-app.html <https://spacetelescope.github.io/guidestar/demos/mock-api/live-app.html>`_
+directly to use the real API and confirm the mock has no effect outside
+the demo context.
+
+
 Limitations
 -----------
 
