@@ -204,13 +204,12 @@
     if (!q) return;
 
     // ── Guidestar demo mock hook ───────────────────────────────────────────
-    // When this page is loaded as the htmlSrc of a Guidestar demo the demo
-    // can set window.__guidestarMock (an array of {title, author, year}
-    // objects) via an initStep that runs a "mock-api" custom action.
-    // The mock is checked before the live API so the demo response is always
-    // instant, deterministic, and costs no network requests to the real server.
-    if (window.__guidestarMock) {
-      renderResults(window.__guidestarMock);
+    // Set window.__guidestarMock = {"search": [{title, author, year}, ...]}
+    // in a "mock-api" initStep to bypass the live Open Library API.
+    // Each API-calling handler reads its own named key so multiple buttons
+    // on the same page can be mocked independently.
+    if (window.__guidestarMock && window.__guidestarMock.search) {
+      renderResults(window.__guidestarMock.search);
       return;
     }
 

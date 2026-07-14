@@ -303,8 +303,10 @@ The mechanism has three parts.
 
 **1 — Add a mock hook to the live page**
 
-Check ``window.__guidestarMock`` at the start of every API-calling function.
-When the demo sets it, the live path is skipped entirely:
+Check ``window.__guidestarMock.<key>`` at the start of every API-calling
+function, using a key that names the call (e.g. ``search``, ``recommend``).
+Each handler reads only its own key, so multiple buttons are mocked
+independently and the demo value for one call never interferes with another:
 
 .. code-block:: javascript
 
@@ -312,10 +314,9 @@ When the demo sets it, the live path is skipped entirely:
      var q = input.value.trim();
      if (!q) return;
 
-     // Demo mock hook — set by a "mock-api" initStep before playback starts.
-     if (window.__guidestarMock) {
-       renderResults(window.__guidestarMock);
-       return;
+     // Demo mock hook — reads the "search" key.
+     if (window.__guidestarMock && window.__guidestarMock.search) {
+       renderResults(window.__guidestarMock.search); return;
      }
 
      // Real API call — only reached when the page is used standalone.
@@ -324,10 +325,18 @@ When the demo sets it, the live path is skipped entirely:
        .then(function (d) { renderResults(d.results); });
    }
 
-The global is ``undefined`` by default, so the check is a no-op when the
+   function doRecommend() {
+     // Second button reads a *different* key — completely independent.
+     if (window.__guidestarMock && window.__guidestarMock.recommend) {
+       renderRecommendations(window.__guidestarMock.recommend); return;
+     }
+     fetch('https://api.example.com/recommend').then( /* … */ );
+   }
+
+The global is ``undefined`` by default, so the checks are no-ops when the
 page is opened directly in a browser.
 
-Also wrap the event-listener setup in an IIFE with a guard to prevent
+Also wrap each event-listener setup in an IIFE with a guard to prevent
 listeners stacking on each restart:
 
 .. code-block:: javascript
@@ -363,7 +372,8 @@ live page, the custom action is always registered before ``initSteps`` run.
 **3 — Install the mock via** ``initSteps``
 
 Put a ``mock-api`` step in ``initSteps`` so the fixture data is in place
-before the first animated step executes:
+before the first animated step executes.  The ``value`` must be a JSON
+**object** whose keys match what each handler reads — one key per API call:
 
 .. code-block:: json
 
@@ -374,7 +384,7 @@ before the first animated step executes:
        {
          "target": "#search-app",
          "action": "mock-api",
-         "value": "[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}]"
+         "value": "{\"search\":[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}]}"
        }
      ],
      "steps": [
@@ -383,6 +393,16 @@ before the first animated step executes:
        {"target": "#results",      "action": "highlight", "delay": 3500,
         "caption": "Results from mock data \u2014 no real API request was made"}
      ]
+   }
+
+For a page with two independently-mockable buttons, include both keys in the
+same object:
+
+.. code-block:: json
+
+   {
+     "action": "mock-api",
+     "value": "{\"search\":[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}],\"recommend\":[{\"title\":\"Pale Blue Dot\",\"author\":\"Carl Sagan\",\"year\":1994}]}"
    }
 
 The ``target`` field is passed to the handler as ``el`` but the ``mock-api``
