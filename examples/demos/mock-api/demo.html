@@ -2,14 +2,11 @@
 <!--
   Guidestar demo: mock-api example.
 
-  Loads live-app.html (an Open Library search page) via htmlSrc and
-  registers a "mock-api" custom action that sets window.__guidestarMock
-  before playback begins.  The live page checks that global and bypasses
-  its real fetch() call, so the demo always returns a fixed, instant
-  response regardless of network conditions.
-
-  This file is meant to be embedded in an <iframe> from docs pages.
-  Deploy it alongside guidestar-controller.js and guidestar-controls.css.
+  Loads live-app.html (a plain Open Library search page) via htmlSrc and
+  registers a "mock-api" custom action that wraps window.fetch to intercept
+  calls to openlibrary.org/search.json. The live page is completely unmodified
+  and has no knowledge of Guidestar — the interception is handled entirely
+  within this demo file.
 -->
 <html lang="en">
 <head>
@@ -35,7 +32,7 @@
     {
       "target": "#search-app",
       "action": "mock-api",
-      "value": "{\"search\":[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980},{\"title\":\"The Pale Blue Dot\",\"author\":\"Carl Sagan\",\"year\":1994},{\"title\":\"A Brief History of Time\",\"author\":\"Stephen Hawking\",\"year\":1988},{\"title\":\"Astrophysics for People in a Hurry\",\"author\":\"Neil deGrasse Tyson\",\"year\":2017},{\"title\":\"The Elegant Universe\",\"author\":\"Brian Greene\",\"year\":1999}]}"
+      "value": "{\"openlibrary.org/search.json\":{\"numFound\":5,\"docs\":[{\"title\":\"Cosmos\",\"author_name\":[\"Carl Sagan\"],\"first_publish_year\":1980},{\"title\":\"The Pale Blue Dot\",\"author_name\":[\"Carl Sagan\"],\"first_publish_year\":1994},{\"title\":\"A Brief History of Time\",\"author_name\":[\"Stephen Hawking\"],\"first_publish_year\":1988},{\"title\":\"Astrophysics for People in a Hurry\",\"author_name\":[\"Neil deGrasse Tyson\"],\"first_publish_year\":2017},{\"title\":\"The Elegant Universe\",\"author_name\":[\"Brian Greene\"],\"first_publish_year\":1999}]}}"
     }
   ],
   "steps": [
@@ -71,18 +68,35 @@
 <script>
 // Register the "mock-api" custom action.
 //
-// This action parses the step's `value` as a JSON array of
-// { title, author, year } objects and stores it on window.__guidestarMock.
-// The live page's search handler checks that global before calling the
-// real Open Library API, so the demo uses predictable fixture data
-// instead of hitting an external server on every playthrough.
+// Wraps window.fetch to intercept calls whose URL contains a key from
+// the step's value (a JSON object mapping URL substrings to mock response
+// bodies).  The live page is completely unmodified — it calls fetch() as
+// normal and the interceptor returns the fixture data transparently.
 //
-// Called from initSteps, so the mock is installed before the first
-// step runs and survives automatic restarts (initSteps re-execute on
-// each loop iteration).
+// On each restart initSteps re-execute, so we restore the original fetch
+// before re-wrapping to avoid stacking wrappers across loop iterations.
 Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
   try {
-    window.__guidestarMock = JSON.parse(step.value);
+    var mocks = JSON.parse(step.value); // { urlSubstring: responseBody, … }
+    // Restore original fetch before re-wrapping (handles repeat restarts)
+    if (window.__guidestarFetchOrig) {
+      window.fetch = window.__guidestarFetchOrig;
+    }
+    window.__guidestarFetchOrig = window.fetch;
+    window.fetch = function (url, opts) {
+      var urlStr = String(url);
+      for (var pattern in mocks) {
+        if (urlStr.indexOf(pattern) !== -1) {
+          var body = mocks[pattern];
+          return Promise.resolve({
+            ok: true, status: 200,
+            json: function () { return Promise.resolve(body); },
+            text: function () { return Promise.resolve(JSON.stringify(body)); }
+          });
+        }
+      }
+      return window.__guidestarFetchOrig.call(this, url, opts);
+    };
   } catch (e) {
     console.error('[Guidestar] mock-api: step value is not valid JSON', e);
   }

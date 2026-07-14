@@ -638,8 +638,8 @@ input[type="checkbox"] { accent-color: #6366f1; width: 15px; height: 15px; }
       </div>
       <div style="margin-top:0.75rem;border-top:1px solid #e2e8f0;padding-top:0.75rem">
         <label style="font-size:0.78rem;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:0.3rem">Mock API response <span style="font-weight:400;color:#94a3b8;font-size:0.75rem;text-transform:none;letter-spacing:normal">&nbsp;&mdash; optional JSON array for live-page demos</span></label>
-        <textarea id="opt-mock-data" rows="3" placeholder='{"search":[{"title":"Cosmos","author":"Carl Sagan","year":1980}],"recommend":[{"title":"Pale Blue Dot","author":"Carl Sagan","year":1994}]}' style="width:100%;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:6px;font-size:0.8rem;font-family:monospace;resize:vertical;outline:none"></textarea>
-        <p style="font-size:0.75rem;color:#64748b;margin:0.3rem 0 0">A JSON <strong>object</strong> with one key per API call (e.g. <code>{"search":[…],"recommend":[…]}</code>). Each button handler reads its own key — <code>window.__guidestarMock.search</code>, <code>window.__guidestarMock.recommend</code>, etc. — so multiple buttons are mocked independently. See <a href="https://guidestar.readthedocs.io/en/latest/wireframe/live-url.html#mocking-external-api-calls" target="_blank" rel="noopener" style="color:#6366f1">Mocking API calls</a>.</p>
+        <textarea id="opt-mock-data" rows="3" placeholder='{"api.example.com/search":{"results":[{"title":"Example A"}]},"api.example.com/recommend":{"items":[{"title":"Example B"}]}}' style="width:100%;padding:0.4rem 0.6rem;border:1px solid #cbd5e1;border-radius:6px;font-size:0.8rem;font-family:monospace;resize:vertical;outline:none"></textarea>
+        <p style="font-size:0.75rem;color:#64748b;margin:0.3rem 0 0">A JSON object mapping <strong>URL substrings</strong> to mock response bodies: <code>{"api.example.com/search":{"results":[&hellip;]}}</code>. Before playback starts the demo wraps <code>window.fetch</code> — any call whose URL contains a key is intercepted and returns the matching value as its <code>.json()</code> response. The live page needs no modification. See <a href="https://guidestar.readthedocs.io/en/latest/wireframe/live-url.html#mocking-external-api-calls" target="_blank" rel="noopener" style="color:#6366f1">Mocking API calls</a>.</p>
       </div>
     </div>
   </section>
@@ -1917,8 +1917,23 @@ function generateHtmlOutput() {
   var mockDataHtml = (document.getElementById('opt-mock-data').value || '').trim();
   var mockScript = mockDataHtml
     ? '\n<script>\nGuidestar.registerAction(\'mock-api\', function (step, el, contentRoot) {\n' +
-      '  try { window.__guidestarMock = JSON.parse(step.value); }\n' +
-      '  catch (e) { console.error(\'[Guidestar] mock-api:\', e); }\n' +
+      '  try {\n' +
+      '    var mocks = JSON.parse(step.value);\n' +
+      '    if (window.__guidestarFetchOrig) window.fetch = window.__guidestarFetchOrig;\n' +
+      '    window.__guidestarFetchOrig = window.fetch;\n' +
+      '    window.fetch = function (url, opts) {\n' +
+      '      var u = String(url);\n' +
+      '      for (var p in mocks) {\n' +
+      '        if (u.indexOf(p) !== -1) {\n' +
+      '          var b = mocks[p];\n' +
+      '          return Promise.resolve({ ok:true, status:200,\n' +
+      '            json: function(){ return Promise.resolve(b); },\n' +
+      '            text: function(){ return Promise.resolve(JSON.stringify(b)); } });\n' +
+      '        }\n' +
+      '      }\n' +
+      '      return window.__guidestarFetchOrig.call(this, url, opts);\n' +
+      '    };\n' +
+      '  } catch (e) { console.error(\'[Guidestar] mock-api:\', e); }\n' +
       '});\n<\/script>'
     : '';
   return '<!-- Guidestar Demo -->' + note + '\n' +

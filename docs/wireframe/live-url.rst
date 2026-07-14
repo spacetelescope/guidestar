@@ -299,14 +299,13 @@ non-deterministic results.  The fix is a **mock hook**: a small, opt-in code
 path that a demo can activate before playback begins so that the search
 handler returns fixture data instead of calling the API.
 
-The mechanism has three parts.
+The mechanism has two parts.
 
-**1 — Add a mock hook to the live page**
+**1 — The live page needs no modification**
 
-Check ``window.__guidestarMock.<key>`` at the start of every API-calling
-function, using a key that names the call (e.g. ``search``, ``recommend``).
-Each handler reads only its own key, so multiple buttons are mocked
-independently and the demo value for one call never interferes with another:
+The live page is a normal application that calls its API with ``fetch()``
+as usual.  No guidestar references, no mock hooks, no awareness of the demo
+layer:
 
 .. code-block:: javascript
 
@@ -314,43 +313,20 @@ independently and the demo value for one call never interferes with another:
      var q = input.value.trim();
      if (!q) return;
 
-     // Demo mock hook — reads the "search" key.
-     if (window.__guidestarMock && window.__guidestarMock.search) {
-       renderResults(window.__guidestarMock.search); return;
-     }
-
-     // Real API call — only reached when the page is used standalone.
      fetch('https://api.example.com/search?q=' + encodeURIComponent(q))
        .then(function (r) { return r.json(); })
        .then(function (d) { renderResults(d.results); });
    }
 
-   function doRecommend() {
-     // Second button reads a *different* key — completely independent.
-     if (window.__guidestarMock && window.__guidestarMock.recommend) {
-       renderRecommendations(window.__guidestarMock.recommend); return;
-     }
-     fetch('https://api.example.com/recommend').then( /* … */ );
-   }
+**2 — The demo wraps** ``window.fetch`` **before playback begins**
 
-The global is ``undefined`` by default, so the checks are no-ops when the
-page is opened directly in a browser.
+Register a ``mock-api`` custom action that installs a ``window.fetch``
+wrapper keyed by URL substring.  Every ``fetch()`` call the live page
+makes is checked against the map; matching URLs receive the fixture body
+instead of going to the network.  Non-matching calls pass through
+unchanged.
 
-Also wrap each event-listener setup in an IIFE with a guard to prevent
-listeners stacking on each restart:
-
-.. code-block:: javascript
-
-   (function () {
-     var btn = document.getElementById('search-btn');
-     if (!btn || btn.__searchBound) return;
-     btn.__searchBound = true;
-     btn.addEventListener('click', doSearch);
-   }());
-
-**2 — Register a** ``mock-api`` **custom action**
-
-Add a ``<script>`` tag immediately after the controller in your demo HTML:
+Add the script **after** the controller tag in your demo HTML:
 
 .. code-block:: html
 
@@ -358,22 +334,50 @@ Add a ``<script>`` tag immediately after the controller in your demo HTML:
    <script>
    Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
      try {
-       window.__guidestarMock = JSON.parse(step.value);
+       var mocks = JSON.parse(step.value); // { urlSubstring: responseBody, … }
+       // Restore original before re-wrapping (handles repeat restarts)
+       if (window.__guidestarFetchOrig) {
+         window.fetch = window.__guidestarFetchOrig;
+       }
+       window.__guidestarFetchOrig = window.fetch;
+       window.fetch = function (url, opts) {
+         var urlStr = String(url);
+         for (var pattern in mocks) {
+           if (urlStr.indexOf(pattern) !== -1) {
+             var body = mocks[pattern];
+             return Promise.resolve({
+               ok: true, status: 200,
+               json: function () { return Promise.resolve(body); },
+               text: function () { return Promise.resolve(JSON.stringify(body)); }
+             });
+           }
+         }
+         return window.__guidestarFetchOrig.call(this, url, opts);
+       };
      } catch (e) {
        console.error('[Guidestar] mock-api: step value is not valid JSON', e);
      }
    });
    </script>
 
-The registration runs synchronously after the controller loads.  Because
-the controller's ``autoDiscover()`` triggers an async ``fetch()`` of the
-live page, the custom action is always registered before ``initSteps`` run.
+The registration is synchronous; the controller's ``autoDiscover()`` starts
+an async ``fetch()`` of the live page, so the action is always registered
+before ``initSteps`` run.
+
+Because ``initSteps`` re-execute on every automatic restart (``repeat:
+true``), the wrapper is reinstalled each loop.  The ``__guidestarFetchOrig``
+stash ensures the original ``fetch`` is restored before re-wrapping, so
+wrappers never stack across restarts.
 
 **3 — Install the mock via** ``initSteps``
 
-Put a ``mock-api`` step in ``initSteps`` so the fixture data is in place
-before the first animated step executes.  The ``value`` must be a JSON
-**object** whose keys match what each handler reads — one key per API call:
+Put a ``mock-api`` step in ``initSteps`` so the fetch wrapper is in place
+before the first animated step executes.  The ``value`` is a JSON **object**
+whose keys are URL substrings and whose values are the response bodies the
+live page's ``.then(r => r.json())`` chain will receive.
+
+Use a substring distinctive enough to identify each endpoint without
+accidentally matching other URLs on the page:
 
 .. code-block:: json
 
@@ -384,7 +388,7 @@ before the first animated step executes.  The ``value`` must be a JSON
        {
          "target": "#search-app",
          "action": "mock-api",
-         "value": "{\"search\":[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}]}"
+         "value": "{\"openlibrary.org/search.json\":{\"numFound\":5,\"docs\":[{\"title\":\"Cosmos\",\"author_name\":[\"Carl Sagan\"],\"first_publish_year\":1980}]}}"
        }
      ],
      "steps": [
@@ -395,21 +399,19 @@ before the first animated step executes.  The ``value`` must be a JSON
      ]
    }
 
-For a page with two independently-mockable buttons, include both keys in the
-same object:
+For a page with two independently-mockable endpoints, include both URL
+substrings in the same object.  Each key intercepts a different ``fetch()``
+call; non-matching requests pass through to the real network:
 
 .. code-block:: json
 
    {
      "action": "mock-api",
-     "value": "{\"search\":[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}],\"recommend\":[{\"title\":\"Pale Blue Dot\",\"author\":\"Carl Sagan\",\"year\":1994}]}"
+     "value": "{\"api.example.com/search\":{\"results\":[{\"title\":\"Cosmos\"}]},\"api.example.com/recommend\":{\"items\":[{\"title\":\"Pale Blue Dot\"}]}}"
    }
 
 The ``target`` field is passed to the handler as ``el`` but the ``mock-api``
 action ignores it — any stable element in the live page works fine.
-Because ``initSteps`` re-execute on every automatic restart (``repeat:
-true``), the mock is reinstalled on each loop so the demo behaves
-consistently across playthroughs.
 
 **Working example**
 

@@ -2,20 +2,14 @@
 <!--
   Open Library Search — live demo page for Guidestar mock-API example.
 
-  This page is intentionally designed to work in two modes:
+  This page is a normal, self-contained application. It makes real calls to
+  the Open Library API when used standalone in a browser. When loaded as the
+  htmlSrc of a Guidestar demo, the demo wraps window.fetch before playback
+  begins (via a "mock-api" initStep) so those calls are intercepted and return
+  fixture data without touching the real server. The page itself is unmodified
+  and has no knowledge of Guidestar.
 
-  1. Standalone — opens directly in a browser and searches the real
-     Open Library API (https://openlibrary.org/search.json).
-
-  2. Embedded via Guidestar htmlSrc — loaded by the controller and
-     injected into a demo container.  The demo sets
-     window.__guidestarMock to an array of book objects before
-     playback starts.  When the mock is present the search handler
-     uses it instead of the live API, so the demo response is always
-     instant, deterministic, and costs no external requests.
-
-  Viewport: 640px wide × no fixed height — use a container height of
-  at least 460px in the demo config.
+  Viewport: 640px wide — use a container height of at least 460px.
 -->
 <html lang="en">
 <head>
@@ -164,12 +158,7 @@
   var input = document.getElementById('search-input');
   var area  = document.getElementById('results');
 
-  // Guard: if Guidestar re-injects the page into a second container on
-  // the same docs page, getElementById returns the first element found.
-  // The guard below is a no-op for standalone use; it prevents a double
-  // bind error if the exact same element reference already has a listener.
-  if (!btn || btn.__gsSearchBound) return;
-  btn.__gsSearchBound = true;
+  if (!btn) return;
 
   function esc(str) {
     return String(str == null ? '' : str)
@@ -202,16 +191,6 @@
   function doSearch() {
     var q = (input.value || '').trim();
     if (!q) return;
-
-    // ── Guidestar demo mock hook ───────────────────────────────────────────
-    // Set window.__guidestarMock = {"search": [{title, author, year}, ...]}
-    // in a "mock-api" initStep to bypass the live Open Library API.
-    // Each API-calling handler reads its own named key so multiple buttons
-    // on the same page can be mocked independently.
-    if (window.__guidestarMock && window.__guidestarMock.search) {
-      renderResults(window.__guidestarMock.search);
-      return;
-    }
 
     // ── Real Open Library API call ─────────────────────────────────────────
     var origLabel   = btn.textContent;
