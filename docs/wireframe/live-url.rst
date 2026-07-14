@@ -288,6 +288,133 @@ For example, to show only the "Output" section of the Demo Builder:
    ]
 
 
+.. _live-url-mock:
+
+Mocking external API calls
+---------------------------
+
+When a live page's buttons make real API calls, every demo playthrough hits
+the external server — consuming quota, adding latency, and producing
+non-deterministic results.  The fix is a **mock hook**: a small, opt-in code
+path that a demo can activate before playback begins so that the search
+handler returns fixture data instead of calling the API.
+
+The mechanism has three parts.
+
+**1 — Add a mock hook to the live page**
+
+Check ``window.__guidestarMock`` at the start of every API-calling function.
+When the demo sets it, the live path is skipped entirely:
+
+.. code-block:: javascript
+
+   function doSearch() {
+     var q = input.value.trim();
+     if (!q) return;
+
+     // Demo mock hook — set by a "mock-api" initStep before playback starts.
+     if (window.__guidestarMock) {
+       renderResults(window.__guidestarMock);
+       return;
+     }
+
+     // Real API call — only reached when the page is used standalone.
+     fetch('https://api.example.com/search?q=' + encodeURIComponent(q))
+       .then(function (r) { return r.json(); })
+       .then(function (d) { renderResults(d.results); });
+   }
+
+The global is ``undefined`` by default, so the check is a no-op when the
+page is opened directly in a browser.
+
+Also wrap the event-listener setup in an IIFE with a guard to prevent
+listeners stacking on each restart:
+
+.. code-block:: javascript
+
+   (function () {
+     var btn = document.getElementById('search-btn');
+     if (!btn || btn.__searchBound) return;
+     btn.__searchBound = true;
+     btn.addEventListener('click', doSearch);
+   }());
+
+**2 — Register a** ``mock-api`` **custom action**
+
+Add a ``<script>`` tag immediately after the controller in your demo HTML:
+
+.. code-block:: html
+
+   <script src="../../guidestar-controller.js"></script>
+   <script>
+   Guidestar.registerAction('mock-api', function (step, el, contentRoot) {
+     try {
+       window.__guidestarMock = JSON.parse(step.value);
+     } catch (e) {
+       console.error('[Guidestar] mock-api: step value is not valid JSON', e);
+     }
+   });
+   </script>
+
+The registration runs synchronously after the controller loads.  Because
+the controller's ``autoDiscover()`` triggers an async ``fetch()`` of the
+live page, the custom action is always registered before ``initSteps`` run.
+
+**3 — Install the mock via** ``initSteps``
+
+Put a ``mock-api`` step in ``initSteps`` so the fixture data is in place
+before the first animated step executes:
+
+.. code-block:: json
+
+   {
+     "htmlSrc": "live-app.html",
+     "allowUserInteractions": false,
+     "initSteps": [
+       {
+         "target": "#search-app",
+         "action": "mock-api",
+         "value": "[{\"title\":\"Cosmos\",\"author\":\"Carl Sagan\",\"year\":1980}]"
+       }
+     ],
+     "steps": [
+       {"target": "#search-input", "action": "type-text", "value": "space exploration", "delay": 2200},
+       {"target": "#search-btn",   "action": "click",     "delay": 1800},
+       {"target": "#results",      "action": "highlight", "delay": 3500,
+        "caption": "Results from mock data \u2014 no real API request was made"}
+     ]
+   }
+
+The ``target`` field is passed to the handler as ``el`` but the ``mock-api``
+action ignores it — any stable element in the live page works fine.
+Because ``initSteps`` re-execute on every automatic restart (``repeat:
+true``), the mock is reinstalled on each loop so the demo behaves
+consistently across playthroughs.
+
+**Working example**
+
+The demo below loads a live book-search page
+(`live-app.html <https://spacetelescope.github.io/guidestar/demos/mock-api/live-app.html>`_)
+that normally calls the `Open Library API`_.  An ``initStep`` installs five
+fixture books via ``mock-api`` before playback begins.  The Search button
+is intercepted by the mock hook, so results appear instantly and identically
+on every playthrough — without touching the Open Library server.
+
+.. _Open Library API: https://openlibrary.org/developers/api
+
+.. raw:: html
+
+   <iframe
+     src="https://spacetelescope.github.io/guidestar/demos/mock-api/demo.html"
+     style="width:100%;height:460px;border:none;display:block"
+     loading="lazy"
+     title="Demo: mocked Open Library search"></iframe>
+
+Open `live-app.html <https://spacetelescope.github.io/guidestar/demos/mock-api/live-app.html>`_
+directly to use the real API and confirm the mock has no effect outside
+the demo context.
+
+
 Limitations
 -----------
 

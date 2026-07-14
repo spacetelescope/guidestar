@@ -494,6 +494,12 @@ The handler receives:
 - ``contentRoot`` — the container element holding the injected HTML
 - ``this`` — the ``Guidestar`` instance (access ``this.pause()``, ``this.play()``, etc.)
 
+Custom actions also work in ``initSteps``.  A common pattern is a
+``mock-api`` action that stores fixture data on ``window.__guidestarMock``
+before the demo starts, so a live page's fetch handler returns predictable
+results instead of hitting a real server.  See
+:ref:`live-url-mock` in the Live URL guide for a full example.
+
 
 Captions (transcript overlay)
 ------------------------------

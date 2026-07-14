@@ -10,7 +10,6 @@ Wireframe Demos
    ../wireframe/ai-assisted-url
    ../wireframe/ai-assisted-screenshots
    ../wireframe/live-url
-   ../wireframe/live-url-mock
 
 .. toctree::
    :maxdepth: 1
